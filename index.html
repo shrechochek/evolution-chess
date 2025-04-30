@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматы с эволюцией</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="element">
+        artist: Serebr1k
+        <br>
+        programmer: shrechochek
+    </div>
+
+    <div style="height: 200px;"></div>
+    <div id="game-container">
+        <div id="chessboard"></div>
+        <div id="game-info">
+            <h1>Шахматы с эволюцией</h1>
+            <p>Ход: <span id="current-player">белых</span></p>
+            <p>Выбранная фигура: <span id="selected-piece">нет</span></p>
+            <div id="game-over" class="hidden">
+                <h2>Игра окончена!</h2>
+                <p id="game-result"></p>
+                <button id="restart-button">Новая игра</button>
+            </div>
+            <div id="evolution-panel" class="hidden">
+                <h3>Эволюция фигуры</h3>
+                <p>Выберите вариант развития:</p>
+                <div id="evolution-options"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
