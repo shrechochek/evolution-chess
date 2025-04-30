@@ -970,7 +970,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     type: 'bomb-bishop',
                     name: 'Бомба-Слон',
-                    description: 'Взрывает все вокруг (3x3) при съедении (кроме пешек)'
+                    description: 'Взрывает все вокруг (3x3) при съедении (кроме пешек и королей)'
                 }
             ];
         } else if (piece.type === 'rook') {
