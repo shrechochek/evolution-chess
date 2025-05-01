@@ -150,6 +150,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const fromCol = selectedSquare.col;
             const fromPiece = boardState[fromRow][fromCol];
 
+            if (fromPiece.evolved && fromPiece.evolutionType === 'range-attack-king' && 
+                square.classList.contains('range-attack')) {
+                
+                // Проверяем, съели ли короля
+                const targetPiece = boardState[row][col];
+                if (targetPiece && targetPiece.type === 'king') {
+                    endGame(currentPlayer === 'white' ? 'Белые' : 'Чёрные');
+                    return;
+                }
+    
+                // Удаляем вражескую фигуру
+                boardState[row][col] = null;
+                renderBoard();
+                switchPlayer();
+                return;
+            }
+
             if (isValidMove(fromRow, fromCol, row, col)) {
                 // Проверяем, съели ли короля
                 const targetPiece = boardState[row][col];
@@ -411,17 +428,11 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'move+-king':
                 highlightMovePlusKingMoves(row, col, piece);
                 break;
-            case 'move++ pawn':
-                highlightMovePlusPlusPawnMoves(row, col, piece);
-                break;
-            case 'move-and-attack pawn':
-                highlightMoveAndAttackPawnMoves(row, col, piece);
-                break;
-            case 'torpedo+ pawn':
-                highlightTorpedoPlusPawnMoves(row, col, piece);
-                break;
             case 'duck':
                 highlightDuckMoves(row,col,piece);
+                break;
+            case 'range-attack-king':
+                highlightRangeAttackKingMoves(row, col, piece);
                 break;
             default:
                 highlightStandardMoves(row, col, piece);
@@ -476,24 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 boardState[row + direction][col + dc] && 
                 boardState[row + direction][col + dc].color !== piece.color) {
                 highlightSquare(row + direction, col + dc, 'capture');
-            }
-        });
-    }
-
-    function highlightMovePlusSpearmenMoves(row, col, piece) {
-        const direction = piece.color === 'white' ? -1 : 1;
-        
-        // Ходы как move+ pawn
-        if (isValidSquare(row + direction, col) && !boardState[row + direction][col]) {
-            highlightSquare(row + direction, col, 'move');
-        }
-        
-        // Взятие как move+ pawn и spearmen
-        [-1, 0, 1].forEach(dc => {
-            const r = row + direction;
-            const c = col + dc;
-            if (isValidSquare(r, c) && boardState[r][c] && boardState[r][c].color !== piece.color) {
-                highlightSquare(r, c, 'capture');
             }
         });
     }
@@ -677,6 +670,15 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const fromPiece = boardState[fromRow][fromCol];
         const toPiece = boardState[toRow][toCol];
+
+        if (fromPiece.evolved && fromPiece.evolutionType === 'range-attack-king' && 
+            square.classList.contains('range-attack')) {
+            // Удаляем вражескую фигуру
+            boardState[toRow][toCol] = null;
+            renderBoard();
+            switchPlayer();
+            return false; // Не считается ходом, так как фигура не двигалась
+        }
         
         // Для X-Ray Bishop
         if (fromPiece.evolved && fromPiece.evolutionType === 'x-ray-bishop') {
@@ -852,7 +854,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'move+-king': 'король+',
             'move++ pawn': 'пешка++',
             'move-and-attack pawn': 'атакующая пешка',
-            'torpedo+ pawn': 'торпеда+'
+            'torpedo+ pawn': 'торпеда+',
+            'range-attack-king': 'король с дальним ударом'
         };
         return names[type] || type;
     }
@@ -877,7 +880,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Дополнительные ходы на 2 клетки
         const plusMoves = [
-            [2, 0], [-2, 0], [0, 2], [0, -2]
+            // [2, 0], [-2, 0], [0, 2], [0, -2]
+            [0, 2], [0, -2]
         ];
         processSingleMoves(row, col, plusMoves, piece.color);
     }
@@ -1152,17 +1156,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 {
                     type: 'move+-king',
                     name: 'Король+',
-                    description: 'Может ходить на 2 клетки по вертикали/горизонтали'
+                    description: 'Может ходить на 2 клетки по горизонтали'
                 }
+                // {
+                //     type: 'range-attack-king',
+                //     name: 'Король с дальним ударом',
+                //     description: 'Может атаковать фигуры в радиусе своего движения, не двигаясь'
+                // }
             ];
-        } else if (piece,type === "spearmen") {
-            options = [
-                {
-                    type: 'move+-spearmen',
-                    name: 'подвижный копейщик',
-                    description: 'бьет и ходит три поля впереди'
-                }
-            ]
         }
         
         options.forEach(option => {
@@ -1180,6 +1181,34 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             evolutionOptions.appendChild(optionElement);
         });
+    }
+
+    function highlightRangeAttackKingMoves(row, col, piece) {
+        // Стандартные ходы короля (подсвечиваем как обычные ходы)
+        const kingMoves = [
+            [1, 0], [-1, 0], [0, 1], [0, -1],
+            [1, 1], [1, -1], [-1, 1], [-1, -1]
+        ];
+        
+        // Подсвечиваем возможные ходы (зелёным)
+        for (const [dr, dc] of kingMoves) {
+            const r = row + dr;
+            const c = col + dc;
+            if (isValidSquare(r, c)) {
+                if (!boardState[r][c]) {
+                    highlightSquare(r, c, 'move');
+                }
+            }
+        }
+        
+        // Подсвечиваем возможные атаки (оранжевым)
+        for (const [dr, dc] of kingMoves) {
+            const r = row + dr;
+            const c = col + dc;
+            if (isValidSquare(r, c) && boardState[r][c] && boardState[r][c].color !== piece.color) {
+                highlightSquare(r, c, 'range-attack');
+            }
+        }
     }
 
 
