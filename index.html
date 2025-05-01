@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматы с эволюцией</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="element">
+        artist: Serebr1k
+        <br>
+        programmer: shrechochek
+    </div>
+
+    <div style="height: 200px;"></div>
+    <div id="game-container">
+        <div id="chessboard"></div>
+        <div id="game-info">
+            <div class="game-header">
+                <h1>Шахматы с эволюцией</h1>
+                <button id="toggle-mods-btn" class="mods-button">Моды</button>
+            </div>
+            <p>Ход: <span id="current-player">белых</span></p>
+            <p>Выбранная фигура: <span id="selected-piece">нет</span></p>
+            <div id="game-over" class="hidden">
+                <h2>Игра окончена!</h2>
+                <p id="game-result"></p>
+                <button id="restart-button">Новая игра</button>
+            </div>
+            <div id="evolution-panel" class="hidden">
+                <h3>Эволюция фигуры</h3>
+                <p>Выберите вариант развития:</p>
+                <div id="evolution-options"></div>
+            </div>
+            
+            <!-- Mods Panel -->
+            <div id="mods-panel" class="hidden">
+                <h3>Управление модами</h3>
+                <div id="mod-drop-area" class="mod-drop-area">
+                    Перетащите файл мода сюда или
+                    <button id="load-mod-btn">Выберите файл</button>
+                    <input type="file" id="mod-file-input" accept=".js" style="display: none;">
+                </div>
+                <div class="mods-list-container">
+                    <h4>Активные моды:</h4>
+                    <div id="mods-list"></div>
+                </div>
+                <button id="apply-mods-btn">Применить моды</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/piece.js"></script>          <!-- 1. Определяет Piece -->
+    <script src="js/move-validator.js"></script> <!-- 2. Зависит от Piece -->
+    <script src="js/move-highlighter.js"></script> <!-- 3. Зависит от Piece -->
+    <script src="js/board-renderer.js"></script> <!-- 4. Зависит от Piece -->
+    <script src="js/move-handler.js"></script>   <!-- 5. Зависит от BoardRenderer, MoveValidator -->
+    <script src="js/mod-manager.js"></script>    <!-- 6. Зависит от Piece -->
+    <script src="js/chess-game.js"></script>     <!-- 7. Главный класс, зависит от всех остальных -->
+    <script src="js/main.js"></script>
+</body>
+</html>
