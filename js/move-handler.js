@@ -16,6 +16,34 @@ class MoveHandler {
             this.game.renderer.renderBoard();
             return;
         }
+
+        if (piece?.type === 'king' && piece.color === this.game.currentPlayer && piece.moves === 0) {
+            this.game.selectedSquare = { row, col };
+            this.game.selectedPieceDisplay.textContent = 
+                `${piece.color === 'white' ? 'белый' : 'чёрный'} ${this.game.getPieceName(piece.type)}`;
+            
+            // Подсвечиваем возможные рокировки
+            if (this.game.canCastle(piece.color, 'king')) {
+                const targetCol = piece.color === 'white' ? 6 : 6;
+                this.game.renderer.highlightSquare(row, targetCol, 'castle');
+            }
+            if (this.game.canCastle(piece.color, 'queen')) {
+                const targetCol = piece.color === 'white' ? 2 : 2;
+                this.game.renderer.highlightSquare(row, targetCol, 'castle');
+            }
+            
+            return;
+        }
+
+        if (this.game.selectedSquare && this.game.boardState[this.game.selectedSquare.row][this.game.selectedSquare.col]?.type === 'king') {
+            const { row: kingRow, col: kingCol } = this.game.selectedSquare;
+            
+            // Проверяем, что кликнули на клетку рокировки (на 2 клетки в сторону)
+            if (row === kingRow && Math.abs(col - kingCol) === 2) {
+                this.game.movePiece(kingRow, kingCol, row, col);
+                return;
+            }
+        }
     
         // Выбор фигуры
         if (piece?.color === this.game.currentPlayer) {
@@ -35,7 +63,7 @@ class MoveHandler {
             
             if (this.game.moveValidator.isValidMove(fromRow, fromCol, row, col)) {
                 this.game.movePiece(fromRow, fromCol, row, col);
-                if (!this.game.pendingEvolution) this.game.switchPlayer();
+                // Не вызываем switchPlayer здесь - он вызывается внутри movePiece
             }
         }
     }

@@ -32,9 +32,47 @@ class ChessGame {
         this.initGame();
     }
 
+    performCastle(row, kingCol, targetCol) {
+        const isKingSide = targetCol > kingCol;
+        const rookCol = isKingSide ? 7 : 0;
+        const newKingCol = isKingSide ? 6 : 2;
+        const newRookCol = isKingSide ? 5 : 3;
+
+        // Перемещаем короля
+        this.boardState[row][newKingCol] = {
+            ...this.boardState[row][kingCol],
+            moves: this.boardState[row][kingCol].moves + 1
+        };
+        this.boardState[row][kingCol] = null;
+
+        // Перемещаем ладью
+        this.boardState[row][newRookCol] = {
+            ...this.boardState[row][rookCol],
+            moves: this.boardState[row][rookCol].moves + 1
+        };
+        this.boardState[row][rookCol] = null;
+
+        this.renderer.renderBoard();
+        this.switchPlayer();
+    }
+
     movePiece(fromRow, fromCol, toRow, toCol) {
         const movingPiece = this.boardState[fromRow][fromCol];
         const targetPiece = this.boardState[toRow][toCol];
+
+        // Проверка на рокировку
+        if (movingPiece.type === 'king' && Math.abs(fromCol - toCol) === 2) {
+            this.performCastle(fromRow, fromCol, toCol);
+            return;
+        }
+
+        // Проверяем, достигла ли пешка последней горизонтали
+        const isPawnPromotion = movingPiece.type === 'pawn' && 
+                            (toRow === 0 || toRow === 7);
+
+        // Событие beforeMove (изменено с on_move на onMove)
+        this.boardState = Piece.triggerEvent('onMove', this, 
+            { ...movingPiece }, fromRow, fromCol, toRow, toCol, this.boardState);
 
         // Проверка на взятие короля
         if (targetPiece && targetPiece.type === 'king') {
@@ -42,21 +80,55 @@ class ChessGame {
             return;
         }
 
-        // Увеличение счетчика ходов для фигуры
+        // Если есть цель - обрабатываем захват
+        if (targetPiece) {
+            const movingPieceType = movingPiece.evolved ? movingPiece.evolutionType : movingPiece.type;
+            const targetPieceType = targetPiece.evolved ? targetPiece.evolutionType : targetPiece.type;
+            
+            // Создаем копию текущего состояния доски перед событием onCapture
+            const boardBeforeCapture = JSON.parse(JSON.stringify(this.boardState));
+            
+            // Событие onCapture для атакующей фигуры
+            this.boardState = Piece.triggerEvent('onCapture', this, 
+                { ...movingPiece }, toRow, toCol, { ...targetPiece }, boardBeforeCapture);
+            
+            // Создаем копию текущего состояния доски перед событием onCaptured
+            const boardBeforeCaptured = JSON.parse(JSON.stringify(this.boardState));
+            
+            // Событие onCaptured для защищающейся фигуры
+            this.boardState = Piece.triggerEvent('onCaptured', this, 
+                { ...targetPiece }, toRow, toCol, { ...movingPiece }, boardBeforeCaptured);
+        }
+
+        // Перемещаем фигуру
         this.boardState[toRow][toCol] = {
             ...movingPiece,
             moves: movingPiece.moves + 1
         };
         this.boardState[fromRow][fromCol] = null;
 
+        // Событие afterMove
+        this.boardState = Piece.triggerEvent('afterMove', this, 
+            { ...this.boardState[toRow][toCol] }, fromRow, fromCol, toRow, toCol, this.boardState);
+
+        // Проверка на превращение пешки
+        if (isPawnPromotion) {
+            this.showPromotionOptions(toRow, toCol, movingPiece.color);
+            return; // Не переключаем игрока здесь - переключится после выбора фигуры
+        }
+
         // Проверка на эволюцию
         if (!movingPiece.evolved && this.checkEvolutionCondition(movingPiece)) {
-            this.pendingEvolution = { row: toRow, col: toCol };
-            this.showEvolutionOptions(movingPiece, toRow, toCol);
-            return;
+            const options = Piece.getEvolutionOptions(movingPiece);
+            if (options.length > 0) {
+                this.pendingEvolution = { row: toRow, col: toCol };
+                this.showEvolutionOptions(movingPiece, toRow, toCol);
+                return;
+            }
         }
 
         this.renderer.renderBoard();
+        this.switchPlayer();
     }
 
     checkEvolutionCondition(piece) {
@@ -114,10 +186,17 @@ class ChessGame {
     }
 
     switchPlayer() {
+        // Вызываем событие onTurnEnd для всех фигур текущего игрока перед сменой хода
+        this.triggerTurnEnd();
+        
+        // Меняем текущего игрока
         this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
         this.currentPlayerDisplay.textContent = this.currentPlayer === 'white' ? 'белых' : 'чёрных';
         this.selectedSquare = null;
         this.selectedPieceDisplay.textContent = 'нет';
+        
+        // Вызываем событие onTurnStart для всех фигур нового игрока
+        this.triggerTurnStart();
     }
 
     endGame(winner) {
@@ -194,44 +273,112 @@ class ChessGame {
         this.renderer.renderBoard();
     }
 
+    // Метод для создания взрыва от bomb-bishop
     triggerExplosion(explosionRow, explosionCol) {
+        // Определяем область взрыва 3x3
         const startRow = Math.max(0, explosionRow - 1);
         const endRow = Math.min(7, explosionRow + 1);
         const startCol = Math.max(0, explosionCol - 1);
         const endCol = Math.min(7, explosionCol + 1);
 
+        // Уничтожаем фигуры в области взрыва
         for (let r = startRow; r <= endRow; r++) {
             for (let c = startCol; c <= endCol; c++) {
-                if (this.boardState[r][c] && this.boardState[r][c].type !== 'pawn' && this.boardState[r][c].type !== 'king') {
-                    const square = document.querySelector(`.square[data-row="${r}"][data-col="${c}"]`);
-                    if (square) {
-                        const explosion = document.createElement('div');
-                        explosion.className = 'explosion-effect';
-                        square.appendChild(explosion);
-                        
-                        setTimeout(() => {
-                            explosion.remove();
-                        }, 500);
+                // Проверяем условия для уничтожения
+                // - Клетка не должна быть пустой
+                // - Не уничтожаем пешек и королей
+                if (this.boardState[r][c] && 
+                    this.boardState[r][c].type !== 'pawn' && 
+                    this.boardState[r][c].type !== 'king') {
+                    
+                    // Создаем мини-взрыв на месте уничтоженной фигуры
+                    try {
+                        const targetSquare = document.querySelector(`.square[data-row="${r}"][data-col="${c}"]`);
+                        if (targetSquare) {
+                            const miniExplosion = document.createElement('div');
+                            miniExplosion.className = 'explosion-effect mini';
+                            miniExplosion.style.transform = 'scale(0.7)';
+                            miniExplosion.style.opacity = '0.7';
+                            targetSquare.appendChild(miniExplosion);
+                            
+                            setTimeout(() => {
+                                miniExplosion.remove();
+                            }, 300);
+                        }
+                    } catch (e) {
+                        console.error(`Ошибка при создании эффекта: ${e.message}`);
                     }
                     
+                    // Уничтожаем фигуру
                     this.boardState[r][c] = null;
                 }
             }
         }
         
-        setTimeout(() => {
-            this.renderer.renderBoard();
-            this.checkGameEnd();
-        }, 100);
+        // Обновляем доску сразу, без задержки
+        this.renderer.renderBoard();
+        
+        // Проверяем условие завершения игры
+        this.checkGameEnd();
     }
 
-    handleBoomKingDeath(row, col) {
-        setTimeout(() => {
-            this.explodeBoomKing(row, col);
-            this.boardState[row][col] = null;
-            this.renderer.renderBoard();
-            this.checkGameEnd();
-        }, 300);
+    // Метод для обработки взрыва от boom-king
+    handleBoomKingDeath(kingRow, kingCol) {
+        // Уничтожаем ВСЕХ фигур в радиусе 2 клеток, включая пешек
+        const startRow = Math.max(0, kingRow - 2);
+        const endRow = Math.min(7, kingRow + 2);
+        const startCol = Math.max(0, kingCol - 2);
+        const endCol = Math.min(7, kingCol + 2);
+        
+        for (let r = startRow; r <= endRow; r++) {
+            for (let c = startCol; c <= endCol; c++) {
+                // Пропускаем пустые клетки
+                if (!this.boardState[r][c]) continue;
+                
+                // Пропускаем самого короля (он уже удален при захвате)
+                if (r === kingRow && c === kingCol) continue;
+                
+                // Рассчитываем расстояние от центра взрыва
+                const distance = Math.max(Math.abs(r - kingRow), Math.abs(c - kingCol));
+                
+                // Фигуры на расстоянии 1 уничтожаются всегда
+                // Фигуры на расстоянии 2 уничтожаются с вероятностью 50%
+                const shouldDestroy = distance === 1 || (distance === 2 && Math.random() > 0.5);
+                
+                if (shouldDestroy) {
+                    // Защищаем только королей от взрыва (иначе игра может завершиться преждевременно)
+                    // Теперь взрыв уничтожает пешек!
+                    if (this.boardState[r][c].type === 'king') continue;
+                    
+                    // Создаем мини-взрыв на месте уничтоженной фигуры
+                    try {
+                        const targetSquare = document.querySelector(`.square[data-row="${r}"][data-col="${c}"]`);
+                        if (targetSquare) {
+                            const miniExplosion = document.createElement('div');
+                            miniExplosion.className = 'explosion-effect mini';
+                            miniExplosion.style.transform = 'scale(0.7)';
+                            miniExplosion.style.opacity = '0.7';
+                            targetSquare.appendChild(miniExplosion);
+                            
+                            setTimeout(() => {
+                                miniExplosion.remove();
+                            }, 300);
+                        }
+                    } catch (e) {
+                        console.error(`Ошибка при создании эффекта: ${e.message}`);
+                    }
+                    
+                    // Уничтожаем фигуру
+                    this.boardState[r][c] = null;
+                }
+            }
+        }
+        
+        // Обновляем доску
+        this.renderer.renderBoard();
+        
+        // Проверяем условие завершения игры
+        this.checkGameEnd();
     }
 
     explodeBoomKing(row, col) {
@@ -272,5 +419,118 @@ class ChessGame {
 
     isValidSquare(row, col) {
         return row >= 0 && row < 8 && col >= 0 && col < 8;
+    }
+    
+    // Метод для вызова события onTurnStart для всех фигур текущего игрока
+    triggerTurnStart() {
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.boardState[row][col];
+                if (piece && piece.color === this.currentPlayer) {
+                    // Изменено с on_turn_start на onTurnStart
+                    this.boardState = Piece.triggerEvent('onTurnStart', this, 
+                        { ...piece }, row, col, this.boardState, this.currentPlayer);
+                }
+            }
+        }
+    }
+    
+    // Метод для вызова события onTurnEnd для всех фигур текущего игрока
+    triggerTurnEnd() {
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const piece = this.boardState[row][col];
+                if (piece && piece.color === this.currentPlayer) {
+                    // Изменено с on_turn_end на onTurnEnd
+                    this.boardState = Piece.triggerEvent('onTurnEnd', this, 
+                        { ...piece }, row, col, this.boardState, this.currentPlayer);
+                }
+            }
+        }
+    }
+
+    canCastle(color, side) {
+        const row = color === 'white' ? 7 : 0;
+        const kingCol = 4;
+        const rookCol = side === 'king' ? 7 : 0;
+        
+        // Проверяем, что король и ладья на своих местах и не ходили
+        const king = this.boardState[row][kingCol];
+        const rook = this.boardState[row][rookCol];
+        
+        if (!king || king.type !== 'king' || king.moves !== 0 || king.color !== color) return false;
+        if (!rook || rook.type !== 'rook' || rook.moves !== 0 || rook.color !== color) return false;
+        
+        // Проверяем, что между королем и ладьей нет фигур
+        const startCol = Math.min(kingCol, rookCol) + 1;
+        const endCol = Math.max(kingCol, rookCol);
+        
+        for (let col = startCol; col < endCol; col++) {
+            if (this.boardState[row][col]) return false;
+        }
+        
+        // Проверяем, что король не под шахом и не проходит через атакованные поля
+        const passingCols = side === 'king' ? [4, 5, 6] : [2, 3, 4];
+        for (const col of passingCols) {
+            if (this.isSquareUnderAttack(row, col, color === 'white' ? 'black' : 'white')) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    isSquareUnderAttack(row, col, byColor) {
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                const piece = this.boardState[r][c];
+                if (piece && piece.color === byColor) {
+                    const moves = Piece.getMoves(this, r, c, piece);
+                    if (moves.some(move => move.x === row && move.y === col && move.type === 'capture')) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    // В классе ChessGame добавляем новый метод для превращения пешки
+    showPromotionOptions(row, col, color) {
+        // Создаем панель превращения
+        const promotionPanel = document.createElement('div');
+        promotionPanel.className = 'promotion-panel';
+        promotionPanel.innerHTML = `
+            <h3>Превращение пешки</h3>
+            <p>Выберите фигуру:</p>
+            <div class="promotion-options">
+                <div data-type="queen">Ферзь</div>
+                <div data-type="rook">Ладья</div>
+                <div data-type="bishop">Слон</div>
+                <div data-type="knight">Конь</div>
+            </div>
+        `;
+        
+        document.body.appendChild(promotionPanel);
+
+        // Обработчики выбора фигуры
+        promotionPanel.querySelectorAll('.promotion-options div').forEach(option => {
+            option.addEventListener('click', () => {
+                const newType = option.dataset.type;
+                this.boardState[row][col] = { 
+                    type: newType, 
+                    color: color,
+                    moves: this.boardState[row][col].moves, // Сохраняем количество ходов
+                    evolved: false
+                };
+                
+                // Удаляем панель и перерисовываем доску
+                document.body.removeChild(promotionPanel);
+                this.renderer.renderBoard();
+                
+                // Передаем ход другому игроку
+                this.switchPlayer();
+            });
+        });
     }
 }

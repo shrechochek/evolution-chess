@@ -5,38 +5,100 @@ window.modRegistration = {
     description: "Добавляет все возможные эволюции фигур с новыми способностями",
     texturePaths: {
         // Пешки
-        'spearmen': 'assets/spearmen.png',
-        'move-plus-pawn': 'assets/move-plus-pawn.png',
-        'torpedo-pawn': 'assets/torpedo-pawn.png',
-        'move-plus-plus-pawn': 'assets/move-plus-plus-pawn.png',
-        'move-and-attack-pawn': 'assets/move-and-attack-pawn.png',
-        'torpedo-plus-pawn': 'assets/torpedo-plus-pawn.png',
+        'spearmen': {
+            'black': 'assets/black-spearmen.png',
+            'white': 'assets/white-spearmen.png'
+        },
+        'move-plus-pawn': {
+            'black': 'assets/black-move-plus-pawn.png',
+            'white': 'assets/white-move-plus-pawn.png'
+        },
+        'torpedo-pawn': {
+            'black': 'assets/black-torpedo-pawn.png',
+            'white': 'assets/white-torpedo-pawn.png'
+        },
+        'move-plus-plus-pawn': {
+            'black': 'assets/black-move-plus-plus-pawn.png',
+            'white': 'assets/white-move-plus-plus-pawn.png'
+        },
+        'move-and-attack-pawn': {
+            'black': 'assets/black-move-and-attack-pawn.png',
+            'white': 'assets/white-move-and-attack-pawn.png'
+        },
+        'torpedo-plus-pawn': {
+            'black': 'assets/black-torpedo-plus-pawn.png',
+            'white': 'assets/white-torpedo-plus-pawn.png'
+        },
         
         // Кони
-        'camel': 'assets/camel.png',
-        'knight-with-next-evolution': 'assets/knight-with-next-evolution.png',
-        'move-plus-knight': 'assets/move-plus-knight.png',
+        'camel': {
+            'black': 'assets/black-camel.png',
+            'white': 'assets/white-camel.png'
+        },
+        'knight-with-next-evolution': {
+            'black': 'assets/black-knight-evolvable.png',
+            'white': 'assets/white-knight-evolvable.png'
+        },
+        'move-plus-knight': {
+            'black': 'assets/black-move-plus-knight.png',
+            'white': 'assets/white-move-plus-knight.png'
+        },
         
         // Слоны
-        '2color-bishop': 'assets/2color-bishop.png',
-        'x-ray-bishop': 'assets/x-ray-bishop.png',
-        // 'cannibal-bishop': 'assets/cannibal-bishop.png',
-        'bomb-bishop': 'assets/bomb-bishop.png',
+        '2color-bishop': {
+            'black': 'assets/black-2color-bishop.png',
+            'white': 'assets/white-2color-bishop.png'
+        },
+        'x-ray-bishop': {
+            'black': 'assets/black-x-ray-bishop.png',
+            'white': 'assets/white-x-ray-bishop.png'
+        },
+        'bomb-bishop': {
+            'black': 'assets/black-bomb-bishop.png',
+            'white': 'assets/white-bomb-bishop.png'
+        },
         
         // Ладьи
-        'x-ray-rook': 'assets/x-ray-rook.png',
-        'move-plus-rook': 'assets/move-plus-rook.png',
-        'horizontal-rook': 'assets/horizontal-rook.png',
+        'x-ray-rook': {
+            'black': 'assets/black-x-ray-rook.png',
+            'white': 'assets/white-x-ray-rook.png'
+        },
+        'move-plus-rook': {
+            'black': 'assets/black-move-plus-rook.png',
+            'white': 'assets/white-move-plus-rook.png'
+        },
+        'horizontal-rook': {
+            'black': 'assets/black-horizontal-rook.png',
+            'white': 'assets/white-horizontal-rook.png'
+        },
         
         // Ферзи
-        'queen-of-horses': 'assets/queen-of-horses.png',
-        'queen-of-camels': 'assets/queen-of-camels.png',
-        'queen-with-evolution': 'assets/queen-with-evolution.png',
+        'queen-of-horses': {
+            'black': 'assets/black-queen-of-horses.png',
+            'white': 'assets/white-queen-of-horses.png'
+        },
+        'queen-of-camels': {
+            'black': 'assets/black-queen-of-camels.png',
+            'white': 'assets/white-queen-of-camels.png'
+        },
+        'queen-with-evolution': {
+            'black': 'assets/black-queen-with-evolution.png',
+            'white': 'assets/white-queen-with-evolution.png'
+        },
         
         // Короли
-        'boom-king': 'assets/boom-king.png',
-        'king-with-potential': 'assets/king-with-potential.png',
-        'move-plus-king': 'assets/move-plus-king.png'
+        'boom-king': {
+            'black': 'assets/black-boom-king.png',
+            'white': 'assets/white-boom-king.png'
+        },
+        'king-with-potential': {
+            'black': 'assets/black-king-with-potentional.png',
+            'white': 'assets/white-king-with-potential.png'
+        },
+        'move-plus-king': {
+            'black': 'assets/black-move-plus-king.png',
+            'white': 'assets/white-move-plus-king.png'
+        }
     },
     pieces: {
         pawn: {
@@ -44,39 +106,33 @@ window.modRegistration = {
                 {
                     type: 'spearmen',
                     name: 'Копейщик',
-                    description: 'Может бить клетку прямо перед собой',
-                    texture: 'spearmen'
+                    description: 'Может бить клетку прямо перед собой'
                 },
                 {
                     type: 'move-plus-pawn',
                     name: 'Пешка+',
-                    description: 'Может ходить по диагонали вперёд',
-                    texture: 'move-plus-pawn'
+                    description: 'Может ходить по диагонали вперёд'
                 },
                 {
                     type: 'torpedo-pawn',
                     name: 'Торпедная пешка',
-                    description: 'Может продвинуться сразу на две клетки вперёд',
-                    texture: 'torpedo-pawn'
+                    description: 'Может продвинуться сразу на две клетки вперёд'
                 },
-                {
-                    type: 'move-plus-plus-pawn',
-                    name: 'Пешка++',
-                    description: 'Может ходить вперёд, по диагонали и в стороны',
-                    texture: 'move-plus-plus-pawn'
-                },
-                {
-                    type: 'move-and-attack-pawn',
-                    name: 'Атакующая пешка',
-                    description: 'Может атаковать прямо и по диагонали',
-                    texture: 'move-and-attack-pawn'
-                },
-                {
-                    type: 'torpedo-plus-pawn',
-                    name: 'Торпеда+',
-                    description: 'Может перепрыгивать через фигуры при движении',
-                    texture: 'torpedo-plus-pawn'
-                }
+                // {
+                //     type: 'move-plus-plus-pawn',
+                //     name: 'Пешка++',
+                //     description: 'Может ходить вперёд, по диагонали и в стороны'
+                // },
+                // {
+                //     type: 'move-and-attack-pawn',
+                //     name: 'Атакующая пешка',
+                //     description: 'Может атаковать прямо и по диагонали'
+                // },
+                // {
+                //     type: 'torpedo-plus-pawn',
+                //     name: 'Торпеда+',
+                //     description: 'Может перепрыгивать через фигуры при движении'
+                // }
             ]
         },
         knight: {
@@ -84,20 +140,17 @@ window.modRegistration = {
                 {
                     type: 'camel',
                     name: 'Верблюд',
-                    description: 'Ходит на 3 клетки в одну сторону и 1 в другую',
-                    texture: 'camel'
+                    description: 'Ходит на 3 клетки в одну сторону и 1 в другую'
                 },
                 {
                     type: 'knight-with-next-evolution',
                     name: 'Конь с эволюцией',
-                    description: 'Может эволюционировать дальше',
-                    texture: 'knight-with-next-evolution'
+                    description: 'Может эволюционировать дальше'
                 },
                 {
                     type: 'move-plus-knight',
                     name: 'Конь+',
-                    description: 'Может ходить как конь + по горизонтали и вертикали на 1 клетку',
-                    texture: 'move-plus-knight'
+                    description: 'Может ходить как конь + по горизонтали и вертикали на 1 клетку'
                 }
             ]
         },
@@ -106,26 +159,22 @@ window.modRegistration = {
                 {
                     type: '2color-bishop',
                     name: 'Двуцветный слон',
-                    description: 'Ходит как слон + может ходить на 1 клетку в любую сторону',
-                    texture: '2color-bishop'
+                    description: 'Ходит как слон + может ходить на 1 клетку в любую сторону'
                 },
                 {
                     type: 'x-ray-bishop',
                     name: 'Рентген-слон',
-                    description: 'Может перепрыгивать через фигуры (1 за ход)',
-                    texture: 'x-ray-bishop'
+                    description: 'Может перепрыгивать через фигуры (1 за ход)'
                 },
-                {
-                    type: 'cannibal-bishop',
-                    name: 'Каннибал-слон',
-                    description: 'Может съедать свои фигуры',
-                    texture: 'cannibal-bishop'
-                },
+                // {
+                //     type: 'cannibal-bishop',
+                //     name: 'Каннибал-слон',
+                //     description: 'Может съедать свои фигуры'
+                // },
                 {
                     type: 'bomb-bishop',
                     name: 'Бомба-Слон',
-                    description: 'Взрывает все вокруг (3x3) при съедении (кроме пешек и королей)',
-                    texture: 'bomb-bishop'
+                    description: 'Взрывает все вокруг (3x3) при съедении (кроме пешек и королей)'
                 }
             ]
         },
@@ -134,20 +183,17 @@ window.modRegistration = {
                 {
                     type: 'x-ray-rook',
                     name: 'Рентген-ладья',
-                    description: 'Может перепрыгивать через фигуры (1 за ход)',
-                    texture: 'x-ray-rook'
+                    description: 'Может перепрыгивать через фигуры (1 за ход)'
                 },
                 {
                     type: 'move-plus-rook',
                     name: 'Ладья+',
-                    description: 'Ходит как ладья + может ходить на 1 клетку в любую сторону',
-                    texture: 'move-plus-rook'
+                    description: 'Ходит как ладья + может ходить на 1 клетку в любую сторону'
                 },
                 {
                     type: 'horizontal-rook',
                     name: 'Горизонтальная ладья',
-                    description: 'Доска зациклена по горизонтали (из 8 клетки можно пойти в 1)',
-                    texture: 'horizontal-rook'
+                    description: 'Доска зациклена по горизонтали (из 8 клетки можно пойти в 1)'
                 }
             ]
         },
@@ -156,20 +202,17 @@ window.modRegistration = {
                 {
                     type: 'queen-of-horses',
                     name: 'Королева коней',
-                    description: 'Ходит как ферзь + ходы коня',
-                    texture: 'queen-of-horses'
+                    description: 'Ходит как ферзь + ходы коня'
                 },
                 {
                     type: 'queen-of-camels',
                     name: 'Королева верблюдов',
-                    description: 'Ходит как ферзь + ходы верблюда (3+1)',
-                    texture: 'queen-of-camels'
+                    description: 'Ходит как ферзь + ходы верблюда (3+1)'
                 },
                 {
                     type: 'queen-with-evolution',
                     name: 'Королева с потенциалом',
-                    description: 'Ходит как обычная королева, но может эволюционировать дальше',
-                    texture: 'queen-with-evolution'
+                    description: 'Ходит как обычная королева, но может эволюционировать дальше'
                 }
             ]
         },
@@ -178,20 +221,17 @@ window.modRegistration = {
                 {
                     type: 'boom-king',
                     name: 'Король-бомба',
-                    description: 'При смерти взрывает всё вокруг (3x3, включая пешек)',
-                    texture: 'boom-king'
+                    description: 'При смерти взрывает всё вокруг (3x3, включая пешек)'
                 },
                 {
                     type: 'king-with-potential',
                     name: 'Король с потенциалом',
-                    description: 'Обычный король с будущими эволюциями',
-                    texture: 'king-with-potential'
+                    description: 'Обычный король с будущими эволюциями'
                 },
                 {
                     type: 'move-plus-king',
                     name: 'Король+',
-                    description: 'Может ходить на 2 клетки по вертикали/горизонтали',
-                    texture: 'move-plus-king'
+                    description: 'Может ходить на 2 клетки по вертикали/горизонтали'
                 }
             ]
         }
@@ -200,6 +240,7 @@ window.modRegistration = {
         // Полные определения для всех новых типов фигур
         'spearmen': {
             name: 'Копейщик',
+            texture: 'spearmen',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const direction = piece.color === 'white' ? -1 : 1;
@@ -222,6 +263,7 @@ window.modRegistration = {
         
         'move-plus-pawn': {
             name: 'Пешка+',
+            texture: 'move-plus-pawn',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const direction = piece.color === 'white' ? -1 : 1;
@@ -248,6 +290,7 @@ window.modRegistration = {
         
         'torpedo-pawn': {
             name: 'Торпедная пешка',
+            texture: 'torpedo-pawn',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const direction = piece.color === 'white' ? -1 : 1;
@@ -273,6 +316,7 @@ window.modRegistration = {
         
         'move-plus-plus-pawn': {
             name: 'Пешка++',
+            texture: 'move-plus-plus-pawn',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const direction = piece.color === 'white' ? -1 : 1;
@@ -310,6 +354,7 @@ window.modRegistration = {
         
         'move-and-attack-pawn': {
             name: 'Атакующая пешка',
+            texture: 'move-and-attack-pawn',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const direction = piece.color === 'white' ? -1 : 1;
@@ -335,6 +380,7 @@ window.modRegistration = {
         
         'torpedo-plus-pawn': {
             name: 'Торпеда+',
+            texture: 'torpedo-plus-pawn',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const direction = piece.color === 'white' ? -1 : 1;
@@ -367,6 +413,7 @@ window.modRegistration = {
         
         'camel': {
             name: 'Верблюд',
+            texture: 'camel',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const camelMoves = [
@@ -393,6 +440,7 @@ window.modRegistration = {
         
         'knight-with-next-evolution': {
             name: 'Конь с эволюцией',
+            texture: 'knight-with-next-evolution',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const knightMoves = [
@@ -419,6 +467,7 @@ window.modRegistration = {
         
         'move-plus-knight': {
             name: 'Конь+',
+            texture: 'move-plus-knight',
             getMoves: (game, x, y, piece) => {
                 const moves = [];
                 const knightMoves = [
@@ -458,270 +507,407 @@ window.modRegistration = {
                 });
                 
                 return moves;
-            }, 
-            '2color-bishop': {
-                name: 'Двуцветный слон',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
+            }
+        },
+        
+        '2color-bishop': {
+            name: 'Двуцветный слон',
+            texture: '2color-bishop',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                
+                // Стандартные ходы слона
+                const bishopDirections = [
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                bishopDirections.forEach(([dx, dy]) => {
+                    let nx = x + dx;
+                    let ny = y + dy;
                     
-                    // Стандартные ходы слона
-                    const bishopDirections = [
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    bishopDirections.forEach(([dx, dy]) => {
-                        let nx = x + dx;
-                        let ny = y + dy;
-                        
-                        while (game.isValidSquare(nx, ny)) {
-                            if (!game.boardState[nx][ny]) {
-                                moves.push({x: nx, y: ny, type: 'move'});
-                            } else {
-                                if (game.boardState[nx][ny].color !== piece.color) {
-                                    moves.push({x: nx, y: ny, type: 'capture'});
-                                }
-                                break;
-                            }
-                            nx += dx;
-                            ny += dy;
-                        }
-                    });
-                    
-                    // Ходы короля (на 1 клетку)
-                    const kingMoves = [
-                        [0, 1], [1, 0], [0, -1], [-1, 0],
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    kingMoves.forEach(([dx, dy]) => {
-                        const nx = x + dx;
-                        const ny = y + dy;
-                        
-                        if (game.isValidSquare(nx, ny)) {
-                            if (!game.boardState[nx][ny]) {
-                                moves.push({x: nx, y: ny, type: 'move'});
-                            } else if (game.boardState[nx][ny].color !== piece.color) {
+                    while (game.isValidSquare(nx, ny)) {
+                        if (!game.boardState[nx][ny]) {
+                            moves.push({x: nx, y: ny, type: 'move'});
+                        } else {
+                            if (game.boardState[nx][ny].color !== piece.color) {
                                 moves.push({x: nx, y: ny, type: 'capture'});
                             }
+                            break;
                         }
-                    });
+                        nx += dx;
+                        ny += dy;
+                    }
+                });
+                
+                // Ходы короля (на 1 клетку)
+                const kingMoves = [
+                    [0, 1], [1, 0], [0, -1], [-1, 0],
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                kingMoves.forEach(([dx, dy]) => {
+                    const nx = x + dx;
+                    const ny = y + dy;
                     
-                    return moves;
-                }
-            },
+                    if (game.isValidSquare(nx, ny)) {
+                        if (!game.boardState[nx][ny]) {
+                            moves.push({x: nx, y: ny, type: 'move'});
+                        } else if (game.boardState[nx][ny].color !== piece.color) {
+                            moves.push({x: nx, y: ny, type: 'capture'});
+                        }
+                    }
+                });
+                
+                return moves;
+            }
+        },
 
-            'x-ray-bishop': {
-                name: 'Рентген-слон',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
-                    const directions = [
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
+        'x-ray-bishop': {
+            name: 'Рентген-слон',
+            texture: 'x-ray-bishop',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                const directions = [
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                directions.forEach(([dr, dc]) => {
+                    let r = x + dr;
+                    let c = y + dc;
+                    let hasJumped = false;
                     
-                    directions.forEach(([dr, dc]) => {
-                        let r = x + dr;
-                        let c = y + dc;
-                        let hasJumped = false;
-                        
+                    while (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: hasJumped ? 'move-after-jump' : 'move'});
+                        } else {
+                            if (!hasJumped) {
+                                moves.push({x: r, y: c, type: 'jump'});
+                                hasJumped = true;
+                                
+                                // Продолжаем после прыжка
+                                let nextR = r + dr;
+                                let nextC = c + dc;
+                                while (game.isValidSquare(nextR, nextC)) {
+                                    if (!game.boardState[nextR][nextC]) {
+                                        moves.push({x: nextR, y: nextC, type: 'move-after-jump'});
+                                    } else {
+                                        break;
+                                    }
+                                    nextR += dr;
+                                    nextC += dc;
+                                }
+                            }
+                            break;
+                        }
+                        r += dr;
+                        c += dc;
+                    }
+                    
+                    // Проверка взятия без прыжка
+                    if (!hasJumped) {
+                        r = x + dr;
+                        c = y + dc;
                         while (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: hasJumped ? 'move-after-jump' : 'move'});
-                            } else {
-                                if (!hasJumped) {
-                                    moves.push({x: r, y: c, type: 'jump'});
-                                    hasJumped = true;
+                            if (game.boardState[r][c]) {
+                                if (game.boardState[r][c].color !== piece.color) {
+                                    moves.push({x: r, y: c, type: 'capture'});
+                                }
+                                break;
+                            }
+                            r += dr;
+                            c += dc;
+                        }
+                    }
+                });
+                
+                return moves;
+            }
+        },
+
+        'cannibal-bishop': {
+            name: 'Каннибал-слон',
+            texture: 'cannibal-bishop',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                const directions = [
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                directions.forEach(([dr, dc]) => {
+                    let r = x + dr;
+                    let c = y + dc;
+                    
+                    while (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else {
+                            // Может съесть любую фигуру (даже своего цвета)
+                            moves.push({x: r, y: c, 
+                                type: game.boardState[r][c].color === piece.color ? 'capture-ally' : 'capture'});
+                            break;
+                        }
+                        r += dr;
+                        c += dc;
+                    }
+                });
+                
+                return moves;
+            }
+        },
+
+        'bomb-bishop': {
+            name: 'Бомба-Слон',
+            texture: 'bomb-bishop',
+            getMoves: (game, x, y, piece) => {
+                // Ходит как обычный слон
+                const moves = [];
+                const directions = [
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                directions.forEach(([dr, dc]) => {
+                    let r = x + dr;
+                    let c = y + dc;
+                    
+                    while (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else {
+                            if (game.boardState[r][c].color !== piece.color) {
+                                moves.push({x: r, y: c, type: 'capture'});
+                            }
+                            break;
+                        }
+                        r += dr;
+                        c += dc;
+                    }
+                });
+                
+                return moves;
+            },
+            // Обработчик для случая, когда этот слон захватывает другую фигуру
+            onCapture: function(game, piece, x, y, capturedPiece, board) {
+                // ВАЖНО: НЕМЕДЛЕННО ОБНОВЛЯЕМ ДОСКУ, чтобы показать текущее состояние
+                requestAnimationFrame(() => {
+                    game.renderer.renderBoard();
+                    
+                    // Затем запускаем взрыв с задержкой
+                    setTimeout(() => {
+                        try {
+                            // Создаем эффект взрыва с максимальным приоритетом
+                            const centerSquare = document.querySelector(`.square[data-row="${x}"][data-col="${y}"]`);
+                            if (centerSquare) {
+                                // Создаем большой яркий взрыв
+                                const explosion = document.createElement('div');
+                                explosion.className = 'explosion-effect';
+                                explosion.style.zIndex = "999"; // Максимальный приоритет
+                                explosion.style.transform = "scale(1.5)";
+                                explosion.style.background = "radial-gradient(circle, rgba(255,165,0,0.9) 0%, rgba(255,0,0,0.8) 50%, rgba(0,0,0,0) 100%)";
+                                centerSquare.appendChild(explosion);
+                                
+                                // Убеждаемся, что анимация запустилась
+                                requestAnimationFrame(() => {
+                                    // Определяем зону взрыва
+                                    const startRow = Math.max(0, x - 1);
+                                    const endRow = Math.min(7, x + 1);
+                                    const startCol = Math.max(0, y - 1);
+                                    const endCol = Math.min(7, y + 1);
                                     
-                                    // Продолжаем после прыжка
-                                    let nextR = r + dr;
-                                    let nextC = c + dc;
-                                    while (game.isValidSquare(nextR, nextC)) {
-                                        if (!game.boardState[nextR][nextC]) {
-                                            moves.push({x: nextR, y: nextC, type: 'move-after-jump'});
-                                        } else {
-                                            break;
-                                        }
-                                        nextR += dr;
-                                        nextC += dc;
-                                    }
-                                }
-                                break;
-                            }
-                            r += dr;
-                            c += dc;
-                        }
-                        
-                        // Проверка взятия без прыжка
-                        if (!hasJumped) {
-                            r = x + dr;
-                            c = y + dc;
-                            while (game.isValidSquare(r, c)) {
-                                if (game.boardState[r][c]) {
-                                    if (game.boardState[r][c].color !== piece.color) {
-                                        moves.push({x: r, y: c, type: 'capture'});
-                                    }
-                                    break;
-                                }
-                                r += dr;
-                                c += dc;
-                            }
-                        }
-                    });
-                    
-                    return moves;
-                }
-            },
-
-            'cannibal-bishop': {
-                name: 'Каннибал-слон',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
-                    const directions = [
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    directions.forEach(([dr, dc]) => {
-                        let r = x + dr;
-                        let c = y + dc;
-                        
-                        while (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else {
-                                // Может съесть любую фигуру (даже своего цвета)
-                                moves.push({x: r, y: c, 
-                                    type: game.boardState[r][c].color === piece.color ? 'capture-ally' : 'capture'});
-                                break;
-                            }
-                            r += dr;
-                            c += dc;
-                        }
-                    });
-                    
-                    return moves;
-                }
-            },
-
-            'bomb-bishop': {
-                name: 'Бомба-Слон',
-                getMoves: (game, x, y, piece) => {
-                    // Ходит как обычный слон
-                    const moves = [];
-                    const directions = [
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    directions.forEach(([dr, dc]) => {
-                        let r = x + dr;
-                        let c = y + dc;
-                        
-                        while (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else {
-                                if (game.boardState[r][c].color !== piece.color) {
-                                    moves.push({x: r, y: c, type: 'capture'});
-                                }
-                                break;
-                            }
-                            r += dr;
-                            c += dc;
-                        }
-                    });
-                    
-                    return moves;
-                }, 
-                on_capture: (game, piece, x, y, capturedPiece, board) => {
-                    // Взрыв при съедении любой фигуры
-                    for (let r = Math.max(0, x-1); r <= Math.min(7, x+1); r++) {
-                        for (let c = Math.max(0, y-1); c <= Math.min(7, y+1); c++) {
-                            if (board[r][c] && board[r][c].type !== 'king') {
-                                board[r][c] = null;
-                            }
-                        }
-                    }
-                    return board;
-                }
-            },
-
-            'x-ray-rook': {
-                name: 'Рентген-ладья',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
-                    const directions = [
-                        [1, 0], [-1, 0], [0, 1], [0, -1]
-                    ];
-                    
-                    directions.forEach(([dr, dc]) => {
-                        let r = x + dr;
-                        let c = y + dc;
-                        let hasJumped = false;
-                        
-                        while (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: hasJumped ? 'move-after-jump' : 'move'});
-                            } else {
-                                if (!hasJumped) {
-                                    moves.push({x: r, y: c, type: 'jump'});
-                                    hasJumped = true;
+                                    // ВАЖНО: Делаем прямую копию доски
+                                    const newBoard = JSON.parse(JSON.stringify(board));
                                     
-                                    // Продолжаем после прыжка
-                                    let nextR = r + dr;
-                                    let nextC = c + dc;
-                                    while (game.isValidSquare(nextR, nextC)) {
-                                        if (!game.boardState[nextR][nextC]) {
-                                            moves.push({x: nextR, y: nextC, type: 'move-after-jump'});
-                                        } else {
-                                            break;
+                                    // Взрываем все фигуры в области 3x3, кроме пешек и королей
+                                    for (let r = startRow; r <= endRow; r++) {
+                                        for (let c = startCol; c <= endCol; c++) {
+                                            const targetPiece = newBoard[r][c];
+                                            
+                                            // Пропускаем пустые клетки, пешек и королей
+                                            if (!targetPiece || targetPiece.type === 'pawn' || targetPiece.type === 'king') {
+                                                continue;
+                                            }
+                                            
+                                            // Создаем мини-взрыв на месте фигуры
+                                            const targetSquare = document.querySelector(`.square[data-row="${r}"][data-col="${c}"]`);
+                                            if (targetSquare) {
+                                                const miniExplosion = document.createElement('div');
+                                                miniExplosion.className = 'explosion-effect mini';
+                                                miniExplosion.style.zIndex = "998";
+                                                miniExplosion.style.transform = 'scale(0.7)';
+                                                targetSquare.appendChild(miniExplosion);
+                                            }
+                                            
+                                            // // Удаляем фигуру с доски
+                                            // newBoard[r][c] = null;
+                                            
+                                            // ВАЖНО: Прямо обновляем состояние игры 
+                                            game.boardState[r][c] = null;
                                         }
-                                        nextR += dr;
-                                        nextC += dc;
                                     }
-                                }
-                                break;
+                                    
+                                    // Через секунду удаляем эффект взрыва и обновляем доску
+                                    setTimeout(() => {
+                                        // Удаляем все эффекты взрыва
+                                        document.querySelectorAll('.explosion-effect').forEach(el => el.remove());
+                                        
+                                        // ВАЖНО: Обновляем доску через рендерер
+                                        game.renderer.renderBoard();
+                                        
+                                        // Проверяем окончание игры
+                                        game.checkGameEnd();
+                                    }, 500);
+                                });
                             }
-                            r += dr;
-                            c += dc;
+                        } catch (e) {
+                            console.error('>>> bomb-bishop: Ошибка при взрыве:', e);
                         }
-                        
-                        // Проверка взятия без прыжка
-                        if (!hasJumped) {
-                            r = x + dr;
-                            c = y + dc;
-                            while (game.isValidSquare(r, c)) {
-                                if (game.boardState[r][c]) {
-                                    if (game.boardState[r][c].color !== piece.color) {
-                                        moves.push({x: r, y: c, type: 'capture'});
+                    }, 50); // Небольшая задержка для начала анимации
+                });
+                
+                return board;
+            },
+            // Добавляем обработчик для случая, когда этот слон захвачен
+            onCaptured: function(game, piece, x, y, capturedBy, board) {
+                // ВАЖНО: НЕМЕДЛЕННО ОБНОВЛЯЕМ ДОСКУ, чтобы показать текущее состояние
+                requestAnimationFrame(() => {
+                    game.renderer.renderBoard();
+                    
+                    // Затем запускаем взрыв с задержкой
+                    setTimeout(() => {
+                        try {
+                            // Создаем эффект взрыва с максимальным приоритетом
+                            const centerSquare = document.querySelector(`.square[data-row="${x}"][data-col="${y}"]`);
+                            if (centerSquare) {
+                                // Создаем большой яркий взрыв
+                                const explosion = document.createElement('div');
+                                explosion.className = 'explosion-effect';
+                                explosion.style.zIndex = "999"; // Максимальный приоритет
+                                explosion.style.transform = "scale(1.5)";
+                                explosion.style.background = "radial-gradient(circle, rgba(255,165,0,0.9) 0%, rgba(255,0,0,0.8) 50%, rgba(0,0,0,0) 100%)";
+                                centerSquare.appendChild(explosion);
+                                
+                                // Убеждаемся, что анимация запустилась
+                                requestAnimationFrame(() => {
+                                    // Определяем зону взрыва
+                                    const startRow = Math.max(0, x - 1);
+                                    const endRow = Math.min(7, x + 1);
+                                    const startCol = Math.max(0, y - 1);
+                                    const endCol = Math.min(7, y + 1);
+                                    
+                                    // ВАЖНО: Делаем прямую копию доски
+                                    const newBoard = JSON.parse(JSON.stringify(board));
+                                    
+                                    // Взрываем все фигуры в области 3x3, кроме пешек и королей
+                                    for (let r = startRow; r <= endRow; r++) {
+                                        for (let c = startCol; c <= endCol; c++) {
+                                            const targetPiece = newBoard[r][c];
+                                            
+                                            // Пропускаем пустые клетки, пешек и королей
+                                            if (!targetPiece || targetPiece.type === 'pawn' || targetPiece.type === 'king') {
+                                                continue;
+                                            }
+                                            
+                                            // Создаем мини-взрыв на месте фигуры
+                                            const targetSquare = document.querySelector(`.square[data-row="${r}"][data-col="${c}"]`);
+                                            if (targetSquare) {
+                                                const miniExplosion = document.createElement('div');
+                                                miniExplosion.className = 'explosion-effect mini';
+                                                miniExplosion.style.zIndex = "998";
+                                                miniExplosion.style.transform = 'scale(0.7)';
+                                                targetSquare.appendChild(miniExplosion);
+                                            }
+                                            
+                                            // Удаляем фигуру с доски
+                                            newBoard[r][c] = null;
+                                            
+                                            // ВАЖНО: Прямо обновляем состояние игры 
+                                            game.boardState[r][c] = null;
+                                        }
                                     }
-                                    break;
-                                }
-                                r += dr;
-                                c += dc;
+                                    
+                                    // Через секунду удаляем эффект взрыва и обновляем доску
+                                    setTimeout(() => {
+                                        // Удаляем все эффекты взрыва
+                                        document.querySelectorAll('.explosion-effect').forEach(el => el.remove());
+                                        
+                                        // ВАЖНО: Обновляем доску через рендерер
+                                        game.renderer.renderBoard();
+                                        
+                                        // Проверяем окончание игры
+                                        game.checkGameEnd();
+                                    }, 500);
+                                });
                             }
+                        } catch (e) {
+                            console.error('>>> bomb-bishop: Ошибка при взрыве при захвате:', e);
                         }
-                    });
-                    
-                    return moves;
-                }
+                    }, 50); // Небольшая задержка для начала анимации
+                });
+                
+                return board;
             },
+            onTurnStart: (game, piece, x, y, board, color) => {
+                // Добавляем эффект при начале хода
+                const square = document.querySelector(`.square[data-row="${x}"][data-col="${y}"]`);
+                if (square) {
+                    const effect = document.createElement('div');
+                    effect.className = 'glow-effect';
+                    square.appendChild(effect);
+                    
+                    setTimeout(() => {
+                        effect.remove();
+                    }, 500);
+                }
+                return board;
+            }
+        },
 
-            'move-plus-rook': {
-                name: 'Ладья+',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
+        'x-ray-rook': {
+            name: 'Рентген-ладья',
+            texture: 'x-ray-rook',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                const directions = [
+                    [1, 0], [-1, 0], [0, 1], [0, -1]
+                ];
+                
+                directions.forEach(([dr, dc]) => {
+                    let r = x + dr;
+                    let c = y + dc;
+                    let hasJumped = false;
                     
-                    // Стандартные ходы ладьи
-                    const rookDirections = [
-                        [1, 0], [-1, 0], [0, 1], [0, -1]
-                    ];
+                    while (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: hasJumped ? 'move-after-jump' : 'move'});
+                        } else {
+                            if (!hasJumped) {
+                                moves.push({x: r, y: c, type: 'jump'});
+                                hasJumped = true;
+                                
+                                // Продолжаем после прыжка
+                                let nextR = r + dr;
+                                let nextC = c + dc;
+                                while (game.isValidSquare(nextR, nextC)) {
+                                    if (!game.boardState[nextR][nextC]) {
+                                        moves.push({x: nextR, y: nextC, type: 'move-after-jump'});
+                                    } else {
+                                        break;
+                                    }
+                                    nextR += dr;
+                                    nextC += dc;
+                                }
+                            }
+                            break;
+                        }
+                        r += dr;
+                        c += dc;
+                    }
                     
-                    rookDirections.forEach(([dr, dc]) => {
-                        let r = x + dr;
-                        let c = y + dc;
-                        
+                    // Проверка взятия без прыжка
+                    if (!hasJumped) {
+                        r = x + dr;
+                        c = y + dc;
                         while (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else {
+                            if (game.boardState[r][c]) {
                                 if (game.boardState[r][c].color !== piece.color) {
                                     moves.push({x: r, y: c, type: 'capture'});
                                 }
@@ -730,332 +916,467 @@ window.modRegistration = {
                             r += dr;
                             c += dc;
                         }
-                    });
+                    }
+                });
+                
+                return moves;
+            }
+        },
+
+        'move-plus-rook': {
+            name: 'Ладья+',
+            texture: 'move-plus-rook',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                
+                // Стандартные ходы ладьи
+                const rookDirections = [
+                    [1, 0], [-1, 0], [0, 1], [0, -1]
+                ];
+                
+                rookDirections.forEach(([dr, dc]) => {
+                    let r = x + dr;
+                    let c = y + dc;
                     
-                    // Ходы короля (на 1 клетку)
-                    const kingMoves = [
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    kingMoves.forEach(([dr, dc]) => {
-                        const r = x + dr;
-                        const c = y + dc;
-                        
-                        if (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else if (game.boardState[r][c].color !== piece.color) {
+                    while (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else {
+                            if (game.boardState[r][c].color !== piece.color) {
                                 moves.push({x: r, y: c, type: 'capture'});
                             }
+                            break;
                         }
-                    });
+                        r += dr;
+                        c += dc;
+                    }
+                });
+                
+                // Ходы короля (на 1 клетку)
+                const kingMoves = [
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                kingMoves.forEach(([dr, dc]) => {
+                    const r = x + dr;
+                    const c = y + dc;
                     
-                    return moves;
-                }
-            },
+                    if (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else if (game.boardState[r][c].color !== piece.color) {
+                            moves.push({x: r, y: c, type: 'capture'});
+                        }
+                    }
+                });
+                
+                return moves;
+            }
+        },
 
-            'horizontal-rook': {
-                name: 'Горизонтальная ладья',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
-                    
-                    // Вертикальные ходы (обычные)
-                    for (let dr = 1; x + dr < 8; dr++) {
-                        const r = x + dr;
-                        if (!game.boardState[r][y]) {
-                            moves.push({x: r, y, type: 'move'});
-                        } else {
-                            if (game.boardState[r][y].color !== piece.color) {
-                                moves.push({x: r, y, type: 'capture'});
-                            }
-                            break;
+        'horizontal-rook': {
+            name: 'Горизонтальная ладья',
+            texture: 'horizontal-rook',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                
+                // Вертикальные ходы (обычные)
+                for (let dr = 1; x + dr < 8; dr++) {
+                    const r = x + dr;
+                    if (!game.boardState[r][y]) {
+                        moves.push({x: r, y, type: 'move'});
+                    } else {
+                        if (game.boardState[r][y].color !== piece.color) {
+                            moves.push({x: r, y, type: 'capture'});
                         }
+                        break;
                     }
-                    for (let dr = -1; x + dr >= 0; dr--) {
-                        const r = x + dr;
-                        if (!game.boardState[r][y]) {
-                            moves.push({x: r, y, type: 'move'});
-                        } else {
-                            if (game.boardState[r][y].color !== piece.color) {
-                                moves.push({x: r, y, type: 'capture'});
-                            }
-                            break;
-                        }
-                    }
-                    
-                    // Горизонтальные ходы (зацикленные)
-                    for (let step = 1; step < 8; step++) {
-                        const c = (y + step) % 8;
-                        if (!game.boardState[x][c]) {
-                            moves.push({x, y: c, type: 'move'});
-                        } else {
-                            if (game.boardState[x][c].color !== piece.color) {
-                                moves.push({x, y: c, type: 'capture'});
-                            }
-                            break;
-                        }
-                    }
-                    for (let step = 1; step < 8; step++) {
-                        const c = (y - step + 8) % 8;
-                        if (!game.boardState[x][c]) {
-                            moves.push({x, y: c, type: 'move'});
-                        } else {
-                            if (game.boardState[x][c].color !== piece.color) {
-                                moves.push({x, y: c, type: 'capture'});
-                            }
-                            break;
-                        }
-                    }
-                    
-                    return moves;
                 }
-            },
+                for (let dr = -1; x + dr >= 0; dr--) {
+                    const r = x + dr;
+                    if (!game.boardState[r][y]) {
+                        moves.push({x: r, y, type: 'move'});
+                    } else {
+                        if (game.boardState[r][y].color !== piece.color) {
+                            moves.push({x: r, y, type: 'capture'});
+                        }
+                        break;
+                    }
+                }
+                
+                // Горизонтальные ходы (зацикленные)
+                for (let step = 1; step < 8; step++) {
+                    const c = (y + step) % 8;
+                    if (!game.boardState[x][c]) {
+                        moves.push({x, y: c, type: 'move'});
+                    } else {
+                        if (game.boardState[x][c].color !== piece.color) {
+                            moves.push({x, y: c, type: 'capture'});
+                        }
+                        break;
+                    }
+                }
+                for (let step = 1; step < 8; step++) {
+                    const c = (y - step + 8) % 8;
+                    if (!game.boardState[x][c]) {
+                        moves.push({x, y: c, type: 'move'});
+                    } else {
+                        if (game.boardState[x][c].color !== piece.color) {
+                            moves.push({x, y: c, type: 'capture'});
+                        }
+                        break;
+                    }
+                }
+                
+                return moves;
+            }
+        },
 
-            'queen-of-horses': {
-                name: 'Королева коней',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
+        'queen-of-horses': {
+            name: 'Королева коней',
+            texture: 'queen-of-horses',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                
+                // Ходы ферзя
+                const queenDirections = [
+                    [1, 0], [-1, 0], [0, 1], [0, -1],
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                queenDirections.forEach(([dr, dc]) => {
+                    let r = x + dr;
+                    let c = y + dc;
                     
-                    // Ходы ферзя
-                    const queenDirections = [
-                        [1, 0], [-1, 0], [0, 1], [0, -1],
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
+                    while (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else {
+                            if (game.boardState[r][c].color !== piece.color) {
+                                moves.push({x: r, y: c, type: 'capture'});
+                            }
+                            break;
+                        }
+                        r += dr;
+                        c += dc;
+                    }
+                });
+                
+                // Ходы коня
+                const knightMoves = [
+                    [2, 1], [2, -1], [-2, 1], [-2, -1],
+                    [1, 2], [1, -2], [-1, 2], [-1, -2]
+                ];
+                
+                knightMoves.forEach(([dr, dc]) => {
+                    const r = x + dr;
+                    const c = y + dc;
                     
-                    queenDirections.forEach(([dr, dc]) => {
-                        let r = x + dr;
-                        let c = y + dc;
+                    if (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else if (game.boardState[r][c].color !== piece.color) {
+                            moves.push({x: r, y: c, type: 'capture'});
+                        }
+                    }
+                });
+                
+                return moves;
+            }
+        },
+
+        'queen-of-camels': {
+            name: 'Королева верблюдов',
+            texture: 'queen-of-camels',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                
+                // Ходы ферзя
+                const queenDirections = [
+                    [1, 0], [-1, 0], [0, 1], [0, -1],
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                queenDirections.forEach(([dr, dc]) => {
+                    let r = x + dr;
+                    let c = y + dc;
+                    
+                    while (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else {
+                            if (game.boardState[r][c].color !== piece.color) {
+                                moves.push({x: r, y: c, type: 'capture'});
+                            }
+                            break;
+                        }
+                        r += dr;
+                        c += dc;
+                    }
+                });
+                
+                // Ходы верблюда
+                const camelMoves = [
+                    [3, 1], [3, -1], [-3, 1], [-3, -1],
+                    [1, 3], [1, -3], [-1, 3], [-1, -3]
+                ];
+                
+                camelMoves.forEach(([dr, dc]) => {
+                    const r = x + dr;
+                    const c = y + dc;
+                    
+                    if (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else if (game.boardState[r][c].color !== piece.color) {
+                            moves.push({x: r, y: c, type: 'capture'});
+                        }
+                    }
+                });
+                
+                return moves;
+            }
+        },
+
+        'queen-with-evolution': {
+            name: 'Королева с потенциалом',
+            texture: 'queen-with-evolution',
+            getMoves: (game, x, y, piece) => {
+                // Ходит как обычный ферзь
+                const moves = [];
+                const directions = [
+                    [1, 0], [-1, 0], [0, 1], [0, -1],
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                directions.forEach(([dr, dc]) => {
+                    let r = x + dr;
+                    let c = y + dc;
+                    
+                    while (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else {
+                            if (game.boardState[r][c].color !== piece.color) {
+                                moves.push({x: r, y: c, type: 'capture'});
+                            }
+                            break;
+                        }
+                        r += dr;
+                        c += dc;
+                    }
+                });
+                
+                return moves;
+            }
+        },
+
+        'boom-king': {
+            name: 'Король-бомба',
+            texture: 'boom-king',
+            getMoves: (game, x, y, piece) => {
+                // Ходит как обычный король
+                const moves = [];
+                const kingMoves = [
+                    [0, 1], [1, 0], [0, -1], [-1, 0],
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                kingMoves.forEach(([dr, dc]) => {
+                    const r = x + dr;
+                    const c = y + dc;
+                    
+                    if (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else if (game.boardState[r][c].color !== piece.color) {
+                            moves.push({x: r, y: c, type: 'capture'});
+                        }
+                    }
+                });
+                
+                return moves;
+            },
+            // Переписанный обработчик с явным именем
+            onCaptured: function(game, piece, x, y, capturedBy, board) {
+                // ВАЖНО: Добавляем прямую реализацию взрыва короля
+                try {
+                    // НЕМЕДЛЕННО ОБНОВЛЯЕМ ДОСКУ, чтобы показать текущее состояние
+                    requestAnimationFrame(() => {
+                        game.renderer.renderBoard();
                         
-                        while (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else {
-                                if (game.boardState[r][c].color !== piece.color) {
-                                    moves.push({x: r, y: c, type: 'capture'});
+                        // Затем запускаем взрыв с небольшой задержкой
+                        setTimeout(() => {
+                            try {
+                                // Создаем эффект взрыва с максимальным приоритетом
+                                const centerSquare = document.querySelector(`.square[data-row="${x}"][data-col="${y}"]`);
+                                if (centerSquare) {
+                                    // Создаем большой яркий взрыв
+                                    const explosion = document.createElement('div');
+                                    explosion.className = 'explosion-effect king-explosion';
+                                    explosion.style.zIndex = "999"; // Максимальный приоритет
+                                    explosion.style.transform = "scale(2.0)";
+                                    explosion.style.background = "radial-gradient(circle, rgba(255,255,0,0.9) 0%, rgba(255,0,0,0.8) 50%, rgba(0,0,0,0) 100%)";
+                                    centerSquare.appendChild(explosion);
+                                    
+                                    // Убеждаемся, что анимация запустилась
+                                    requestAnimationFrame(() => {
+                                        // Определяем зону взрыва
+                                        const startRow = Math.max(0, x - 2);
+                                        const endRow = Math.min(7, x + 2);
+                                        const startCol = Math.max(0, y - 2);
+                                        const endCol = Math.min(7, y + 2);
+                                        
+                                        // Взрываем ВСЕ фигуры, кроме королей
+                                        for (let r = startRow; r <= endRow; r++) {
+                                            for (let c = startCol; c <= endCol; c++) {
+                                                // Пропускаем клетку самого взрывающегося короля
+                                                if (r === x && c === y) continue;
+                                                
+                                                const targetPiece = board[r][c];
+                                                
+                                                // Пропускаем пустые клетки и других королей
+                                                if (!targetPiece || targetPiece.type === 'king') {
+                                                    continue;
+                                                }
+                                                
+                                                // Рассчитываем расстояние от центра взрыва
+                                                const distance = Math.max(Math.abs(r - x), Math.abs(c - y));
+                                                
+                                                // Фигуры на расстоянии 1 уничтожаются всегда
+                                                // Фигуры на расстоянии 2 уничтожаются с вероятностью 50%
+                                                const shouldDestroy = distance === 1 || (distance === 2 && Math.random() > 0.5);
+                                                
+                                                if (shouldDestroy) {
+                                                    // Создаем мини-взрыв на месте фигуры
+                                                    const targetSquare = document.querySelector(`.square[data-row="${r}"][data-col="${c}"]`);
+                                                    if (targetSquare) {
+                                                        const miniExplosion = document.createElement('div');
+                                                        miniExplosion.className = 'explosion-effect mini';
+                                                        miniExplosion.style.zIndex = "998";
+                                                        miniExplosion.style.transform = 'scale(0.7)';
+                                                        miniExplosion.style.opacity = '0.7';
+                                                        targetSquare.appendChild(miniExplosion);
+                                                    }
+                                                    
+                                                    // Удаляем фигуру с доски сразу
+                                                    game.boardState[r][c] = null;
+                                                }
+                                            }
+                                        }
+                                                
+                                        // Через секунду удаляем эффект взрыва и обновляем доску
+                                        setTimeout(() => {
+                                            // Удаляем все эффекты взрыва
+                                            document.querySelectorAll('.explosion-effect').forEach(el => el.remove());
+                                            
+                                            // ВАЖНО: Обновляем доску через рендерер
+                                            game.renderer.renderBoard();
+                                            
+                                            // Проверяем окончание игры
+                                            game.checkGameEnd();
+                                        }, 800);
+                                    });
                                 }
-                                break;
+                            } catch (e) {
+                                console.error('>>> boom-king: Ошибка при анимации взрыва:', e);
                             }
-                            r += dr;
-                            c += dc;
-                        }
+                        }, 50);
                     });
-                    
-                    // Ходы коня
-                    const knightMoves = [
-                        [2, 1], [2, -1], [-2, 1], [-2, -1],
-                        [1, 2], [1, -2], [-1, 2], [-1, -2]
-                    ];
-                    
-                    knightMoves.forEach(([dr, dc]) => {
-                        const r = x + dr;
-                        const c = y + dc;
-                        
-                        if (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else if (game.boardState[r][c].color !== piece.color) {
-                                moves.push({x: r, y: c, type: 'capture'});
-                            }
-                        }
-                    });
-                    
-                    return moves;
+                } catch (e) {
+                    console.error('>>> boom-king: Ошибка при прямом взрыве:', e);
                 }
+                
+                return board;
             },
-
-            'queen-of-camels': {
-                name: 'Королева верблюдов',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
+            onTurnEnd: (game, piece, x, y, board, color) => {
+                // Создаем эффект "тиканья" в конце хода
+                const square = document.querySelector(`.square[data-row="${x}"][data-col="${y}"]`);
+                if (square) {
+                    const effect = document.createElement('div');
+                    effect.className = 'bomb-tick-effect';
+                    square.appendChild(effect);
                     
-                    // Ходы ферзя
-                    const queenDirections = [
-                        [1, 0], [-1, 0], [0, 1], [0, -1],
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    queenDirections.forEach(([dr, dc]) => {
-                        let r = x + dr;
-                        let c = y + dc;
-                        
-                        while (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else {
-                                if (game.boardState[r][c].color !== piece.color) {
-                                    moves.push({x: r, y: c, type: 'capture'});
-                                }
-                                break;
-                            }
-                            r += dr;
-                            c += dc;
-                        }
-                    });
-                    
-                    // Ходы верблюда
-                    const camelMoves = [
-                        [3, 1], [3, -1], [-3, 1], [-3, -1],
-                        [1, 3], [1, -3], [-1, 3], [-1, -3]
-                    ];
-                    
-                    camelMoves.forEach(([dr, dc]) => {
-                        const r = x + dr;
-                        const c = y + dc;
-                        
-                        if (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else if (game.boardState[r][c].color !== piece.color) {
-                                moves.push({x: r, y: c, type: 'capture'});
-                            }
-                        }
-                    });
-                    
-                    return moves;
+                    setTimeout(() => {
+                        effect.remove();
+                    }, 300);
                 }
-            },
+                return board;
+            }
+        },
 
-            'queen-with-evolution': {
-                name: 'Королева с потенциалом',
-                getMoves: (game, x, y, piece) => {
-                    // Ходит как обычный ферзь
-                    const moves = [];
-                    const directions = [
-                        [1, 0], [-1, 0], [0, 1], [0, -1],
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
+        'king-with-potential': {
+            name: 'Король с потенциалом',
+            texture: 'king-with-potential',
+            getMoves: (game, x, y, piece) => {
+                // Ходит как обычный король
+                const moves = [];
+                const kingMoves = [
+                    [0, 1], [1, 0], [0, -1], [-1, 0],
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                kingMoves.forEach(([dr, dc]) => {
+                    const r = x + dr;
+                    const c = y + dc;
                     
-                    directions.forEach(([dr, dc]) => {
-                        let r = x + dr;
-                        let c = y + dc;
-                        
-                        while (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else {
-                                if (game.boardState[r][c].color !== piece.color) {
-                                    moves.push({x: r, y: c, type: 'capture'});
-                                }
-                                break;
-                            }
-                            r += dr;
-                            c += dc;
-                        }
-                    });
-                    
-                    return moves;
-                }
-            },
-
-            'boom-king': {
-                name: 'Король-бомба',
-                getMoves: (game, x, y, piece) => {
-                    // Ходит как обычный король
-                    const moves = [];
-                    const kingMoves = [
-                        [0, 1], [1, 0], [0, -1], [-1, 0],
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    kingMoves.forEach(([dr, dc]) => {
-                        const r = x + dr;
-                        const c = y + dc;
-                        
-                        if (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else if (game.boardState[r][c].color !== piece.color) {
-                                moves.push({x: r, y: c, type: 'capture'});
-                            }
-                        }
-                    });
-                    
-                    return moves;
-                }, 
-                on_captured: (game, piece, x, y, capturedBy, board) => {
-                    // Взрыв при смерти
-                    for (let r = Math.max(0, x-1); r <= Math.min(7, x+1); r++) {
-                        for (let c = Math.max(0, y-1); c <= Math.min(7, y+1); c++) {
-                            if (!(r === x && c === y) && board[r][c]) {
-                                board[r][c] = null;
-                            }
+                    if (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else if (game.boardState[r][c].color !== piece.color) {
+                            moves.push({x: r, y: c, type: 'capture'});
                         }
                     }
-                    return board;
-                }
-            },
+                });
+                
+                return moves;
+            }
+        },
 
-            'king-with-potential': {
-                name: 'Король с потенциалом',
-                getMoves: (game, x, y, piece) => {
-                    // Ходит как обычный король
-                    const moves = [];
-                    const kingMoves = [
-                        [0, 1], [1, 0], [0, -1], [-1, 0],
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
+        'move-plus-king': {
+            name: 'Король+',
+            texture: 'move-plus-king',
+            getMoves: (game, x, y, piece) => {
+                const moves = [];
+                
+                // Стандартные ходы короля
+                const kingMoves = [
+                    [1, 0], [-1, 0], [0, 1], [0, -1],
+                    [1, 1], [1, -1], [-1, 1], [-1, -1]
+                ];
+                
+                kingMoves.forEach(([dr, dc]) => {
+                    const r = x + dr;
+                    const c = y + dc;
                     
-                    kingMoves.forEach(([dr, dc]) => {
-                        const r = x + dr;
-                        const c = y + dc;
-                        
-                        if (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else if (game.boardState[r][c].color !== piece.color) {
-                                moves.push({x: r, y: c, type: 'capture'});
-                            }
+                    if (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else if (game.boardState[r][c].color !== piece.color) {
+                            moves.push({x: r, y: c, type: 'capture'});
                         }
-                    });
+                    }
+                });
+                
+                // Дополнительные ходы на 2 клетки
+                const plusMoves = [
+                    [2, 0], [-2, 0], [0, 2], [0, -2]
+                ];
+                
+                plusMoves.forEach(([dr, dc]) => {
+                    const r = x + dr;
+                    const c = y + dc;
                     
-                    return moves;
-                }
-            },
-
-            'move-plus-king': {
-                name: 'Король+',
-                getMoves: (game, x, y, piece) => {
-                    const moves = [];
-                    
-                    // Стандартные ходы короля
-                    const kingMoves = [
-                        [1, 0], [-1, 0], [0, 1], [0, -1],
-                        [1, 1], [1, -1], [-1, 1], [-1, -1]
-                    ];
-                    
-                    kingMoves.forEach(([dr, dc]) => {
-                        const r = x + dr;
-                        const c = y + dc;
-                        
-                        if (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else if (game.boardState[r][c].color !== piece.color) {
-                                moves.push({x: r, y: c, type: 'capture'});
-                            }
+                    if (game.isValidSquare(r, c)) {
+                        if (!game.boardState[r][c]) {
+                            moves.push({x: r, y: c, type: 'move'});
+                        } else if (game.boardState[r][c].color !== piece.color) {
+                            moves.push({x: r, y: c, type: 'capture'});
                         }
-                    });
-                    
-                    // Дополнительные ходы на 2 клетки
-                    const plusMoves = [
-                        [2, 0], [-2, 0], [0, 2], [0, -2]
-                    ];
-                    
-                    plusMoves.forEach(([dr, dc]) => {
-                        const r = x + dr;
-                        const c = y + dc;
-                        
-                        if (game.isValidSquare(r, c)) {
-                            if (!game.boardState[r][c]) {
-                                moves.push({x: r, y: c, type: 'move'});
-                            } else if (game.boardState[r][c].color !== piece.color) {
-                                moves.push({x: r, y: c, type: 'capture'});
-                            }
-                        }
-                    });
-                    
-                    return moves;
-                }
+                    }
+                });
+                
+                return moves;
             }
         }
     }
