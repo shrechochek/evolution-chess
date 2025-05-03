@@ -408,3 +408,35 @@ body {
     font-weight: bold;
     color: red;
 }
+
+.promotion-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+
+.promotion-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.promotion-options div {
+    padding: 10px;
+    background: #f0f0f0;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.promotion-options div:hover {
+    background: #ddd;
+}
+
