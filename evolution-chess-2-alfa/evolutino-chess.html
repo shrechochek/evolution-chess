@@ -252,7 +252,7 @@ const SYMBOLS = {
     spearman: '🔱', soldier: '⚔', torpedo: '🐇',
     camel: '🐫', paladin: '🛡', knight_knight: '🤺',
     bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
-    tank: '🚜',
+    tank: '🚜', car: '🏎',
     // Tier 3 (Legendary)
     spartan: '🏛', super_soldier: '🦾',
     camel_knight: '👹', crusader: '⚜', endless_knight: '🐴',
@@ -345,6 +345,11 @@ const PIECE_TYPES = {
         // ИСПРАВЛЕНИЕ: Ortho - slide, Diag - step
         moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)]
     },
+    'rook_ghost': {
+        name: 'Призрак', symbol: SYMBOLS.car, tier: 2, xpReq: 2,
+        desc: 'Ладья, прыгающая через фигуры',
+        moves: [...slide(VEC_ORTHO)], ghost: true
+    },
 
     // === TIER 3 (LEGENDARY) ===
     
@@ -416,7 +421,7 @@ const EVOLUTION_TREE = {
     'pawn': ['pawn_soldier', 'pawn_spearman', 'pawn_torpedo'],
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
-    'rook': ['rook_tank'],
+    'rook': ['rook_tank', 'rook_ghost'],
     'queen': [], 
 
     // TIER 2 -> TIER 3
