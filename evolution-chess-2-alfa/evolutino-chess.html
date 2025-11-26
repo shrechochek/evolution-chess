@@ -211,7 +211,7 @@
 <body>
 
     <h1>Шахматы: Эволюция Фигур V2.3</h1>
-    <!-- <div class="subtitle">Исправлена логика Танка и Копейщика</div> -->
+    <div class="subtitle">made by shrechochek</div>
 
     <div class="game-container">
         <div id="board"></div>
@@ -249,10 +249,11 @@ const SYMBOLS = {
     // Basic
     pawn: '♟', knight: '♞', bishop: '♝', rook: '♜', queen: '♛', king: '♚',
     // Tier 2
-    spearman: '🔱', soldier: '⚔', torpedo: '🐇',
+    spearman: '🔱', soldier: '🪖', torpedo: '🐇',
     camel: '🐫', paladin: '🛡', knight_knight: '🤺',
     bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
     tank: '🚜', car: '🏎',
+    ring: '💍',
     // Tier 3 (Legendary)
     spartan: '🏛', super_soldier: '🦾',
     camel_knight: '👹', crusader: '⚜', endless_knight: '🐴',
@@ -351,6 +352,13 @@ const PIECE_TYPES = {
         moves: [...slide(VEC_ORTHO)], ghost: true
     },
 
+    // Ветка Ферзя
+    'queen_camel': {
+        name: 'королева верблюдов', symbol: SYMBOLS.ring, tier: 2, xpReq: 2,
+        desc: "королева + верблюд",
+        moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)]
+    },
+
     // === TIER 3 (LEGENDARY) ===
     
     // Пешка -> Копейщик -> СПАРТАНЕЦ
@@ -422,7 +430,7 @@ const EVOLUTION_TREE = {
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank', 'rook_ghost'],
-    'queen': [], 
+    'queen': ['queen_camel'], 
 
     // TIER 2 -> TIER 3
     'pawn_soldier': ['pawn_supersoldier', 'pawn_spartan'],
