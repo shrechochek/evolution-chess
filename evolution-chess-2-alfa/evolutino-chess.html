@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шахматы с Эволюцией V2.2</title>
+    <title>Шахматы с Эволюцией V2.3</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -210,7 +210,7 @@
 </head>
 <body>
 
-    <h1>Шахматы: Эволюция Фигур V2.1</h1>
+    <h1>Шахматы: Эволюция Фигур V2.3</h1>
     <div class="subtitle">Исправлена логика Танка и Копейщика</div>
 
     <div class="game-container">
@@ -333,7 +333,7 @@ const PIECE_TYPES = {
         moves: slide(VEC_DIAG), ghost: true // Флаг для прохода сквозь фигуры
     },
     'two_color_bishop': {
-        name: 'двухцветный слон', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 2,
+        name: 'двухцветный слон', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1,
         desc: 'Слон + король',
         moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)]
     },
@@ -355,19 +355,19 @@ const PIECE_TYPES = {
     
     // Пешка -> Копейщик -> СПАРТАНЕЦ
     'pawn_spartan': {
-        name: 'Спартанец', symbol: SYMBOLS.spartan, tier: 3, xpReq: 999,
-        desc: 'Атака дальностью 2 + Ходит как Король',
+        name: 'Спартанец', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1,
+        desc: 'ходит и бьет три клетки впереди себя',
         moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], 
         attackRange: 2, // Range attack handled separately
         special: 'range_capture'
     },
     // Пешка -> Солдат -> СУПЕР СОЛДАТ
     'pawn_supersoldier': {
-        name: 'Легионер', symbol: SYMBOLS.super_soldier, tier: 3, xpReq: 999,
+        name: 'Легионер', symbol: SYMBOLS.super_soldier, tier: 3, xpReq: 1,
         desc: 'Ходит и бьет на 2 клетки в любую сторону',
         moves: [
-            ...step(VEC_ORTHO), ...step(VEC_DIAG), // 1 step
-            ...step(VEC_ORTHO.map(v=>({dx:v.dx*2, dy:v.dy*2}))), // 2 step ortho
+            // ...step(VEC_ORTHO), ...step(VEC_DIAG), // 1 step
+            // ...step(VEC_ORTHO.map(v=>({dx:v.dx*2, dy:v.dy*2}))), // 2 step ortho
             ...step(VEC_DIAG.map(v=>({dx:v.dx*2, dy:v.dy*2})))   // 2 step diag
         ]
     },
@@ -418,14 +418,14 @@ const PIECE_TYPES = {
  */
 const EVOLUTION_TREE = {
     // TIER 1 -> TIER 2
-    'pawn': ['pawn_soldier', 'pawn_spearman', 'pawn_torpedo'],
+    'pawn': ['pawn_soldier', 'pawn_spearman', 'pawn_torpedo', 'knight'],
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank', 'rook_ghost'],
     'queen': [], 
 
     // TIER 2 -> TIER 3
-    'pawn_soldier': ['pawn_supersoldier'],
+    'pawn_soldier': ['pawn_supersoldier', 'pawn_spartan'],
     'pawn_spearman': ['pawn_spartan'],
     
     'knight_camel': ['knight_camel_hybrid', 'knight_endless'],
@@ -434,7 +434,12 @@ const EVOLUTION_TREE = {
     'bishop_bomber': ['bishop_nuke'],
     'bishop_ghost': ['bishop_sniper'],
 
-    'rook_tank': ['rook_fortress']
+    'rook_tank': ['rook_fortress'],
+
+    // TO ANOTHER FIGURES
+    'two_color_bishop': ['rook'],
+    'pawn_supersoldier': ['knight'],
+    'pawn_spartan': ['bishop']
 };
 
 // Глобальное состояние
