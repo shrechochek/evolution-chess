@@ -251,7 +251,7 @@ const SYMBOLS = {
     // Tier 2
     spearman: '🔱', soldier: '⚔', torpedo: '🐇',
     camel: '🐫', paladin: '🛡', knight_knight: '🤺',
-    bomber: '💣', ghost: '👻',
+    bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
     tank: '🚜',
     // Tier 3 (Legendary)
     spartan: '🏛', super_soldier: '🦾',
@@ -332,6 +332,11 @@ const PIECE_TYPES = {
         desc: 'Слон, прыгающий через фигуры',
         moves: slide(VEC_DIAG), ghost: true // Флаг для прохода сквозь фигуры
     },
+    'two_color_bishop': {
+        name: 'двухцветный слон', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 2,
+        desc: 'Слон + король',
+        moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)]
+    },
 
     // Ветка Ладьи - ТАНК (ИСПОЛЬЗУЕТ СМЕШАННУЮ ЛОГИКУ)
     'rook_tank': {
@@ -410,7 +415,7 @@ const EVOLUTION_TREE = {
     // TIER 1 -> TIER 2
     'pawn': ['pawn_soldier', 'pawn_spearman', 'pawn_torpedo'],
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
-    'bishop': ['bishop_bomber', 'bishop_ghost'],
+    'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank'],
     'queen': [], 
 
