@@ -250,7 +250,7 @@ const SYMBOLS = {
     pawn: '♟', knight: '♞', bishop: '♝', rook: '♜', queen: '♛', king: '♚',
     // Tier 2
     spearman: '🔱', soldier: '⚔', 
-    camel: '🐫', paladin: '🛡', 
+    camel: '🐫', paladin: '🛡', knight_knight: '🤺',
     bomber: '💣', ghost: '👻',
     tank: '🚜',
     // Tier 3 (Legendary)
@@ -306,8 +306,13 @@ const PIECE_TYPES = {
     },
     'knight_paladin': {
         name: 'Паладин', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2,
-        desc: 'Конь + Король',
-        moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)]
+        desc: 'Конь + одна клетка по диагонали',
+        moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)]
+    },
+    'knight_knight': {
+        name: 'рыцарь', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 2,
+        desc: 'Конь + одна клетка по вертикали и горизонтали',
+        moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)]
     },
 
     // Ветка Слона
@@ -392,7 +397,7 @@ const PIECE_TYPES = {
 const EVOLUTION_TREE = {
     // TIER 1 -> TIER 2
     'pawn': ['pawn_soldier', 'pawn_spearman'],
-    'knight': ['knight_camel', 'knight_paladin'],
+    'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost'],
     'rook': ['rook_tank'],
     'queen': [], 
