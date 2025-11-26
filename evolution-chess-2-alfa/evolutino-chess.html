@@ -255,7 +255,7 @@ const SYMBOLS = {
     tank: '🚜',
     // Tier 3 (Legendary)
     spartan: '🏛', super_soldier: '🦾',
-    camel_knight: '👹', crusader: '⚜',
+    camel_knight: '👹', crusader: '⚜', endless_knight: '🐴',
     nuke_bishop: '☢', sniper: '🔭',
     fortress: '🏰' 
 };
@@ -368,6 +368,12 @@ const PIECE_TYPES = {
         desc: 'Конь (2+1) И Верблюд (3+1)',
         moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)]
     },
+    // Конь -> Верблюд -> бесконечный конь
+    'knight_endless': {
+        name: 'беконечный конь', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999,
+        desc: 'конь который может ходить на любое кол-во клеток',
+        moves: [...slide(VEC_KNIGHT)], ghost: true
+    },
     // Конь -> Паладин -> ХРАМОВНИК
     'knight_crusader': {
         name: 'Храмовник', symbol: SYMBOLS.crusader, tier: 3, xpReq: 999,
@@ -412,7 +418,7 @@ const EVOLUTION_TREE = {
     'pawn_soldier': ['pawn_supersoldier'],
     'pawn_spearman': ['pawn_spartan'],
     
-    'knight_camel': ['knight_camel_hybrid'],
+    'knight_camel': ['knight_camel_hybrid', 'knight_endless'],
     'knight_paladin': ['knight_crusader'],
 
     'bishop_bomber': ['bishop_nuke'],
