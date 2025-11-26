@@ -249,7 +249,7 @@ const SYMBOLS = {
     // Basic
     pawn: '♟', knight: '♞', bishop: '♝', rook: '♜', queen: '♛', king: '♚',
     // Tier 2
-    spearman: '🔱', soldier: '⚔', 
+    spearman: '🔱', soldier: '⚔', torpedo: '🐇',
     camel: '🐫', paladin: '🛡', knight_knight: '🤺',
     bomber: '💣', ghost: '👻',
     tank: '🚜',
@@ -297,6 +297,12 @@ const PIECE_TYPES = {
         role: 'pawn', 
         special: 'spear_attack' // Логика реализована в getValidMoves
     },
+    'pawn_torpedo': {
+        name: 'торпедная пешка', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 2,
+        desc: 'прыгает на две клетки',
+        role: 'pawn', extraMoves: [{dx:0,dy:2}]
+    },
+    
 
     // Ветка Коня
     'knight_camel': {
@@ -396,7 +402,7 @@ const PIECE_TYPES = {
  */
 const EVOLUTION_TREE = {
     // TIER 1 -> TIER 2
-    'pawn': ['pawn_soldier', 'pawn_spearman'],
+    'pawn': ['pawn_soldier', 'pawn_spearman', 'pawn_torpedo'],
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost'],
     'rook': ['rook_tank'],
