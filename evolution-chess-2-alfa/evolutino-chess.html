@@ -253,10 +253,10 @@ const SYMBOLS = {
     camel: '🐫', paladin: '🛡', knight_knight: '🤺',
     bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
     tank: '🚜', car: '🏎',
-    ring: '💍',
+    ring: '💍', crown: '👑',
     // Tier 3 (Legendary)
     spartan: '🏛', super_soldier: '🦾',
-    camel_knight: '👹', crusader: '⚜', endless_knight: '🐴',
+    camel_knight: '👹', crusader: '⚜', endless_knight: '🐴', glasses: '👓',
     nuke_bishop: '☢', sniper: '🔭',
     fortress: '🏰' 
 };
@@ -317,7 +317,7 @@ const PIECE_TYPES = {
         moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)]
     },
     'knight_knight': {
-        name: 'рыцарь', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 2,
+        name: 'рыцарь', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1,
         desc: 'Конь + одна клетка по вертикали и горизонтали',
         moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)]
     },
@@ -357,6 +357,11 @@ const PIECE_TYPES = {
         name: 'королева верблюдов', symbol: SYMBOLS.ring, tier: 2, xpReq: 2,
         desc: "королева + верблюд",
         moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)]
+    },
+    'queen_knight': {
+        name: 'королева коней', symbol: SYMBOLS.crown, tier: 2, xpReq: 2,
+        desc: "королева + конь",
+        moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)]
     },
 
     // === TIER 3 (LEGENDARY) ===
@@ -398,6 +403,12 @@ const PIECE_TYPES = {
         desc: 'Конь (прыжок) + Слон (скольжение)',
         moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)]
     },
+    // Конь -> Паладин -> король коней
+    'knight_king': {
+        name: 'король коней', symbol: SYMBOLS.glasses, tier: 3, xpReq: 999,
+        desc: 'Конь + король',
+        moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)]
+    },
 
     // Слон -> Бомбардир -> ЯДЕРНЫЙ СЛОН
     'bishop_nuke': {
@@ -430,14 +441,15 @@ const EVOLUTION_TREE = {
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank', 'rook_ghost'],
-    'queen': ['queen_camel'], 
+    'queen': ['queen_camel', 'queen_knight'], 
 
     // TIER 2 -> TIER 3
     'pawn_soldier': ['pawn_supersoldier', 'pawn_spartan'],
     'pawn_spearman': ['pawn_spartan'],
     
     'knight_camel': ['knight_camel_hybrid', 'knight_endless'],
-    'knight_paladin': ['knight_crusader'],
+    'knight_paladin': ['knight_crusader', 'knight_king'],
+    'knight_knight': ['knight_king', 'rook'],
 
     'bishop_bomber': ['bishop_nuke'],
     'bishop_ghost': ['bishop_sniper'],
