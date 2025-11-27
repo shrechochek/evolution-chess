@@ -364,6 +364,11 @@ const PIECE_TYPES = {
         desc: "королева + конь",
         moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)]
     },
+    'queen_upgradeable': {
+        name: 'королева с возможностью улучшения', symbol: SYMBOLS.queen, tier: 1, xpReq: 2,
+        desc: "королева, которую можно улучшать дальше",
+        moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)]
+    },
 
     // === TIER 3 (LEGENDARY) ===
     
@@ -455,7 +460,7 @@ const EVOLUTION_TREE = {
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank', 'rook_ghost'],
-    'queen': ['queen_camel', 'queen_knight'], 
+    'queen': ['queen_camel', 'queen_knight', 'queen_upgradeable'], 
 
     // TIER 2 -> TIER 3
     'pawn_runner': ['pawn_superrunner', 'pawn_spartan'],
