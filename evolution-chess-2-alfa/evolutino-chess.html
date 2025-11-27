@@ -249,13 +249,13 @@ const SYMBOLS = {
     // Basic
     pawn: '♟', knight: '♞', bishop: '♝', rook: '♜', queen: '♛', king: '♚',
     // Tier 2
-    spearman: '🔱', soldier: '🪖', torpedo: '🐇',
+    spearman: '🔱', runner: '🏃', torpedo: '🐇',
     camel: '🐫', paladin: '🛡', knight_knight: '🤺',
     bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
     tank: '🚜', car: '🏎',
     ring: '💍', crown: '👑',
     // Tier 3 (Legendary)
-    spartan: '🏛', super_soldier: '🦾',
+    spartan: '🏛', super_runner: '🧑‍🦽‍➡️',
     camel_knight: '👹', crusader: '⚜', endless_knight: '🐴', glasses: '👓',
     nuke_bishop: '☢', sniper: '🔭',
     fortress: '🏰' 
@@ -287,8 +287,8 @@ const PIECE_TYPES = {
     // === TIER 2 (XP REQ: 2) ===
     
     // Ветка Пешки
-    'pawn_soldier': {
-        name: 'Солдат', symbol: SYMBOLS.soldier, tier: 2, xpReq: 2,
+    'pawn_runner': {
+        name: 'бегун', symbol: SYMBOLS.runner, tier: 2, xpReq: 2,
         desc: 'Ходит вперед и по диагонали (как пешка + король вперед)',
         role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] // Доп ходы как у пешки (диагональ)
     },
@@ -370,19 +370,14 @@ const PIECE_TYPES = {
     'pawn_spartan': {
         name: 'Спартанец', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1,
         desc: 'ходит и бьет три клетки впереди себя',
-        moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], 
-        attackRange: 2, // Range attack handled separately
-        special: 'range_capture'
+        role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], 
+        special: 'spear_attack'
     },
     // Пешка -> Солдат -> СУПЕР СОЛДАТ
-    'pawn_supersoldier': {
-        name: 'Легионер', symbol: SYMBOLS.super_soldier, tier: 3, xpReq: 1,
-        desc: 'Ходит и бьет на 2 клетки в любую сторону',
-        moves: [
-            // ...step(VEC_ORTHO), ...step(VEC_DIAG), // 1 step
-            // ...step(VEC_ORTHO.map(v=>({dx:v.dx*2, dy:v.dy*2}))), // 2 step ortho
-            ...step(VEC_DIAG.map(v=>({dx:v.dx*2, dy:v.dy*2})))   // 2 step diag
-        ]
+    'pawn_superrunner': {
+        name: 'супер буген', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1,
+        desc: 'Ходит как король, бьет как пешка',
+        role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}],
     },
 
     // Конь -> Верблюд -> КОНЕ-ВЕРБЛЮД
@@ -437,14 +432,14 @@ const PIECE_TYPES = {
  */
 const EVOLUTION_TREE = {
     // TIER 1 -> TIER 2
-    'pawn': ['pawn_soldier', 'pawn_spearman', 'pawn_torpedo'],
+    'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo'],
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank', 'rook_ghost'],
     'queen': ['queen_camel', 'queen_knight'], 
 
     // TIER 2 -> TIER 3
-    'pawn_soldier': ['pawn_supersoldier', 'pawn_spartan'],
+    'pawn_runner': ['pawn_superrunner', 'pawn_spartan'],
     'pawn_spearman': ['pawn_spartan'],
     
     'knight_camel': ['knight_camel_hybrid', 'knight_endless'],
@@ -458,7 +453,7 @@ const EVOLUTION_TREE = {
 
     // TO ANOTHER FIGURES
     'two_color_bishop': ['rook'],
-    'pawn_supersoldier': ['knight'],
+    'pawn_superrunner': ['knight'],
     'pawn_spartan': ['bishop']
 };
 
