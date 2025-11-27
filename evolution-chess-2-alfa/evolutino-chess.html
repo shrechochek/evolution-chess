@@ -257,8 +257,8 @@ const SYMBOLS = {
     // Tier 3 (Legendary)
     spartan: '🏛', super_runner: '🧑‍🦽‍➡️',
     camel_knight: '👹', crusader: '⚜', endless_knight: '🐴', moose: '🫎',
-    nuke_bishop: '☢', sniper: '🔭',
-    fortress: '🏰' ,
+    nuke_bishop: '☢', sniper: '🔭', ship: '⛵️',
+    fortress: '🏰', helicopter: '🚁',
     unicorn: '🦄'
 };
 
@@ -418,13 +418,24 @@ const PIECE_TYPES = {
         desc: 'Ферзь, прошивающий насквозь',
         moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost: true
     },
+    // Слон -> двухцветный слон -> подвижный слон (потом переименовать)
+    'bishop_ship': {
+        name: 'корабль', symbol: SYMBOLS.ship, tier: 3, xpReq: 999,
+        desc: 'слон + конь',
+        moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)]
+    },
 
     // Ладья -> Танк -> КРЕПОСТЬ
-    'rook_fortress': {
-        name: 'Крепость', symbol: SYMBOLS.fortress, tier: 3, xpReq: 999,
-        desc: 'Танк + Конь',
-        // Танк (Ладья slide + Король step) + Конь (step)
-        moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG), ...step(VEC_KNIGHT)]
+    // 'rook_fortress': {
+    //     name: 'Крепость', symbol: SYMBOLS.fortress, tier: 3, xpReq: 999,
+    //     desc: 'Танк + Конь',
+    //     // Танк (Ладья slide + Король step) + Конь (step)
+    //     moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG), ...step(VEC_KNIGHT)]
+    // },
+    'rook_helicopter': {
+        name: 'вертолет', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2,
+        desc: 'Ладья + конь',
+        moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)]
     },
 
     // ферзь -> королева коней или королева верблюдов -> королева коней и верблюдов
@@ -454,16 +465,16 @@ const EVOLUTION_TREE = {
     'knight_paladin': ['knight_crusader', 'knight_king'],
     'knight_knight': ['knight_king', 'rook'],
 
+    'two_color_bishop': ['rook', 'bishop_ship'],
     'bishop_bomber': ['bishop_nuke'],
     'bishop_ghost': ['bishop_sniper'],
 
-    'rook_tank': ['rook_fortress'],
+    'rook_tank': ['rook_helicopter'],
 
     'queen_camel': ['queen_knight_camel'],
     'queen_knight': ['queen_knight_camel'],
 
     // TO ANOTHER FIGURES
-    'two_color_bishop': ['rook'],
     'pawn_superrunner': ['knight'],
     'pawn_spartan': ['bishop']
 };
