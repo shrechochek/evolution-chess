@@ -256,9 +256,10 @@ const SYMBOLS = {
     ring: '💍', crown: '👑',
     // Tier 3 (Legendary)
     spartan: '🏛', super_runner: '🧑‍🦽‍➡️',
-    camel_knight: '👹', crusader: '⚜', endless_knight: '🐴', glasses: '👓',
+    camel_knight: '👹', crusader: '⚜', endless_knight: '🐴', moose: '🫎',
     nuke_bishop: '☢', sniper: '🔭',
-    fortress: '🏰' 
+    fortress: '🏰' ,
+    unicorn: '🦄'
 };
 
 // === ОПРЕДЕЛЕНИЕ БАЗОВЫХ ВЕКТОРОВ ===
@@ -354,12 +355,12 @@ const PIECE_TYPES = {
 
     // Ветка Ферзя
     'queen_camel': {
-        name: 'королева верблюдов', symbol: SYMBOLS.ring, tier: 2, xpReq: 2,
+        name: 'королева верблюдов', symbol: SYMBOLS.ring, tier: 2, xpReq: 4,
         desc: "королева + верблюд",
         moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)]
     },
     'queen_knight': {
-        name: 'королева коней', symbol: SYMBOLS.crown, tier: 2, xpReq: 2,
+        name: 'королева коней', symbol: SYMBOLS.crown, tier: 2, xpReq: 4,
         desc: "королева + конь",
         moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)]
     },
@@ -400,7 +401,7 @@ const PIECE_TYPES = {
     },
     // Конь -> Паладин -> король коней
     'knight_king': {
-        name: 'король коней', symbol: SYMBOLS.glasses, tier: 3, xpReq: 999,
+        name: 'король коней', symbol: SYMBOLS.moose, tier: 3, xpReq: 999,
         desc: 'Конь + король',
         moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)]
     },
@@ -424,6 +425,13 @@ const PIECE_TYPES = {
         desc: 'Танк + Конь',
         // Танк (Ладья slide + Король step) + Конь (step)
         moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG), ...step(VEC_KNIGHT)]
+    },
+
+    // ферзь -> королева коней или королева верблюдов -> королева коней и верблюдов
+    'queen_knight_camel': {
+        name: 'королева коней и верблюдов', symbol: SYMBOLS.unicorn, tier: 2, xpReq: 999,
+        desc: "королева + верблюд",
+        moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)]
     }
 };
 
@@ -450,6 +458,9 @@ const EVOLUTION_TREE = {
     'bishop_ghost': ['bishop_sniper'],
 
     'rook_tank': ['rook_fortress'],
+
+    'queen_camel': ['queen_knight_camel'],
+    'queen_knight': ['queen_knight_camel'],
 
     // TO ANOTHER FIGURES
     'two_color_bishop': ['rook'],
