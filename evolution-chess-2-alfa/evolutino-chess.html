@@ -297,10 +297,10 @@ const PIECE_TYPES = {
 
     'queen_camel': { name: 'королева верблюдов', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
     'queen_knight': { name: 'королева коней', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
-    'queen_upgradeable': { name: 'королева v2', symbol: SYMBOLS.queen, tier: 1, xpReq: 2, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
+    'queen_upgradeable': { name: 'королева v2', symbol: SYMBOLS.queen, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
 
-    'king_dead_end': { name: 'король без эволюции', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)] },
-    'king_nuke': { name: 'ядерный король', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5' },
+    'king_dead_end': { name: 'король без эволюции', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
+    'king_nuke': { name: 'ядерный король', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5', role: 'king'  },
 
     // === TIER 3 ===
     'pawn_spartan': { name: 'Спартанец', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack' },
@@ -346,6 +346,7 @@ const EVOLUTION_TREE = {
 
     'queen_camel': ['queen_knight_camel'],
     'queen_knight': ['queen_knight_camel'],
+    'queen_upgradeable': ['king'],
 
     'pawn_superrunner': ['knight'],
     'pawn_spartan': ['bishop']
@@ -571,10 +572,12 @@ function makeMove(fromX, fromY, move) {
     }
 
     if (target) {
+        log(PIECE_TYPES[target.type].role)
         captureHappened = true;
         enemyType = target.type;
         piece.xp += 1;
-        if (target.type === 'king') {
+        // if (target.type === 'king') {
+        if (PIECE_TYPES[target.type].role === 'king') {
             alert(`Победа!`);
             gameOver = true;
             board[toY][toX] = piece;
@@ -582,8 +585,8 @@ function makeMove(fromX, fromY, move) {
             renderBoard();
             return;
         }
-        log(PIECE_TYPES[target.type].special);
-        log(PIECE_TYPES[target.type].name);
+        // log(PIECE_TYPES[target.type].special);
+        // log(PIECE_TYPES[target.type].name);
         if (PIECE_TYPES[target.type].special === 'explode_3') {
             const radius = target.type.special === 'explode_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
