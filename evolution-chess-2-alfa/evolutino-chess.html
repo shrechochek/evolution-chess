@@ -249,6 +249,7 @@ const SYMBOLS = {
     bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
     tank: '🚜', car: '🏎',
     ring: '💍', crown: '👑',
+    tnt: '🧨',
     // Tier 3
     spartan: '🏛', super_runner: '🧑‍🦽‍➡️',
     camel_knight: '👹', crusader: '⚜', endless_knight: '🐴', moose: '🫎',
@@ -276,7 +277,7 @@ const PIECE_TYPES = {
     'knight': { name: 'Конь', symbol: SYMBOLS.knight, moves: step(VEC_KNIGHT), tier: 1, xpReq: 1 },
     'bishop': { name: 'Слон', symbol: SYMBOLS.bishop, moves: slide(VEC_DIAG), tier: 1, xpReq: 1 },
     'queen': { name: 'Ферзь', symbol: SYMBOLS.queen, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], tier: 1, xpReq: 2 },
-    'king': { name: 'Король', symbol: SYMBOLS.king, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], tier: 1, xpReq: 999, role: 'king' },
+    'king': { name: 'Король', symbol: SYMBOLS.king, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], tier: 1, xpReq: 1, role: 'king' },
 
     // === TIER 2 ===
     'pawn_runner': { name: 'бегун', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
@@ -298,6 +299,9 @@ const PIECE_TYPES = {
     'queen_knight': { name: 'королева коней', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
     'queen_upgradeable': { name: 'королева v2', symbol: SYMBOLS.queen, tier: 1, xpReq: 2, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
 
+    'king_dead_end': { name: 'король без эволюции', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)] },
+    'king_nuke': { name: 'ядерный король', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5' },
+
     // === TIER 3 ===
     'pawn_spartan': { name: 'Спартанец', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack' },
     'pawn_superrunner': { name: 'супер бегун', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
@@ -307,7 +311,7 @@ const PIECE_TYPES = {
     'knight_crusader': { name: 'Храмовник', symbol: SYMBOLS.crusader, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
     'knight_king': { name: 'король коней', symbol: SYMBOLS.moose, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
-    'bishop_nuke': { name: 'Ядерный Слон', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_5' },
+    'bishop_nuke': { name: 'Ядерный Слон', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_3' },
     'bishop_sniper': { name: 'Снайпер', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost: true },
     'bishop_ship': { name: 'корабль', symbol: SYMBOLS.ship, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
 
@@ -325,6 +329,7 @@ const EVOLUTION_TREE = {
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank', 'rook_ghost'],
     'queen': ['queen_camel', 'queen_knight', 'queen_upgradeable'], 
+    'king': ['king_nuke', 'king_dead_end'],
 
     'pawn_runner': ['pawn_superrunner', 'pawn_spartan'],
     'pawn_spearman': ['pawn_spartan'],
