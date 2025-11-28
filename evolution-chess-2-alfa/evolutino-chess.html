@@ -612,31 +612,32 @@ function makeMove(fromX, fromY, move) {
                 return;
             }
         }
+        log('skip');
         // log(PIECE_TYPES[target.type].special);
         // log(PIECE_TYPES[target.type].name);
         if (PIECE_TYPES[target.type].special === 'explode_3') {
-            const radius = target.type.special === 'explode_5' ? 2 : 1; 
+            const radius = PIECE_TYPES[target.type].special === 'explode_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
             explosion = true;
             log('boom!!!!!');
             // return;
         }
         else if (PIECE_TYPES[target.type].special === 'detonate_3') {
-            const radius = target.type.special === 'explode_5' ? 2 : 1; 
+            const radius = PIECE_TYPES[target.type].special === 'detonate_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
             explosion = true;
             log('boom!!!!!');
             // return;
         }
         else if (PIECE_TYPES[target.type].special === 'explode_5') {
-            const radius = target.type.special === 'explode_5' ? 2 : 1; 
+            const radius = PIECE_TYPES[target.type].special === 'explode_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
             explosion = true;
             log('boom!!!!!');
             // return;
         }
         else if (PIECE_TYPES[target.type].special === 'detonate_5') {
-            const radius = target.type.special === 'explode_5' ? 2 : 1; 
+            const radius = PIECE_TYPES[target.type].special === 'detonate_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
             explosion = true;
             log('boom!!!!!');
@@ -649,7 +650,7 @@ function makeMove(fromX, fromY, move) {
     }
 
     // ПЕРЕМЕЩЕНИЕ ФИГУРЫ
-    if (!explosion) {
+    if (!explosion || piece.type === 'king') {
         board[toY][toX] = piece;
     }
     else {
@@ -775,7 +776,8 @@ function showEvolutionModal(piece) {
     showModal('Эволюция!', 'Ваша фигура мутирует.', options, (newType) => {
         piece.type = newType;
         // log(PIECE_TYPES[piece.type].role);
-        if(PIECE_TYPES[piece.type].role === "king") {
+        // if(PIECE_TYPES[piece.type].role === "king") {
+        if(piece.type === "king") {
             if(currentTurn === "white") {
                 white_kings += 1
             }
