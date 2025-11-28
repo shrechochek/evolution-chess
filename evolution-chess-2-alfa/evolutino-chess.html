@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шахматы с Эволюцией V2.4</title>
+    <title>Шахматы с Эволюцией V2.5</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -205,7 +205,7 @@
 </head>
 <body>
 
-    <h1>Шахматы: Эволюция Фигур V2.4</h1>
+    <h1>Шахматы: Эволюция Фигур V2.5</h1>
     <div class="subtitle">made by shrechochek</div>
 
     <div class="game-container">
@@ -359,6 +359,9 @@ let selectedCell = null;
 let possibleMoves = [];
 let gameOver = false;
 let enPassantTarget = null; // {x, y} или null
+
+let white_kings = 1;
+let black_kings = 1;
 
 // --- Инициализация ---
 
@@ -551,6 +554,8 @@ function cellClick(x, y) {
 }
 
 function makeMove(fromX, fromY, move) {
+    log(white_kings);
+    log(black_kings);
     const toX = move.x;
     const toY = move.y;
     const piece = board[fromY][fromX];
@@ -578,12 +583,30 @@ function makeMove(fromX, fromY, move) {
         piece.xp += 1;
         // if (target.type === 'king') {
         if (PIECE_TYPES[target.type].role === 'king') {
-            alert(`Победа!`);
-            gameOver = true;
-            board[toY][toX] = piece;
-            board[fromY][fromX] = null;
-            renderBoard();
-            return;
+            // log(target.color);
+            if(target.color === 'white') {
+                white_kings -= 1;
+            }
+            else {
+                black_kings -= 1;
+            }
+
+            if (white_kings === 0) {
+                alert(`Победа черных!`);
+                gameOver = true;
+                board[toY][toX] = piece;
+                board[fromY][fromX] = null;
+                renderBoard();
+                return;
+            }
+            else if (black_kings === 0) {
+                alert(`Победа белых!`);
+                gameOver = true;
+                board[toY][toX] = piece;
+                board[fromY][fromX] = null;
+                renderBoard();
+                return;
+            }
         }
         // log(PIECE_TYPES[target.type].special);
         // log(PIECE_TYPES[target.type].name);
@@ -743,6 +766,15 @@ function showEvolutionModal(piece) {
     const options = EVOLUTION_TREE[piece.type];
     showModal('Эволюция!', 'Ваша фигура мутирует.', options, (newType) => {
         piece.type = newType;
+        // log(PIECE_TYPES[piece.type].role);
+        if(PIECE_TYPES[piece.type].role === "king") {
+            if(currentTurn === "white") {
+                white_kings += 1
+            }
+            else {
+                black_kings += 1
+            }
+        }
         piece.xp = 0;
         log(`🧬 Эволюция завершена!`);
         endTurn();
