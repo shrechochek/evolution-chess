@@ -279,9 +279,9 @@ const PIECE_TYPES = {
     'king': { name: 'Король', symbol: SYMBOLS.king, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], tier: 1, xpReq: 999, role: 'king' },
 
     // === TIER 2 ===
-    'pawn_runner': { name: 'бегун', symbol: SYMBOLS.runner, tier: 2, xpReq: 2, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
-    'pawn_spearman': { name: 'Копейщик', symbol: SYMBOLS.spearman, tier: 2, xpReq: 2, role: 'pawn', special: 'spear_attack' },
-    'pawn_torpedo': { name: 'торпеда', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 2, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
+    'pawn_runner': { name: 'бегун', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
+    'pawn_spearman': { name: 'Копейщик', symbol: SYMBOLS.spearman, tier: 2, xpReq: 1, role: 'pawn', special: 'spear_attack' },
+    'pawn_torpedo': { name: 'торпеда', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
 
     'knight_camel': { name: 'Верблюд', symbol: SYMBOLS.camel, tier: 2, xpReq: 2, moves: step(VEC_CAMEL) },
     'knight_paladin': { name: 'Паладин', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
