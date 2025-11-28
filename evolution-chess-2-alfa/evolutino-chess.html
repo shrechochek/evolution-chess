@@ -287,7 +287,7 @@ const PIECE_TYPES = {
     'knight_paladin': { name: 'Паладин', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
     'knight_knight': { name: 'рыцарь', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
 
-    'bishop_bomber': { name: 'Бомбардир', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'explode_3' },
+    'bishop_bomber': { name: 'Бомбардир', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' },
     'bishop_ghost': { name: 'Призрак', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: true },
     'two_color_bishop': { name: 'двухцветный слон', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
@@ -553,6 +553,8 @@ function makeMove(fromX, fromY, move) {
     let captureHappened = false;
     let enemyType = null;
 
+    let explosion = false;
+
     // ОБРАБОТКА ВЗЯТИЯ НА ПРОХОДЕ
     if (move.isEnPassant) {
         const dir = piece.color === 'white' ? 1 : -1; 
@@ -575,10 +577,31 @@ function makeMove(fromX, fromY, move) {
             renderBoard();
             return;
         }
+        log(PIECE_TYPES[target.type].special);
+        log(PIECE_TYPES[target.type].name);
+        if (PIECE_TYPES[target.type].special === 'explode_3') {
+            const radius = target.type.special === 'explode_5' ? 2 : 1; 
+            explode(toX, toY, board[toY][toX].color, radius);
+            explosion = true;
+            log('boom!!!!!');
+            // return;
+        }
+        if (PIECE_TYPES[target.type].special === 'detonate_3') {
+            const radius = target.type.special === 'explode_5' ? 2 : 1; 
+            explode(toX, toY, board[toY][toX].color, radius);
+            explosion = true;
+            log('boom!!!!!');
+            // return;
+        }
     }
 
     // ПЕРЕМЕЩЕНИЕ ФИГУРЫ
-    board[toY][toX] = piece;
+    if (!explosion) {
+        board[toY][toX] = piece;
+    }
+    else {
+        board[toY][toX] = null;
+    }
     board[fromY][fromX] = null;
     piece.hasMoved = true;
 
