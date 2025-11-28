@@ -284,44 +284,43 @@ const PIECE_TYPES = {
     'king': { name: 'Король', symbol: SYMBOLS.king, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], tier: 1, xpReq: 1, role: 'king' },
 
     // === TIER 2 ===
-    'pawn_runner': { name: 'бегун', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
-    'pawn_spearman': { name: 'Копейщик', symbol: SYMBOLS.spearman, tier: 2, xpReq: 1, role: 'pawn', special: 'spear_attack' },
-    'pawn_torpedo': { name: 'торпеда', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
+    'pawn_runner': { name: 'бегун', desc: 'может ходить по диагонали вперед на одну клетку', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
+    'pawn_spearman': { name: 'Копейщик', desc: 'бьет клетку перед собой', symbol: SYMBOLS.spearman, tier: 2, xpReq: 1, role: 'pawn', special: 'spear_attack' },
+    'pawn_torpedo': { name: 'торпеда', desc: 'может ходить на две клетки вперед', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
 
-    'knight_camel': { name: 'Верблюд', symbol: SYMBOLS.camel, tier: 2, xpReq: 2, moves: step(VEC_CAMEL) },
-    'knight_paladin': { name: 'Паладин', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
-    'knight_knight': { name: 'рыцарь', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
+    'knight_camel': { name: 'Верблюд', desc: 'ходит (3+1)', symbol: SYMBOLS.camel, tier: 2, xpReq: 2, moves: step(VEC_CAMEL) },
+    'knight_paladin': { name: 'Паладин', desc: 'ходит как конь, плюс одна клетка по горизонтали и вертикали', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
+    'knight_knight': { name: 'рыцарь', desc: 'ходит как конь, плюс одна клетка по диагонали', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
 
-    'bishop_bomber': { name: 'Бомбардир', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, //detonate - explode only when this piece is captured, explode - explode if you capture orw was captured
-    'bishop_ghost': { name: 'Призрак', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: true },
-    'two_color_bishop': { name: 'двухцветный слон', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
+    'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается(3x3) при съедении', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, //detonate - explode only when this piece is captured, explode - explode if you capture orw was captured
+    'bishop_ghost': { name: 'Призрак', desc: 'проходит через фигуры', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: true },
+    'two_color_bishop': { name: 'двухцветный слон', desc: 'слон + король', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
-    'rook_tank': { name: 'Танк', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)] },
-    'rook_ghost': { name: 'Призрак', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: true },
+    'rook_tank': { name: 'Танк', desc: 'ладья + король', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)] },
+    'rook_ghost': { name: 'Призрак', desc: 'проходит через фигуры', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: true },
 
-    'queen_camel': { name: 'королева верблюдов', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
-    'queen_knight': { name: 'королева коней', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
-    'queen_upgradeable': { name: 'королева v2', symbol: SYMBOLS.queen, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
+    'queen_camel': { name: 'королева верблюдов', desc: 'королева + верблюд', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
+    'queen_knight': { name: 'королева коней', desc: 'королева + конь', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
+    'queen_upgradeable': { name: 'королева v2', desc: 'королева, которая эволюционирует дальше', symbol: SYMBOLS.queen, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
 
-    'king_dead_end': { name: 'король без эволюции', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
-    'king_nuke': { name: 'ядерный король', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5', role: 'king'  },
+    'king_dead_end': { name: 'король без эволюции', desc: 'обычный король', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
+    'king_nuke': { name: 'ядерный король', desc: 'взрывается(5x5) когда съедает или съеден', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5', role: 'king'  },
 
     // === TIER 3 ===
-    'pawn_spartan': { name: 'Спартанец', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack' },
-    'pawn_superrunner': { name: 'супер бегун', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
+    'pawn_spartan': { name: 'Спартанец', desc: 'копейщик + бегун', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack' },
+    'pawn_superrunner': { name: 'супер бегун', desc: 'ходит как король', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
 
-    'knight_camel_hybrid': { name: 'Коне-Верблюд', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
-    'knight_endless': { name: 'беконечный конь', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: true },
-    'knight_crusader': { name: 'Храмовник', symbol: SYMBOLS.crusader, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
-    'knight_king': { name: 'король коней', symbol: SYMBOLS.moose, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
+    'knight_camel_hybrid': { name: 'Коне-Верблюд', desc: 'конь + верблюд', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
+    'knight_endless': { name: 'беконечный конь', desc: 'конь без ограничения радиуса', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: true },
+    'knight_king': { name: 'король коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
-    'bishop_nuke': { name: 'Ядерный Слон', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_3' },
-    'bishop_sniper': { name: 'Снайпер', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost: true },
-    'bishop_ship': { name: 'корабль', symbol: SYMBOLS.ship, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
+    'bishop_nuke': { name: 'Ядерный Слон', desc: 'взрывается(3x3) когда съедает или съеден', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_3' },
+    'bishop_sniper': { name: 'Снайпер', desc: 'королева которая проходит через фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost: true },
+    'bishop_ship': { name: 'корабль', desc: 'конь + слон', symbol: SYMBOLS.ship, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
 
-    'rook_helicopter': { name: 'вертолет', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
+    'rook_helicopter': { name: 'вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
 
-    'queen_knight_camel': { name: 'ультимативная королева', symbol: SYMBOLS.unicorn, tier: 2, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] }
+    'queen_knight_camel': { name: 'ультимативная королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 2, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] }
 };
 
 /**
