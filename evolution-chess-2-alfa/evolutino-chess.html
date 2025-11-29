@@ -326,7 +326,8 @@ const PIECE_TYPES = {
     'rook_sniper':  { name: 'ракета', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.rocket, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO)], ghost: 2 },
 
     'queen_knight_camel': { name: 'ультимативная королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
-    'queen_ghost': { name: 'призрак', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 }
+    'queen_ghost': { name: 'призрак', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 },
+    'quuen_range': { name: 'дальняя королева', desc: 'дальняя атака', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
 
 /**
@@ -355,7 +356,7 @@ const EVOLUTION_TREE = {
 
     'queen_camel': ['queen_knight_camel'],
     'queen_knight': ['queen_knight_camel'],
-    'queen_upgradeable': ['king', 'queen_ghost'],
+    'queen_upgradeable': ['king', 'queen_ghost', 'quuen_range'],
 
     'pawn_superrunner': ['knight'],
     'pawn_spartan': ['bishop']
@@ -622,6 +623,7 @@ function makeMove(fromX, fromY, move) {
         captureHappened = true;
         log('⚔️ Взятие на проходе!');
     }
+    // log('test1');
 
     if (target) {
         // log(PIECE_TYPES[target.type].role)
@@ -641,16 +643,26 @@ function makeMove(fromX, fromY, move) {
             if (white_kings === 0) {
                 alert(`Победа черных!`);
                 gameOver = true;
-                board[toY][toX] = piece;
-                board[fromY][fromX] = null;
+                if(PIECE_TYPES[target.type].special !== 'range_capture') {
+                    board[toY][toX] = piece;
+                    board[fromY][fromX] = null;
+                }
+                else {
+                    board[toY][toX] = null;
+                }
                 renderBoard();
                 return;
             }
             else if (black_kings === 0) {
                 alert(`Победа белых!`);
                 gameOver = true;
-                board[toY][toX] = piece;
-                board[fromY][fromX] = null;
+                if(PIECE_TYPES[target.type].special !== 'range_capture') {
+                    board[toY][toX] = piece;
+                    board[fromY][fromX] = null;
+                }
+                else {
+                    board[toY][toX] = null;
+                }
                 renderBoard();
                 return;
             }
@@ -686,14 +698,36 @@ function makeMove(fromX, fromY, move) {
         move_audio.play();
     }
 
+    // log('test2');
+    log(PIECE_TYPES[piece.type].special);
+    log(target)
+
     // ПЕРЕМЕЩЕНИЕ ФИГУРЫ
-    if (!explosion || piece.type === 'king') {
-        board[toY][toX] = piece;
+    if(target)
+    { //дальняя атака или взрыв
+        if(PIECE_TYPES[piece.type].special === 'range_capture' || explosion) {
+            board[toY][toX] = null;
+        }
+        else {
+            board[toY][toX] = piece;
+        }
     }
     else {
-        board[toY][toX] = null;
+        board[toY][toX] = piece;
     }
-    board[fromY][fromX] = null;
+
+    // log('test3');
+    // if(!(target & PIECE_TYPES[piece.type].special !== 'range_capture')) {
+    //     board[fromY][fromX] = null;
+    // }
+    if(PIECE_TYPES[piece.type].special !== 'range_capture') {
+        board[fromY][fromX] = null;
+    }
+    else if(!target) {
+        board[fromY][fromX] = null;
+    }
+    log(fromY);
+    log(fromX);
     piece.hasMoved = true;
 
     // РОКИРОВКА (Перемещение ладьи)
