@@ -250,15 +250,15 @@ const SYMBOLS = {
     spearman: '🔱', runner: '🏃', torpedo: '🐇',
     camel: '🐫', paladin: '🛡', knight_knight: '🤺',
     bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
-    tank: '🚜', car: '🏎', statue: '🗿',
+    tank: '🚜', car: '🏎', statue: '🗽',
     ring: '💍', crown: '👑',
     tnt: '🧨',
     // Tier 3
     spartan: '🏛', super_runner: '🧑‍🦽‍➡️',
-    camel_knight: '👹', crusader: '⚜', endless_knight: '🐴', moose: '🫎',
+    camel_knight: '👹', endless_knight: '🐴', moose: '🫎',
     nuke_bishop: '☢', sniper: '🔭', ship: '⛵️',
-    fortress: '🏰', helicopter: '🚁',
-    unicorn: '🦄'
+    fortress: '🏰', helicopter: '🚁', rocket: '🚀',
+    unicorn: '🦄', pin: '📌'
 };
 
 // Векторы
@@ -296,7 +296,7 @@ const PIECE_TYPES = {
     'knight_knight': { name: 'рыцарь', desc: 'ходит как конь, плюс одна клетка по диагонали', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
 
     'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается(3x3) при съедении', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, 
-    'bishop_ghost': { name: 'Призрак', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 }, // Теперь ghost принимает число
+    'bishop_ghost': { name: 'Призрак', desc: 'проходит через 1 фигуру', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 }, // Теперь ghost принимает число
     'two_color_bishop': { name: 'двухцветный слон', desc: 'слон + король', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
     'rook_tank': { name: 'Танк', desc: 'ладья + король', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)] },
@@ -315,16 +315,18 @@ const PIECE_TYPES = {
     'pawn_superrunner': { name: 'супер бегун', desc: 'ходит как король', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
 
     'knight_camel_hybrid': { name: 'Коне-Верблюд', desc: 'конь + верблюд', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
-    'knight_endless': { name: 'беконечный конь', desc: 'конь без ограничения радиуса', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: true }, // true = Infinity
+    'knight_endless': { name: 'беконечный конь', desc: 'конь без ограничения радиуса', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: 10 }, // true = Infinity
     'knight_king': { name: 'король коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
     'bishop_nuke': { name: 'Ядерный Слон', desc: 'взрывается(3x3) когда съедает или съеден', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_3' },
-    'bishop_sniper': { name: 'Снайпер', desc: 'королева которая проходит через ВСЕ фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost: true },
+    'bishop_sniper': { name: 'Снайпер', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_DIAG)], ghost: 2 },
     'bishop_ship': { name: 'корабль', desc: 'конь + слон', symbol: SYMBOLS.ship, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
 
     'rook_helicopter': { name: 'вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
+    'rook_sniper':  { name: 'ракета', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.rocket, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO)], ghost: 2 },
 
-    'queen_knight_camel': { name: 'ультимативная королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 2, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] }
+    'queen_knight_camel': { name: 'ультимативная королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
+    'queen_ghost': { name: 'призрак', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 }
 };
 
 /**
@@ -353,7 +355,7 @@ const EVOLUTION_TREE = {
 
     'queen_camel': ['queen_knight_camel'],
     'queen_knight': ['queen_knight_camel'],
-    'queen_upgradeable': ['king'],
+    'queen_upgradeable': ['king', 'queen_ghost'],
 
     'pawn_superrunner': ['knight'],
     'pawn_spartan': ['bishop']
