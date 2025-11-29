@@ -5,7 +5,8 @@
 [_pieces evolution table_](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 
-[_our website_](https://shrechochek.github.io/evolution-chess/)
+[_our website_]([https://shrechochek.github.io/evolution-chess/](https://shrechochek.github.io/evolution-chess/))
+
 
 
 Programmer: [_shrechochek_](https://github.com/shrechochek)
