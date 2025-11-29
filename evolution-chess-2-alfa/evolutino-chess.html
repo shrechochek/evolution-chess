@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шахматы с Эволюцией V2.5</title>
+    <title>Шахматы с Эволюцией V2.6</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -12,6 +12,7 @@
             --highlight: rgba(241, 196, 15, 0.6);
             --capture: rgba(231, 76, 60, 0.6);
             --special: rgba(52, 152, 219, 0.6); /* Синий цвет для спец. ходов */
+            --immortal: rgba(142, 68, 173, 0.6); /* Фиолетовый для бессмертных */
             --white-piece: #fff;
             --black-piece: #000;
             --white-stroke: #000;
@@ -87,6 +88,8 @@
         .piece.white { color: var(--white-piece); text-shadow: 0 0 2px var(--white-stroke); }
         .piece.black { color: var(--black-piece); text-shadow: 0 0 2px var(--black-stroke); }
         
+        .piece.immortal { text-shadow: 0 0 5px #9b59b6; } /* Подсветка бессмертия */
+
         /* Tiers Effects */
         .piece.tier-2 { filter: drop-shadow(0 0 3px #3498db); }
         .piece.tier-3 { filter: drop-shadow(0 0 5px #f1c40f); font-size: 44px; }
@@ -205,8 +208,8 @@
 </head>
 <body>
 
-    <h1>Шахматы: Эволюция Фигур V2.5</h1>
-    <div class="subtitle">made by shrechochek</div>
+    <h1>Шахматы: Эволюция Фигур V2.6</h1>
+    <div class="subtitle">Статуи, Бессмертие и Умные Призраки</div>
 
     <div class="game-container">
         <div id="board"></div>
@@ -247,7 +250,7 @@ const SYMBOLS = {
     spearman: '🔱', runner: '🏃', torpedo: '🐇',
     camel: '🐫', paladin: '🛡', knight_knight: '🤺',
     bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
-    tank: '🚜', car: '🏎',
+    tank: '🚜', car: '🏎', statue: '🗿',
     ring: '💍', crown: '👑',
     tnt: '🧨',
     // Tier 3
@@ -292,12 +295,13 @@ const PIECE_TYPES = {
     'knight_paladin': { name: 'Паладин', desc: 'ходит как конь, плюс одна клетка по горизонтали и вертикали', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
     'knight_knight': { name: 'рыцарь', desc: 'ходит как конь, плюс одна клетка по диагонали', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
 
-    'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается(3x3) при съедении', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, //detonate - explode only when this piece is captured, explode - explode if you capture orw was captured
-    'bishop_ghost': { name: 'Призрак', desc: 'проходит через фигуры', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: true },
+    'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается(3x3) при съедении', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, 
+    'bishop_ghost': { name: 'Призрак', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 }, // Теперь ghost принимает число
     'two_color_bishop': { name: 'двухцветный слон', desc: 'слон + король', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
     'rook_tank': { name: 'Танк', desc: 'ладья + король', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)] },
-    'rook_ghost': { name: 'Призрак', desc: 'проходит через фигуры', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: true },
+    'rook_ghost': { name: 'Призрак', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: 1 },
+    'statue': { name: 'статуя', desc: 'Неуязвима. Телепортируется на любую свободную клетку.', symbol: SYMBOLS.statue, tier: 2, xpReq: 999, moves:[], immortal: true, special: 'teleport' },
 
     'queen_camel': { name: 'королева верблюдов', desc: 'королева + верблюд', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
     'queen_knight': { name: 'королева коней', desc: 'королева + конь', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
@@ -311,11 +315,11 @@ const PIECE_TYPES = {
     'pawn_superrunner': { name: 'супер бегун', desc: 'ходит как король', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
 
     'knight_camel_hybrid': { name: 'Коне-Верблюд', desc: 'конь + верблюд', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
-    'knight_endless': { name: 'беконечный конь', desc: 'конь без ограничения радиуса', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: true },
+    'knight_endless': { name: 'беконечный конь', desc: 'конь без ограничения радиуса', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: true }, // true = Infinity
     'knight_king': { name: 'король коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
     'bishop_nuke': { name: 'Ядерный Слон', desc: 'взрывается(3x3) когда съедает или съеден', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_3' },
-    'bishop_sniper': { name: 'Снайпер', desc: 'королева которая проходит через фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost: true },
+    'bishop_sniper': { name: 'Снайпер', desc: 'королева которая проходит через ВСЕ фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost: true },
     'bishop_ship': { name: 'корабль', desc: 'конь + слон', symbol: SYMBOLS.ship, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
 
     'rook_helicopter': { name: 'вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
@@ -330,7 +334,7 @@ const EVOLUTION_TREE = {
     'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo'],
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
-    'rook': ['rook_tank', 'rook_ghost'],
+    'rook': ['rook_tank', 'rook_ghost', 'statue'],
     'queen': ['queen_camel', 'queen_knight', 'queen_upgradeable'], 
     'king': ['king_nuke', 'king_dead_end'],
 
@@ -416,6 +420,20 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
     const isWhite = piece.color === 'white';
     const direction = isWhite ? -1 : 1;
 
+    // 0. СПЕЦ-СПОСОБНОСТЬ: ТЕЛЕПОРТ (СТАТУЯ)
+    if (def.special === 'teleport') {
+        for(let y=0; y<8; y++) {
+            for(let x=0; x<8; x++) {
+                // Можно прыгать только на пустые клетки
+                if (!checkBoard[y][x]) {
+                    moves.push({x, y});
+                }
+            }
+        }
+        // Статуя не имеет других ходов, кроме телепорта (moves: [])
+        return moves; 
+    }
+
     // 1. Логика Пешек
     if (def.role === 'pawn') {
         // Обычный шаг
@@ -434,9 +452,11 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
             const ty = startY + att[1];
             if (isValidPos(tx, ty)) {
                 const target = checkBoard[ty][tx];
-                // Обычная атака
+                // Обычная атака (Проверка на бессмертие target происходит здесь)
                 if (target && target.color !== piece.color) {
-                    moves.push({x: tx, y: ty, isCapture: true});
+                    if (!PIECE_TYPES[target.type].immortal) {
+                         moves.push({x: tx, y: ty, isCapture: true});
+                    }
                 }
                 // Взятие на проходе (En Passant)
                 else if (!target && enPassantTarget && enPassantTarget.x === tx && enPassantTarget.y === ty) {
@@ -445,13 +465,15 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
             }
         });
 
-        // Спец-атаки пешек
+        // Спец-атаки пешек (Копейщик)
         if (def.special === 'spear_attack') {
             const forwardY = startY + direction;
             if (isValidPos(startX, forwardY)) {
                 const target = checkBoard[forwardY][startX];
                 if (target && target.color !== piece.color) {
-                    moves.push({x: startX, y: forwardY, isCapture: true});
+                     if (!PIECE_TYPES[target.type].immortal) {
+                         moves.push({x: startX, y: forwardY, isCapture: true});
+                     }
                 }
             }
         }
@@ -468,32 +490,56 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
         }
     }
 
-    // 2. Стандартные ходы
+    // 2. Стандартные ходы (Слайдеры и Шаги)
     if (def.moves) {
         def.moves.forEach(vec => {
             const dx = vec.dx;
             const dy = vec.dy;
             
             if (vec.slide) {
+                // ЛОГИКА СЛАЙДА С УЧЕТОМ ПРИЗРАКА (Числовой лимит)
+                let obstaclesPassed = 0;
+                // Если ghost === true (старый формат), считаем как Infinity. Иначе берем число или 0.
+                const ghostLimit = (def.ghost === true) ? Infinity : (def.ghost || 0);
+
                 for (let i = 1; i < 8; i++) {
                     const tx = startX + (dx * i);
                     const ty = startY + (dy * i);
                     if (!isValidPos(tx, ty)) break;
+                    
                     const target = checkBoard[ty][tx];
+                    
                     if (!target) {
                         moves.push({x: tx, y: ty});
                     } else {
-                        if (target.color !== piece.color) moves.push({x: tx, y: ty, isCapture: true});
-                        if (!def.ghost) break; 
+                        // Если встретили фигуру:
+                        // 1. Можем ли мы её съесть?
+                        if (target.color !== piece.color) {
+                            // Если не бессмертная - добавляем как ход взятия
+                            if (!PIECE_TYPES[target.type].immortal) {
+                                moves.push({x: tx, y: ty, isCapture: true});
+                            }
+                        }
+                        
+                        // 2. Можем ли мы пройти сквозь неё дальше?
+                        obstaclesPassed++;
+                        if (obstaclesPassed > ghostLimit) {
+                            break; // Лимит прохода исчерпан
+                        }
                     }
                 }
             } else {
+                // ЛОГИКА ШАГА (Прыжок)
                 const tx = startX + dx;
                 const ty = startY + dy;
                 if (isValidPos(tx, ty)) {
                     const target = checkBoard[ty][tx];
-                    if (!target || target.color !== piece.color) {
-                        moves.push({x: tx, y: ty, isCapture: !!target});
+                    if (!target) {
+                        moves.push({x: tx, y: ty});
+                    } else if (target.color !== piece.color) {
+                        if (!PIECE_TYPES[target.type].immortal) {
+                            moves.push({x: tx, y: ty, isCapture: true});
+                        }
                     }
                 }
             }
@@ -506,7 +552,6 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
         
         // Короткая (KingSide)
         const kRook = checkBoard[row][7];
-        // FIX: Проверяем role через PIECE_TYPES, а не напрямую у объекта фигуры
         if (kRook && PIECE_TYPES[kRook.type].role === 'rook' && !kRook.hasMoved) {
             if (!checkBoard[row][5] && !checkBoard[row][6]) {
                 moves.push({x: 6, y: row, isCastling: true, rookX: 7, rookToX: 5});
@@ -515,7 +560,6 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
         
         // Длинная (QueenSide)
         const qRook = checkBoard[row][0];
-        // FIX: Проверяем role через PIECE_TYPES
         if (qRook && PIECE_TYPES[qRook.type].role === 'rook' && !qRook.hasMoved) {
             if (!checkBoard[row][1] && !checkBoard[row][2] && !checkBoard[row][3]) {
                 moves.push({x: 2, y: row, isCastling: true, rookX: 0, rookToX: 3});
@@ -557,8 +601,6 @@ function cellClick(x, y) {
 }
 
 function makeMove(fromX, fromY, move) {
-    // log(white_kings);
-    // log(black_kings);
     const toX = move.x;
     const toY = move.y;
     const piece = board[fromY][fromX];
@@ -580,14 +622,13 @@ function makeMove(fromX, fromY, move) {
     }
 
     if (target) {
-        log(PIECE_TYPES[target.type].role)
+        // log(PIECE_TYPES[target.type].role)
         capture_audio.play();
         captureHappened = true;
         enemyType = target.type;
         piece.xp += 1;
-        // if (target.type === 'king') {
+        
         if (PIECE_TYPES[target.type].role === 'king') {
-            // log(target.color);
             if(target.color === 'white') {
                 white_kings -= 1;
             }
@@ -612,36 +653,30 @@ function makeMove(fromX, fromY, move) {
                 return;
             }
         }
-        log('skip');
-        // log(PIECE_TYPES[target.type].special);
-        // log(PIECE_TYPES[target.type].name);
+        
         if (PIECE_TYPES[target.type].special === 'explode_3') {
             const radius = PIECE_TYPES[target.type].special === 'explode_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
             explosion = true;
             log('boom!!!!!');
-            // return;
         }
         else if (PIECE_TYPES[target.type].special === 'detonate_3') {
             const radius = PIECE_TYPES[target.type].special === 'detonate_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
             explosion = true;
             log('boom!!!!!');
-            // return;
         }
         else if (PIECE_TYPES[target.type].special === 'explode_5') {
             const radius = PIECE_TYPES[target.type].special === 'explode_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
             explosion = true;
             log('boom!!!!!');
-            // return;
         }
         else if (PIECE_TYPES[target.type].special === 'detonate_5') {
             const radius = PIECE_TYPES[target.type].special === 'detonate_5' ? 2 : 1; 
             explode(toX, toY, board[toY][toX].color, radius);
             explosion = true;
             log('boom!!!!!');
-            // return;
         }
     }
 
@@ -724,7 +759,8 @@ function explode(cx, cy, attackerColor, radius) {
             const ty = cy + dy;
             if (isValidPos(tx, ty)) {
                 const victim = board[ty][tx];
-                if (victim && victim.type !== 'king') { 
+                // Бессмертные фигуры выживают при взрыве (кроме королей, у которых логика отдельная)
+                if (victim && victim.type !== 'king' && !PIECE_TYPES[victim.type].immortal) { 
                     const isNuke = radius > 1;
                     if (isNuke || victim.color !== attackerColor) {
                         board[ty][tx] = null;
@@ -775,8 +811,6 @@ function showEvolutionModal(piece) {
     const options = EVOLUTION_TREE[piece.type];
     showModal('Эволюция!', 'Ваша фигура мутирует.', options, (newType) => {
         piece.type = newType;
-        // log(PIECE_TYPES[piece.type].role);
-        // if(PIECE_TYPES[piece.type].role === "king") {
         if(piece.type === "king") {
             if(currentTurn === "white") {
                 white_kings += 1
@@ -831,6 +865,10 @@ function renderBoard() {
                 const pieceEl = document.createElement('div');
                 const def = PIECE_TYPES[piece.type];
                 pieceEl.className = `piece ${piece.color} tier-${def.tier}`;
+                
+                // Подсветка бессмертия
+                if (def.immortal) pieceEl.classList.add('immortal');
+
                 pieceEl.innerText = def.symbol;
                 
                 if (piece.xp > 0) {
@@ -858,8 +896,10 @@ function updateInfo(piece) {
     const nextEvos = EVOLUTION_TREE[piece.type] || [];
     const hasEvo = nextEvos.length > 0;
     
+    let immortalBadge = def.immortal ? '<span style="font-size:0.6em; background:#9b59b6; color:#fff; padding:2px 5px; border-radius:4px; margin-left:5px;">Бессмертный</span>' : '';
+
     infoPanel.innerHTML = `
-        <div style="font-size: 1.4em; margin-bottom:5px;">${def.symbol} <strong>${def.name}</strong> <span style="font-size:0.6em; background:#f1c40f; color:#000; padding:2px 5px; border-radius:4px;">Tier ${def.tier}</span></div>
+        <div style="font-size: 1.4em; margin-bottom:5px;">${def.symbol} <strong>${def.name}</strong> <span style="font-size:0.6em; background:#f1c40f; color:#000; padding:2px 5px; border-radius:4px;">Tier ${def.tier}</span>${immortalBadge}</div>
         <div style="font-size: 0.9em; color: #ccc; margin-bottom: 10px;">${def.desc || ''}</div>
         
         ${hasEvo ? 
