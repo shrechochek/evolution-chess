@@ -6,7 +6,7 @@
 
 
 <!--- [_our website_](https://shrechochek.github.io/evolution-chess/) --->
-[_play online ](https://shrechochek.github.io/evolution-chess/)
+[ play online ](https://shrechochek.github.io/evolution-chess/)
 
 
 
