@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шахматы с Эволюцией V2.6</title>
+    <title>Шахматы с Эволюцией: SVG версия</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -11,12 +11,10 @@
             --board-light: #ecf0f1;
             --highlight: rgba(241, 196, 15, 0.6);
             --capture: rgba(231, 76, 60, 0.6);
-            --special: rgba(52, 152, 219, 0.6); /* Синий цвет для спец. ходов */
-            --immortal: rgba(142, 68, 173, 0.6); /* Фиолетовый для бессмертных */
+            --special: rgba(52, 152, 219, 0.6);
+            --immortal: rgba(142, 68, 173, 0.8);
             --white-piece: #fff;
             --black-piece: #000;
-            --white-stroke: #000;
-            --black-stroke: #fff;
         }
 
         body {
@@ -36,7 +34,7 @@
 
         .game-container {
             display: flex;
-            gap: 20px;
+            gap: 30px;
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -44,20 +42,19 @@
         /* Chess Board */
         #board {
             display: grid;
-            grid-template-columns: repeat(8, 60px);
-            grid-template-rows: repeat(8, 60px);
-            border: 5px solid #34495e;
+            grid-template-columns: repeat(8, 80px);
+            grid-template-rows: repeat(8, 80px);
+            border: 8px solid #34495e;
             user-select: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
         }
 
         .cell {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 38px;
             cursor: pointer;
             position: relative;
         }
@@ -65,10 +62,11 @@
         .cell.light { background-color: var(--board-light); }
         .cell.dark { background-color: var(--board-dark); }
         .cell.selected { background-color: var(--highlight) !important; }
+        
         .cell.possible-move::after {
             content: '';
-            width: 14px;
-            height: 14px;
+            width: 20px;
+            height: 20px;
             background: rgba(0,0,0,0.25);
             border-radius: 50%;
         }
@@ -77,40 +75,47 @@
 
         /* Pieces */
         .piece {
-            cursor: grab;
-            transition: transform 0.2s;
-            z-index: 2;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%; height: 100%;
+            z-index: 2;
+            cursor: grab;
+            transition: transform 0.2s;
         }
-        .piece.white { color: var(--white-piece); text-shadow: 0 0 2px var(--white-stroke); }
-        .piece.black { color: var(--black-piece); text-shadow: 0 0 2px var(--black-stroke); }
         
-        .piece.immortal { text-shadow: 0 0 5px #9b59b6; } /* Подсветка бессмертия */
+        .piece img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            /* SVG тени могут работать иначе, но фильтр оставим для объема */
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
+        }
 
-        /* Tiers Effects */
-        .piece.tier-2 { filter: drop-shadow(0 0 3px #3498db); }
-        .piece.tier-3 { filter: drop-shadow(0 0 5px #f1c40f); font-size: 44px; }
+        /* Эффект для бессмертных фигур */
+        .piece.immortal img {
+            filter: drop-shadow(0 0 8px #9b59b6);
+        }
 
-        /* Level badges */
+        /* Бейджик уровня */
         .lvl-badge {
             position: absolute;
-            bottom: 2px;
-            right: 2px;
-            font-size: 10px;
-            background: rgba(0,0,0,0.8);
+            bottom: 4px;
+            right: 4px;
+            font-size: 12px;
+            background: rgba(0,0,0,0.85);
             color: #f1c40f;
-            padding: 1px 4px;
-            border-radius: 4px;
+            padding: 2px 6px;
+            border-radius: 6px;
             pointer-events: none;
             font-weight: bold;
+            z-index: 3;
         }
 
         /* Sidebar */
         .sidebar {
-            width: 300px;
+            width: 320px;
             background: rgba(0,0,0,0.2);
             padding: 20px;
             border-radius: 8px;
@@ -124,20 +129,20 @@
         }
 
         .turn-indicator {
-            font-size: 1.2em;
+            font-size: 1.4em;
             font-weight: bold;
             margin-bottom: 10px;
         }
 
         .log {
-            height: 200px;
+            height: 300px;
             overflow-y: auto;
-            font-size: 0.85em;
+            font-size: 0.9em;
             font-family: monospace;
             border-top: 1px solid rgba(255,255,255,0.2);
             padding-top: 5px;
             display: flex;
-            flex-direction: column-reverse; /* Newest at bottom visually but scrolled */
+            flex-direction: column-reverse;
         }
 
         /* Modal */
@@ -149,7 +154,7 @@
             z-index: 100;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(5px);
         }
 
         .modal-content {
@@ -157,7 +162,7 @@
             color: #333;
             padding: 30px;
             border-radius: 12px;
-            max-width: 600px;
+            max-width: 700px;
             width: 90%;
             text-align: center;
             box-shadow: 0 15px 30px rgba(0,0,0,0.5);
@@ -166,7 +171,7 @@
 
         .modal-options {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             justify-content: center;
             margin-top: 20px;
             flex-wrap: wrap;
@@ -177,10 +182,13 @@
             padding: 15px;
             border-radius: 8px;
             cursor: pointer;
-            width: 140px;
+            width: 150px;
             transition: all 0.2s;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .modal-card:hover {
@@ -190,7 +198,12 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .modal-icon { font-size: 45px; display: block; margin-bottom: 10px; }
+        .modal-card img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+
         .modal-name { font-weight: bold; display: block; margin-bottom: 5px; font-size: 1.1em;}
         .modal-desc { font-size: 0.8em; color: #555; line-height: 1.2; }
 
@@ -198,18 +211,19 @@
             background: #e74c3c;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
             font-weight: bold;
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
 
-    <h1>Шахматы: Эволюция Фигур V2.6</h1>
-    <div class="subtitle">made by shrechochek</div>
+    <h1>Шахматы: Эволюция Фигур V2.8</h1>
+    <div class="subtitle">SVG Edition</div>
 
     <div class="game-container">
         <div id="board"></div>
@@ -227,7 +241,6 @@
         </div>
     </div>
 
-    <!-- Universal Modal -->
     <div id="modal-overlay">
         <div class="modal-content">
             <h2 id="modal-title">Заголовок</h2>
@@ -242,26 +255,26 @@
  */
 const BOARD_SIZE = 8;
 
-// Символы и Эмодзи
+// ИМЕНА ФАЙЛОВ (без расширения)
+// Теперь игра будет искать .svg файлы
 const SYMBOLS = {
     // Basic
-    pawn: '♟', knight: '♞', bishop: '♝', rook: '♜', queen: '♛', king: '♚',
+    pawn: 'pawn', knight: 'knight', bishop: 'bishop', rook: 'rook', queen: 'queen', king: 'king',
     // Tier 2
-    spearman: '🔱', runner: '🏃', torpedo: '🐇',
-    camel: '🐫', paladin: '🛡', knight_knight: '🤺',
-    bomber: '💣', ghost: '👻', two_color_bishop: '☯️',
-    tank: '🚜', car: '🏎', statue: '🗽',
-    ring: '💍', crown: '👑',
-    tnt: '🧨',
+    spearman: 'spearman', runner: 'runner', torpedo: 'torpedo',
+    camel: 'camel', paladin: 'paladin', knight_knight: 'knight_knight',
+    bomber: 'bomber', ghost: 'ghost', two_color_bishop: 'two_color_bishop',
+    tank: 'tank', car: 'car', statue: 'statue',
+    ring: 'ring', crown: 'crown',
+    tnt: 'tnt',
     // Tier 3
-    spartan: '🏛', super_runner: '🧑‍🦽‍➡️',
-    camel_knight: '👹', endless_knight: '🐴', moose: '🫎',
-    nuke_bishop: '☢', sniper: '🔭', ship: '⛵️',
-    fortress: '🏰', helicopter: '🚁', rocket: '🚀',
-    unicorn: '🦄', pin: '📌'
+    spartan: 'spartan', super_runner: 'super_runner',
+    camel_knight: 'camel_knight', endless_knight: 'endless_knight', moose: 'moose',
+    nuke_bishop: 'nuke_bishop', sniper: 'sniper', ship: 'ship',
+    fortress: 'fortress', helicopter: 'helicopter', rocket: 'rocket',
+    unicorn: 'unicorn', pin: 'pin'
 };
 
-// Векторы
 const VEC_ORTHO = [{dx:1,dy:0},{dx:-1,dy:0},{dx:0,dy:1},{dx:0,dy:-1}];
 const VEC_DIAG = [{dx:1,dy:1},{dx:1,dy:-1},{dx:-1,dy:1},{dx:-1,dy:-1}];
 const VEC_KNIGHT = [{dx:2,dy:1},{dx:2,dy:-1},{dx:-2,dy:1},{dx:-2,dy:-1},{dx:1,dy:2},{dx:1,dy:-2},{dx:-1,dy:2},{dx:-1,dy:-2}];
@@ -269,7 +282,6 @@ const VEC_CAMEL = [{dx:3,dy:1},{dx:3,dy:-1},{dx:-3,dy:1},{dx:-3,dy:-1},{dx:1,dy:
 
 const move_audio = new Audio('sounds/move.mp3');
 const capture_audio = new Audio('sounds/capture.mp3');
-
 
 function slide(vectors) { return vectors.map(v => ({...v, slide: true})); }
 function step(vectors) { return vectors.map(v => ({...v, slide: false})); }
@@ -287,54 +299,51 @@ const PIECE_TYPES = {
     'king': { name: 'Король', symbol: SYMBOLS.king, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], tier: 1, xpReq: 1, role: 'king' },
 
     // === TIER 2 ===
-    'pawn_runner': { name: 'бегун', desc: 'может ходить по диагонали вперед на одну клетку', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
+    'pawn_runner': { name: 'Бегун', desc: 'ходит диагонально вперед на 1 клетку', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
     'pawn_spearman': { name: 'Копейщик', desc: 'бьет клетку перед собой', symbol: SYMBOLS.spearman, tier: 2, xpReq: 1, role: 'pawn', special: 'spear_attack' },
-    'pawn_torpedo': { name: 'торпеда', desc: 'может ходить на две клетки вперед', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
+    'pawn_torpedo': { name: 'Торпеда', desc: 'ходит на 2 клетки вперед', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
 
     'knight_camel': { name: 'Верблюд', desc: 'ходит (3+1)', symbol: SYMBOLS.camel, tier: 2, xpReq: 2, moves: step(VEC_CAMEL) },
-    'knight_paladin': { name: 'Паладин', desc: 'ходит как конь, плюс одна клетка по горизонтали и вертикали', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
-    'knight_knight': { name: 'рыцарь', desc: 'ходит как конь, плюс одна клетка по диагонали', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
+    'knight_paladin': { name: 'Паладин', desc: 'конь + король', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
+    'knight_knight': { name: 'Рыцарь', desc: 'конь + диагональ (1)', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
 
-    'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается(3x3) при съедении', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, 
-    'bishop_ghost': { name: 'Призрак', desc: 'проходит через 1 фигуру', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 }, // Теперь ghost принимает число
-    'two_color_bishop': { name: 'двухцветный слон', desc: 'слон + король', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
+    'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается (3x3)', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, 
+    'bishop_ghost': { name: 'Призрак', desc: 'проходит сквозь 1 фигуру', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 },
+    'two_color_bishop': { name: 'Двухцветный слон', desc: 'слон + король', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
     'rook_tank': { name: 'Танк', desc: 'ладья + король', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)] },
-    'rook_ghost': { name: 'Призрак', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: 1 },
-    'statue': { name: 'статуя', desc: 'Неуязвима. Телепортируется на любую свободную клетку.', symbol: SYMBOLS.statue, tier: 2, xpReq: 999, moves:[], immortal: true, special: 'teleport' },
+    'rook_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: 1 },
+    'statue': { name: 'Статуя', desc: 'ходит на любую клетку доски', symbol: SYMBOLS.statue, tier: 2, xpReq: 999, moves:[], immortal: true, special: 'teleport' },
 
-    'queen_camel': { name: 'королева верблюдов', desc: 'королева + верблюд', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
-    'queen_knight': { name: 'королева коней', desc: 'королева + конь', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
-    'queen_upgradeable': { name: 'королева v2', desc: 'королева, которая эволюционирует дальше', symbol: SYMBOLS.queen, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
+    'queen_camel': { name: 'Королева Верблюдов', desc: 'королева + верблюд', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
+    'queen_knight': { name: 'Королева Коней', desc: 'королева + конь', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
+    'queen_upgradeable': { name: 'Королева V2', desc: 'эволюционирует дальше', symbol: SYMBOLS.queen, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
 
-    'king_dead_end': { name: 'король без эволюции', desc: 'обычный король', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
-    'king_nuke': { name: 'ядерный король', desc: 'взрывается(5x5) когда съедает или съеден', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5', role: 'king'  },
+    'king_dead_end': { name: 'Король (Обычный)', desc: 'без эволюции', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
+    'king_nuke': { name: 'Ядерный Король', desc: 'взрывается (5x5)', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5', role: 'king'  },
 
     // === TIER 3 ===
     'pawn_spartan': { name: 'Спартанец', desc: 'копейщик + бегун', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack' },
-    'pawn_superrunner': { name: 'супер бегун', desc: 'ходит как король', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
+    'pawn_superrunner': { name: 'Супер Бегун', desc: 'ходит как король', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
 
     'knight_camel_hybrid': { name: 'Коне-Верблюд', desc: 'конь + верблюд', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
-    'knight_endless': { name: 'беконечный конь', desc: 'конь без ограничения радиуса', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: 10 }, // true = Infinity
-    'knight_king': { name: 'король коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
+    'knight_endless': { name: 'Бесконечный конь', desc: 'слайд конем (∞)', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: 10 },
+    'knight_king': { name: 'Король Коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
-    'bishop_nuke': { name: 'Ядерный Слон', desc: 'взрывается(3x3) когда съедает или съеден', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_3' },
-    'bishop_sniper': { name: 'Снайпер', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_DIAG)], ghost: 2 },
-    'bishop_ship': { name: 'корабль', desc: 'конь + слон', symbol: SYMBOLS.ship, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
+    'bishop_nuke': { name: 'Ядерный Слон', desc: 'взрыв (3x3)', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_3' },
+    'bishop_sniper': { name: 'Снайпер', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_DIAG)], ghost: 2 },
+    'bishop_ship': { name: 'Корабль', desc: 'конь + слон', symbol: SYMBOLS.ship, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
 
-    'rook_helicopter': { name: 'вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
-    'rook_sniper':  { name: 'ракета', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.rocket, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO)], ghost: 2 },
+    'rook_helicopter': { name: 'Вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
+    'rook_sniper':  { name: 'Ракета', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.rocket, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO)], ghost: 2 },
 
-    'queen_knight_camel': { name: 'ультимативная королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
-    'queen_ghost': { name: 'призрак', desc: 'проходит через 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 },
-    'quuen_range': { name: 'дальняя королева', desc: 'дальняя атака', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
+    'queen_knight_camel': { name: 'Ультимативная Королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
+    'queen_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 },
+    'queen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
 
-/**
- * ДЕРЕВО ЭВОЛЮЦИИ
- */
 const EVOLUTION_TREE = {
-    'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo'],
+    'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo'], 
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank', 'rook_ghost', 'statue'],
@@ -356,24 +365,22 @@ const EVOLUTION_TREE = {
 
     'queen_camel': ['queen_knight_camel'],
     'queen_knight': ['queen_knight_camel'],
-    'queen_upgradeable': ['king', 'queen_ghost', 'quuen_range'],
+    'queen_upgradeable': ['king', 'queen_ghost', 'queen_range'],
 
     'pawn_superrunner': ['knight'],
     'pawn_spartan': ['bishop']
 };
 
-// Глобальное состояние
 let board = [];
 let currentTurn = 'white';
 let selectedCell = null;
 let possibleMoves = [];
 let gameOver = false;
-let enPassantTarget = null; // {x, y} или null
-
+let enPassantTarget = null; 
 let white_kings = 1;
 let black_kings = 1;
 
-// --- Инициализация ---
+// --- FUNCTIONS ---
 
 function initGame() {
     board = createBoard();
@@ -383,25 +390,22 @@ function initGame() {
     possibleMoves = [];
     enPassantTarget = null;
     document.getElementById('game-log').innerHTML = '';
-    log('Новая игра!');
+    log('Игра началась! Используйте SVG изображения в папке images/');
     renderBoard();
     updateInfo();
 }
 
 function createBoard() {
     const newBoard = Array(8).fill(null).map(() => Array(8).fill(null));
-    
     for(let x=0; x<8; x++) {
         newBoard[1][x] = createPiece('pawn', 'black');
         newBoard[6][x] = createPiece('pawn', 'white');
     }
-
     const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
     backRow.forEach((type, x) => {
         newBoard[0][x] = createPiece(type, 'black');
         newBoard[7][x] = createPiece(type, 'white');
     });
-
     return newBoard;
 }
 
@@ -415,60 +419,46 @@ function createPiece(type, color) {
     };
 }
 
-// --- Логика движения ---
-
 function getValidMoves(piece, startX, startY, checkBoard = board) {
     const moves = [];
     const def = PIECE_TYPES[piece.type];
     const isWhite = piece.color === 'white';
     const direction = isWhite ? -1 : 1;
 
-    // 0. СПЕЦ-СПОСОБНОСТЬ: ТЕЛЕПОРТ (СТАТУЯ)
     if (def.special === 'teleport') {
         for(let y=0; y<8; y++) {
             for(let x=0; x<8; x++) {
-                // Можно прыгать только на пустые клетки
                 if (!checkBoard[y][x]) {
                     moves.push({x, y});
                 }
             }
         }
-        // Статуя не имеет других ходов, кроме телепорта (moves: [])
         return moves; 
     }
 
-    // 1. Логика Пешек
     if (def.role === 'pawn') {
-        // Обычный шаг
         let dy = direction;
         if (isValidPos(startX, startY + dy) && !checkBoard[startY + dy][startX]) {
             moves.push({x: startX, y: startY + dy});
-            // Double move
             if (!piece.hasMoved && isValidPos(startX, startY + dy * 2) && !checkBoard[startY + dy * 2][startX]) {
                 moves.push({x: startX, y: startY + dy * 2, isDoublePawnMove: true});
             }
         }
-
-        // Атака + Взятие на проходе
         [[-1, dy], [1, dy]].forEach(att => {
             const tx = startX + att[0];
             const ty = startY + att[1];
             if (isValidPos(tx, ty)) {
                 const target = checkBoard[ty][tx];
-                // Обычная атака (Проверка на бессмертие target происходит здесь)
                 if (target && target.color !== piece.color) {
                     if (!PIECE_TYPES[target.type].immortal) {
                          moves.push({x: tx, y: ty, isCapture: true});
                     }
                 }
-                // Взятие на проходе (En Passant)
                 else if (!target && enPassantTarget && enPassantTarget.x === tx && enPassantTarget.y === ty) {
                      moves.push({x: tx, y: ty, isCapture: true, isEnPassant: true});
                 }
             }
         });
-
-        // Спец-атаки пешек (Копейщик)
         if (def.special === 'spear_attack') {
             const forwardY = startY + direction;
             if (isValidPos(startX, forwardY)) {
@@ -480,7 +470,6 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
                 }
             }
         }
-
         if (def.extraMoves) {
             def.extraMoves.forEach(m => {
                 const actualDy = m.dy * direction; 
@@ -493,16 +482,13 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
         }
     }
 
-    // 2. Стандартные ходы (Слайдеры и Шаги)
     if (def.moves) {
         def.moves.forEach(vec => {
             const dx = vec.dx;
             const dy = vec.dy;
             
             if (vec.slide) {
-                // ЛОГИКА СЛАЙДА С УЧЕТОМ ПРИЗРАКА (Числовой лимит)
                 let obstaclesPassed = 0;
-                // Если ghost === true (старый формат), считаем как Infinity. Иначе берем число или 0.
                 const ghostLimit = (def.ghost === true) ? Infinity : (def.ghost || 0);
 
                 for (let i = 1; i < 8; i++) {
@@ -511,28 +497,19 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
                     if (!isValidPos(tx, ty)) break;
                     
                     const target = checkBoard[ty][tx];
-                    
                     if (!target) {
                         moves.push({x: tx, y: ty});
                     } else {
-                        // Если встретили фигуру:
-                        // 1. Можем ли мы её съесть?
                         if (target.color !== piece.color) {
-                            // Если не бессмертная - добавляем как ход взятия
                             if (!PIECE_TYPES[target.type].immortal) {
                                 moves.push({x: tx, y: ty, isCapture: true});
                             }
                         }
-                        
-                        // 2. Можем ли мы пройти сквозь неё дальше?
                         obstaclesPassed++;
-                        if (obstaclesPassed > ghostLimit) {
-                            break; // Лимит прохода исчерпан
-                        }
+                        if (obstaclesPassed > ghostLimit) break;
                     }
                 }
             } else {
-                // ЛОГИКА ШАГА (Прыжок)
                 const tx = startX + dx;
                 const ty = startY + dy;
                 if (isValidPos(tx, ty)) {
@@ -549,19 +526,14 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
         });
     }
 
-    // 3. РОКИРОВКА (Castling)
     if (def.role === 'king' && !piece.hasMoved) {
         const row = isWhite ? 7 : 0;
-        
-        // Короткая (KingSide)
         const kRook = checkBoard[row][7];
         if (kRook && PIECE_TYPES[kRook.type].role === 'rook' && !kRook.hasMoved) {
             if (!checkBoard[row][5] && !checkBoard[row][6]) {
                 moves.push({x: 6, y: row, isCastling: true, rookX: 7, rookToX: 5});
             }
         }
-        
-        // Длинная (QueenSide)
         const qRook = checkBoard[row][0];
         if (qRook && PIECE_TYPES[qRook.type].role === 'rook' && !qRook.hasMoved) {
             if (!checkBoard[row][1] && !checkBoard[row][2] && !checkBoard[row][3]) {
@@ -569,15 +541,12 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
             }
         }
     }
-
     return moves;
 }
 
 function isValidPos(x, y) {
     return x >= 0 && x < 8 && y >= 0 && y < 8;
 }
-
-// --- Взаимодействие ---
 
 function cellClick(x, y) {
     if (gameOver) return;
@@ -611,10 +580,8 @@ function makeMove(fromX, fromY, move) {
     
     let captureHappened = false;
     let enemyType = null;
-
     let explosion = false;
 
-    // ОБРАБОТКА ВЗЯТИЯ НА ПРОХОДЕ
     if (move.isEnPassant) {
         const dir = piece.color === 'white' ? 1 : -1; 
         const capturedPawnY = toY + dir;
@@ -623,114 +590,61 @@ function makeMove(fromX, fromY, move) {
         captureHappened = true;
         log('⚔️ Взятие на проходе!');
     }
-    // log('test1');
 
     if (target) {
-        // log(PIECE_TYPES[target.type].role)
-        capture_audio.play();
+        capture_audio.play().catch(e=>{});
         captureHappened = true;
         enemyType = target.type;
         piece.xp += 1;
         
         if (PIECE_TYPES[target.type].role === 'king') {
-            if(target.color === 'white') {
-                white_kings -= 1;
-            }
-            else {
-                black_kings -= 1;
-            }
+            if(target.color === 'white') white_kings -= 1;
+            else black_kings -= 1;
 
             if (white_kings === 0) {
                 alert(`Победа черных!`);
                 gameOver = true;
-                if(PIECE_TYPES[target.type].special !== 'range_capture') {
-                    board[toY][toX] = piece;
-                    board[fromY][fromX] = null;
-                }
-                else {
-                    board[toY][toX] = null;
-                }
-                renderBoard();
-                return;
-            }
-            else if (black_kings === 0) {
+            } else if (black_kings === 0) {
                 alert(`Победа белых!`);
                 gameOver = true;
-                if(PIECE_TYPES[target.type].special !== 'range_capture') {
-                    board[toY][toX] = piece;
-                    board[fromY][fromX] = null;
-                }
-                else {
-                    board[toY][toX] = null;
-                }
+            }
+            if(gameOver) {
+                board[toY][toX] = piece;
+                board[fromY][fromX] = null;
                 renderBoard();
                 return;
             }
         }
         
-        if (PIECE_TYPES[target.type].special === 'explode_3') {
-            const radius = PIECE_TYPES[target.type].special === 'explode_5' ? 2 : 1; 
-            explode(toX, toY, board[toY][toX].color, radius);
+        if (['explode_3', 'detonate_3'].includes(PIECE_TYPES[target.type].special)) {
+            explode(toX, toY, board[toY][toX].color, 1);
             explosion = true;
-            log('boom!!!!!');
-        }
-        else if (PIECE_TYPES[target.type].special === 'detonate_3') {
-            const radius = PIECE_TYPES[target.type].special === 'detonate_5' ? 2 : 1; 
-            explode(toX, toY, board[toY][toX].color, radius);
+        } else if (['explode_5', 'detonate_5'].includes(PIECE_TYPES[target.type].special)) {
+            explode(toX, toY, board[toY][toX].color, 2);
             explosion = true;
-            log('boom!!!!!');
         }
-        else if (PIECE_TYPES[target.type].special === 'explode_5') {
-            const radius = PIECE_TYPES[target.type].special === 'explode_5' ? 2 : 1; 
-            explode(toX, toY, board[toY][toX].color, radius);
-            explosion = true;
-            log('boom!!!!!');
-        }
-        else if (PIECE_TYPES[target.type].special === 'detonate_5') {
-            const radius = PIECE_TYPES[target.type].special === 'detonate_5' ? 2 : 1; 
-            explode(toX, toY, board[toY][toX].color, radius);
-            explosion = true;
-            log('boom!!!!!');
-        }
+    } else {
+        move_audio.play().catch(e=>{});
     }
 
-    else {
-        move_audio.play();
-    }
-
-    // log('test2');
-    log(PIECE_TYPES[piece.type].special);
-    log(target)
-
-    // ПЕРЕМЕЩЕНИЕ ФИГУРЫ
-    if(target)
-    { //дальняя атака или взрыв
+    if(target) {
         if(PIECE_TYPES[piece.type].special === 'range_capture' || explosion) {
             board[toY][toX] = null;
-        }
-        else {
+        } else {
             board[toY][toX] = piece;
         }
-    }
-    else {
+    } else {
         board[toY][toX] = piece;
     }
 
-    // log('test3');
-    // if(!(target & PIECE_TYPES[piece.type].special !== 'range_capture')) {
-    //     board[fromY][fromX] = null;
-    // }
     if(PIECE_TYPES[piece.type].special !== 'range_capture') {
         board[fromY][fromX] = null;
-    }
-    else if(!target) {
+    } else if(!target) {
         board[fromY][fromX] = null;
     }
-    // log(fromY);
-    // log(fromX);
+    
     piece.hasMoved = true;
 
-    // РОКИРОВКА (Перемещение ладьи)
     if (move.isCastling) {
         const rook = board[toY][move.rookX];
         board[toY][move.rookToX] = rook;
@@ -739,7 +653,6 @@ function makeMove(fromX, fromY, move) {
         log('🔄 Рокировка!');
     }
 
-    // Установка флага En Passant на следующий ход
     if (move.isDoublePawnMove) {
         const dir = piece.color === 'white' ? -1 : 1;
         enPassantTarget = { x: toX, y: toY - dir }; 
@@ -747,7 +660,6 @@ function makeMove(fromX, fromY, move) {
         enPassantTarget = null;
     }
 
-    // ПРЕВРАЩЕНИЕ ПЕШКИ (Promotion)
     const def = PIECE_TYPES[piece.type];
     const isAtEnd = (piece.color === 'white' && toY === 0) || (piece.color === 'black' && toY === 7);
     
@@ -757,9 +669,8 @@ function makeMove(fromX, fromY, move) {
         return; 
     }
 
-    // XP & Evolve
     if (captureHappened && enemyType) {
-        log(`${def.symbol} ${def.name} рубит ${PIECE_TYPES[enemyType].name} (+1 XP)`);
+        log(`${def.name} рубит ${PIECE_TYPES[enemyType].name} (+1 XP)`);
         if (def.special && def.special.startsWith('explode')) {
             const radius = def.special === 'explode_5' ? 2 : 1; 
             explode(toX, toY, piece.color, radius);
@@ -780,10 +691,8 @@ function endTurn() {
     possibleMoves = [];
     currentTurn = currentTurn === 'white' ? 'black' : 'white';
     renderBoard();
-    
     const turnText = document.getElementById('turn-display');
     turnText.innerText = `Ход: ${currentTurn === 'white' ? 'Белые' : 'Черные'}`;
-    turnText.style.color = currentTurn === 'white' ? '#fff' : '#aaa';
 }
 
 function explode(cx, cy, attackerColor, radius) {
@@ -795,7 +704,6 @@ function explode(cx, cy, attackerColor, radius) {
             const ty = cy + dy;
             if (isValidPos(tx, ty)) {
                 const victim = board[ty][tx];
-                // Бессмертные фигуры выживают при взрыве (кроме королей, у которых логика отдельная)
                 if (victim && victim.type !== 'king' && !PIECE_TYPES[victim.type].immortal) { 
                     const isNuke = radius > 1;
                     if (isNuke || victim.color !== attackerColor) {
@@ -807,7 +715,7 @@ function explode(cx, cy, attackerColor, radius) {
     }
 }
 
-// --- Модальные окна (Эволюция и Превращение) ---
+// --- MODALS & RENDER ---
 
 function showModal(title, text, items, callback) {
     const overlay = document.getElementById('modal-overlay');
@@ -820,8 +728,12 @@ function showModal(title, text, items, callback) {
         const def = PIECE_TYPES[item];
         const card = document.createElement('div');
         card.className = `modal-card ${def.tier === 3 ? 'tier-3-card' : ''}`;
+        
+        // Changed to .svg
+        const imgPath = `images/white_${def.symbol}.svg`; 
         card.innerHTML = `
-            <span class="modal-icon">${def.symbol}</span>
+            <img src="${imgPath}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <div style="display:none; font-size:40px;">?</div>
             <span class="modal-name">${def.name}</span>
             <span class="modal-desc">${def.desc || ''}</span>
         `;
@@ -835,7 +747,6 @@ function showModal(title, text, items, callback) {
     overlay.style.display = 'flex';
 }
 
-// Эволюция
 function canEvolve(piece) {
     const evolutions = EVOLUTION_TREE[piece.type];
     if (!evolutions || evolutions.length === 0) return false;
@@ -848,12 +759,8 @@ function showEvolutionModal(piece) {
     showModal('Эволюция!', 'Ваша фигура мутирует.', options, (newType) => {
         piece.type = newType;
         if(piece.type === "king") {
-            if(currentTurn === "white") {
-                white_kings += 1
-            }
-            else {
-                black_kings += 1
-            }
+            if(currentTurn === "white") white_kings += 1;
+            else black_kings += 1;
         }
         piece.xp = 0;
         log(`🧬 Эволюция завершена!`);
@@ -861,9 +768,8 @@ function showEvolutionModal(piece) {
     });
 }
 
-// Превращение пешки
 function showPromotionModal(piece) {
-    const options = ['queen', 'rook', 'bishop', 'knight']; // Стандартный набор
+    const options = ['queen', 'rook', 'bishop', 'knight'];
     showModal('Превращение!', 'Пешка дошла до края.', options, (newType) => {
         piece.type = newType;
         piece.xp = 0;
@@ -872,9 +778,6 @@ function showPromotionModal(piece) {
         endTurn();
     });
 }
-
-
-// --- Рендеринг ---
 
 function renderBoard() {
     const boardEl = document.getElementById('board');
@@ -901,11 +804,24 @@ function renderBoard() {
                 const pieceEl = document.createElement('div');
                 const def = PIECE_TYPES[piece.type];
                 pieceEl.className = `piece ${piece.color} tier-${def.tier}`;
-                
-                // Подсветка бессмертия
                 if (def.immortal) pieceEl.classList.add('immortal');
 
-                pieceEl.innerText = def.symbol;
+                // IMAGE LOGIC (SVG)
+                const img = document.createElement('img');
+                const imageName = `${piece.color}_${def.symbol}.svg`; // Now looks for .svg
+                img.src = `images/${imageName}`;
+                
+                // Fallback text if image missing
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    const textSpan = document.createElement('span');
+                    textSpan.style.fontSize = '12px';
+                    textSpan.style.fontWeight = 'bold';
+                    textSpan.innerText = def.name; 
+                    pieceEl.appendChild(textSpan);
+                };
+
+                pieceEl.appendChild(img);
                 
                 if (piece.xp > 0) {
                     const badge = document.createElement('span');
@@ -935,7 +851,11 @@ function updateInfo(piece) {
     let immortalBadge = def.immortal ? '<span style="font-size:0.6em; background:#9b59b6; color:#fff; padding:2px 5px; border-radius:4px; margin-left:5px;">Бессмертный</span>' : '';
 
     infoPanel.innerHTML = `
-        <div style="font-size: 1.4em; margin-bottom:5px;">${def.symbol} <strong>${def.name}</strong> <span style="font-size:0.6em; background:#f1c40f; color:#000; padding:2px 5px; border-radius:4px;">Tier ${def.tier}</span>${immortalBadge}</div>
+        <div style="font-size: 1.4em; margin-bottom:5px;">
+            <strong>${def.name}</strong> 
+            <span style="font-size:0.6em; background:#f1c40f; color:#000; padding:2px 5px; border-radius:4px;">Tier ${def.tier}</span>
+            ${immortalBadge}
+        </div>
         <div style="font-size: 0.9em; color: #ccc; margin-bottom: 10px;">${def.desc || ''}</div>
         
         ${hasEvo ? 
@@ -950,7 +870,7 @@ function updateInfo(piece) {
 function log(msg) {
     const logEl = document.getElementById('game-log');
     const entry = document.createElement('div');
-    entry.innerHTML = `> ${msg}`;
+    entry.innerText = `> ${msg}`;
     entry.style.padding = "2px 0";
     entry.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
     logEl.prepend(entry); 
