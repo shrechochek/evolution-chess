@@ -265,8 +265,8 @@ const SYMBOLS = {
     camel: 'camel', paladin: 'paladin', knight_knight: 'knight_knight',
     bomber: 'bomber', ghost: 'ghost', two_color_bishop: 'two_color_bishop',
     tank: 'tank', car: 'car', statue: 'statue',
-    ring: 'ring', crown: 'crown',
-    tnt: 'tnt',
+    ring: 'ring', crown: 'crown', queen_upgradeable: 'queen_upgradeable',
+    tnt: 'tnt', dead_end: 'dead_end',
     // Tier 3
     spartan: 'spartan', super_runner: 'super_runner',
     camel_knight: 'camel_knight', endless_knight: 'endless_knight', moose: 'moose',
@@ -317,9 +317,9 @@ const PIECE_TYPES = {
 
     'queen_camel': { name: 'Королева Верблюдов', desc: 'королева + верблюд', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
     'queen_knight': { name: 'Королева Коней', desc: 'королева + конь', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
-    'queen_upgradeable': { name: 'Королева V2', desc: 'эволюционирует дальше', symbol: SYMBOLS.queen, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
+    'queen_upgradeable': { name: 'Королева V2', desc: 'эволюционирует дальше', symbol: SYMBOLS.queen_upgradeable, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
 
-    'king_dead_end': { name: 'Король (Обычный)', desc: 'без эволюции', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
+    'king_dead_end': { name: 'Король (Обычный)', desc: 'без эволюции', symbol: SYMBOLS.dead_end, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
     'king_nuke': { name: 'Ядерный Король', desc: 'взрывается (5x5)', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5', role: 'king'  },
 
     // === TIER 3 ===
@@ -390,7 +390,7 @@ function initGame() {
     possibleMoves = [];
     enPassantTarget = null;
     document.getElementById('game-log').innerHTML = '';
-    log('Игра началась! Используйте SVG изображения в папке images/');
+    // log('Игра началась! Используйте SVG изображения в папке images/');
     renderBoard();
     updateInfo();
 }
