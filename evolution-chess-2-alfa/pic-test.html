@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шахматы с Эволюцией: SVG версия</title>
+    <title>Шахматы с Эволюцией: Графическая версия</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -34,24 +34,24 @@
 
         .game-container {
             display: flex;
-            gap: 30px;
+            gap: 30px; /* Увеличил отступ */
             flex-wrap: wrap;
             justify-content: center;
         }
 
-        /* Chess Board */
+        /* Chess Board - УВЕЛИЧЕН */
         #board {
             display: grid;
-            grid-template-columns: repeat(8, 80px);
-            grid-template-rows: repeat(8, 80px);
+            grid-template-columns: repeat(8, 80px); /* 60px -> 80px */
+            grid-template-rows: repeat(8, 80px);    /* 60px -> 80px */
             border: 8px solid #34495e;
             user-select: none;
             box-shadow: 0 15px 30px rgba(0,0,0,0.4);
         }
 
         .cell {
-            width: 80px;
-            height: 80px;
+            width: 80px;  /* 60px -> 80px */
+            height: 80px; /* 60px -> 80px */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -65,7 +65,7 @@
         
         .cell.possible-move::after {
             content: '';
-            width: 20px;
+            width: 20px; /* Точка побольше */
             height: 20px;
             background: rgba(0,0,0,0.25);
             border-radius: 50%;
@@ -73,7 +73,7 @@
         .cell.capture { background-color: var(--capture) !important; }
         .cell.special-move { background-color: var(--special) !important; }
 
-        /* Pieces */
+        /* Pieces - ИЗОБРАЖЕНИЯ */
         .piece {
             width: 100%;
             height: 100%;
@@ -86,14 +86,13 @@
         }
         
         .piece img {
-            width: 90%;
+            width: 90%; /* Немного отступа */
             height: 90%;
             object-fit: contain;
-            /* SVG тени могут работать иначе, но фильтр оставим для объема */
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
         }
 
-        /* Эффект для бессмертных фигур */
+        /* Эффект для бессмертных фигур (фиолетовая аура) */
         .piece.immortal img {
             filter: drop-shadow(0 0 8px #9b59b6);
         }
@@ -135,7 +134,7 @@
         }
 
         .log {
-            height: 300px;
+            height: 300px; /* Журнал повыше */
             overflow-y: auto;
             font-size: 0.9em;
             font-family: monospace;
@@ -222,8 +221,8 @@
 </head>
 <body>
 
-    <h1>Шахматы: Эволюция Фигур V3</h1>
-    <div class="subtitle">made by shrechochek</div>
+    <h1>Шахматы: Эволюция Фигур V2.7</h1>
+    <div class="subtitle">made by shrechochek (PNG Edition)</div>
 
     <div class="game-container">
         <div id="board"></div>
@@ -255,8 +254,9 @@
  */
 const BOARD_SIZE = 8;
 
-// ИМЕНА ФАЙЛОВ (без расширения)
-// Теперь игра будет искать .svg файлы
+// ИМЕНА ФАЙЛОВ (без расширения .png)
+// Имена должны совпадать с теми, что вы положите в папку images/
+// Пример: images/white_pawn.png, images/black_statue.png
 const SYMBOLS = {
     // Basic
     pawn: 'pawn', knight: 'knight', bishop: 'bishop', rook: 'rook', queen: 'queen', king: 'king',
@@ -265,14 +265,14 @@ const SYMBOLS = {
     camel: 'camel', paladin: 'paladin', knight_knight: 'knight_knight',
     bomber: 'bomber', ghost: 'ghost', two_color_bishop: 'two_color_bishop',
     tank: 'tank', car: 'car', statue: 'statue',
-    ring: 'ring', crown: 'crown', queen_upgradeable: 'queen_upgradeable',
-    tnt: 'tnt', dead_end: 'dead_end',
+    ring: 'ring', crown: 'crown',
+    tnt: 'tnt',
     // Tier 3
     spartan: 'spartan', super_runner: 'super_runner',
     camel_knight: 'camel_knight', endless_knight: 'endless_knight', moose: 'moose',
     nuke_bishop: 'nuke_bishop', sniper: 'sniper', ship: 'ship',
     fortress: 'fortress', helicopter: 'helicopter', rocket: 'rocket',
-    unicorn: 'unicorn', pin: 'pin', range: 'range',
+    unicorn: 'unicorn', pin: 'pin'
 };
 
 const VEC_ORTHO = [{dx:1,dy:0},{dx:-1,dy:0},{dx:0,dy:1},{dx:0,dy:-1}];
@@ -313,13 +313,13 @@ const PIECE_TYPES = {
 
     'rook_tank': { name: 'Танк', desc: 'ладья + король', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)] },
     'rook_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: 1 },
-    'statue': { name: 'Статуя', desc: 'ходит на любую клетку доски', symbol: SYMBOLS.statue, tier: 2, xpReq: 999, moves:[], immortal: true, special: 'teleport' },
+    'statue': { name: 'Статуя', desc: 'Неуязвима. Телепорт.', symbol: SYMBOLS.statue, tier: 2, xpReq: 999, moves:[], immortal: true, special: 'teleport' },
 
     'queen_camel': { name: 'Королева Верблюдов', desc: 'королева + верблюд', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
     'queen_knight': { name: 'Королева Коней', desc: 'королева + конь', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
-    'queen_upgradeable': { name: 'Королева V2', desc: 'эволюционирует дальше', symbol: SYMBOLS.queen_upgradeable, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
+    'queen_upgradeable': { name: 'Королева V2', desc: 'эволюционирует дальше', symbol: SYMBOLS.queen, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
 
-    'king_dead_end': { name: 'Король (Обычный)', desc: 'без эволюции', symbol: SYMBOLS.dead_end, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
+    'king_dead_end': { name: 'Король (Обычный)', desc: 'без эволюции', symbol: SYMBOLS.king, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king'  },
     'king_nuke': { name: 'Ядерный Король', desc: 'взрывается (5x5)', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5', role: 'king'  },
 
     // === TIER 3 ===
@@ -339,11 +339,11 @@ const PIECE_TYPES = {
 
     'queen_knight_camel': { name: 'Ультимативная Королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
     'queen_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 },
-    'queen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.range, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
+    'quuen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
 
 const EVOLUTION_TREE = {
-    'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo'], 
+    'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo', 'statue'], 
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'rook': ['rook_tank', 'rook_ghost', 'statue'],
@@ -362,11 +362,10 @@ const EVOLUTION_TREE = {
     'bishop_ghost': ['bishop_sniper'],
 
     'rook_tank': ['rook_helicopter', 'queen'],
-    'rook_ghost': ['rook_sniper'],
 
     'queen_camel': ['queen_knight_camel'],
     'queen_knight': ['queen_knight_camel'],
-    'queen_upgradeable': ['king', 'queen_ghost', 'queen_range'],
+    'queen_upgradeable': ['king', 'queen_ghost', 'quuen_range'],
 
     'pawn_superrunner': ['knight'],
     'pawn_spartan': ['bishop']
@@ -391,7 +390,7 @@ function initGame() {
     possibleMoves = [];
     enPassantTarget = null;
     document.getElementById('game-log').innerHTML = '';
-    // log('Игра началась! Используйте SVG изображения в папке images/');
+    log('Игра началась! Используйте PNG изображения в папке images/');
     renderBoard();
     updateInfo();
 }
@@ -730,8 +729,8 @@ function showModal(title, text, items, callback) {
         const card = document.createElement('div');
         card.className = `modal-card ${def.tier === 3 ? 'tier-3-card' : ''}`;
         
-        // Changed to .svg
-        const imgPath = `images/white_${def.symbol}.svg`; 
+        // Modal uses generic icon or text if image missing
+        const imgPath = `images/white_${def.symbol}.png`; // Show white version for preview
         card.innerHTML = `
             <img src="${imgPath}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
             <div style="display:none; font-size:40px;">?</div>
@@ -807,9 +806,9 @@ function renderBoard() {
                 pieceEl.className = `piece ${piece.color} tier-${def.tier}`;
                 if (def.immortal) pieceEl.classList.add('immortal');
 
-                // IMAGE LOGIC (SVG)
+                // IMAGE LOGIC
                 const img = document.createElement('img');
-                const imageName = `${piece.color}_${def.symbol}.svg`; // Now looks for .svg
+                const imageName = `${piece.color}_${def.symbol}.png`; // e.g. white_pawn.png
                 img.src = `images/${imageName}`;
                 
                 // Fallback text if image missing
@@ -851,6 +850,7 @@ function updateInfo(piece) {
     
     let immortalBadge = def.immortal ? '<span style="font-size:0.6em; background:#9b59b6; color:#fff; padding:2px 5px; border-radius:4px; margin-left:5px;">Бессмертный</span>' : '';
 
+    // Show image in info panel too?
     infoPanel.innerHTML = `
         <div style="font-size: 1.4em; margin-bottom:5px;">
             <strong>${def.name}</strong> 

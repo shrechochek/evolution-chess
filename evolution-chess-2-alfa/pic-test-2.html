@@ -222,8 +222,8 @@
 </head>
 <body>
 
-    <h1>Шахматы: Эволюция Фигур V3</h1>
-    <div class="subtitle">made by shrechochek</div>
+    <h1>Шахматы: Эволюция Фигур V2.8</h1>
+    <div class="subtitle">SVG Edition</div>
 
     <div class="game-container">
         <div id="board"></div>
@@ -272,7 +272,7 @@ const SYMBOLS = {
     camel_knight: 'camel_knight', endless_knight: 'endless_knight', moose: 'moose',
     nuke_bishop: 'nuke_bishop', sniper: 'sniper', ship: 'ship',
     fortress: 'fortress', helicopter: 'helicopter', rocket: 'rocket',
-    unicorn: 'unicorn', pin: 'pin', range: 'range',
+    unicorn: 'unicorn', pin: 'pin'
 };
 
 const VEC_ORTHO = [{dx:1,dy:0},{dx:-1,dy:0},{dx:0,dy:1},{dx:0,dy:-1}];
@@ -339,7 +339,7 @@ const PIECE_TYPES = {
 
     'queen_knight_camel': { name: 'Ультимативная Королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
     'queen_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 },
-    'queen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.range, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
+    'queen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
 
 const EVOLUTION_TREE = {
@@ -362,7 +362,6 @@ const EVOLUTION_TREE = {
     'bishop_ghost': ['bishop_sniper'],
 
     'rook_tank': ['rook_helicopter', 'queen'],
-    'rook_ghost': ['rook_sniper'],
 
     'queen_camel': ['queen_knight_camel'],
     'queen_knight': ['queen_knight_camel'],
