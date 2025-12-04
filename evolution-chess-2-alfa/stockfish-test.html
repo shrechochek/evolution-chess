@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шахматы с Эволюцией V3.2 (Умный Бот)</title>
+    <style>
+        :root {
+            --bg-color: #2c3e50;
+            --board-dark: #7f8c8d;
+            --board-light: #ecf0f1;
+            --highlight: rgba(241, 196, 15, 0.6);
+            --capture: rgba(231, 76, 60, 0.6);
+            --special: rgba(52, 152, 219, 0.6);
+            --immortal: rgba(142, 68, 173, 0.8);
+            --white-piece: #fff;
+            --black-piece: #000;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 { margin-bottom: 5px; }
+        .subtitle { color: #bdc3c7; margin-bottom: 20px; font-size: 0.9em; }
+
+        .game-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Chess Board */
+        #board {
+            display: grid;
+            grid-template-columns: repeat(8, 80px);
+            grid-template-rows: repeat(8, 80px);
+            border: 8px solid #34495e;
+            user-select: none;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cell.light { background-color: var(--board-light); }
+        .cell.dark { background-color: var(--board-dark); }
+        .cell.selected { background-color: var(--highlight) !important; }
+        
+        .cell.possible-move::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: rgba(0,0,0,0.25);
+            border-radius: 50%;
+        }
+        .cell.capture { background-color: var(--capture) !important; }
+        .cell.special-move { background-color: var(--special) !important; }
+
+        /* Pieces */
+        .piece {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            cursor: grab;
+            transition: transform 0.2s;
+        }
+        
+        .piece img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
+        }
+
+        .piece.immortal img { filter: drop-shadow(0 0 8px #9b59b6); }
+
+        .lvl-badge {
+            position: absolute;
+            bottom: 4px; right: 4px;
+            font-size: 12px; background: rgba(0,0,0,0.85);
+            color: #f1c40f; padding: 2px 6px;
+            border-radius: 6px; pointer-events: none;
+            font-weight: bold; z-index: 3;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .turn-indicator {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .log {
+            height: 300px;
+            overflow-y: auto;
+            font-size: 0.9em;
+            font-family: monospace;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 5px;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        /* Menu / Modal Styles */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #fff;
+            color: #333;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            border: 4px solid #f1c40f;
+        }
+
+        .modal-options {
+            display: flex; gap: 20px; justify-content: center; margin-top: 20px; flex-wrap: wrap;
+        }
+
+        .modal-card {
+            border: 2px solid #ddd; padding: 15px; border-radius: 8px;
+            cursor: pointer; width: 150px; transition: all 0.2s;
+            position: relative; overflow: hidden; display: flex;
+            flex-direction: column; align-items: center;
+        }
+        .modal-card:hover { background: #fffdf0; transform: translateY(-5px); border-color: #f1c40f; }
+        .modal-card img { width: 60px; height: 60px; margin-bottom: 10px; }
+        .modal-name { font-weight: bold; display: block; margin-bottom: 5px; font-size: 1.1em;}
+        .modal-desc { font-size: 0.8em; color: #555; line-height: 1.2; }
+
+        button.btn {
+            background: #3498db; color: white; border: none;
+            padding: 10px 20px; border-radius: 5px; cursor: pointer;
+            margin: 5px; font-weight: bold; font-size: 1em;
+            transition: background 0.2s;
+        }
+        button.btn:hover { background: #2980b9; }
+        button.btn.secondary { background: #7f8c8d; }
+        button.btn.start { background: #27ae60; font-size: 1.2em; padding: 15px 30px; }
+
+        /* Start Menu Specifics */
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .form-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 1em; }
+    </style>
+</head>
+<body>
+
+    <h1>Шахматы: Эволюция Фигур V3.2</h1>
+    <div class="subtitle">Smart AI Edition</div>
+
+    <div class="game-container">
+        <div id="board"></div>
+
+        <div class="sidebar">
+            <div class="panel">
+                <div class="turn-indicator" id="turn-display">Ожидание начала...</div>
+                <div id="piece-info">Нажмите "Новая игра"</div>
+            </div>
+            <div class="panel">
+                <h3>Журнал событий</h3>
+                <div class="log" id="game-log"></div>
+            </div>
+            <button class="btn secondary" onclick="showStartMenu()">Меню</button>
+        </div>
+    </div>
+
+    <!-- Start Menu Modal -->
+    <div id="start-menu-overlay" class="overlay" style="display: flex;">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2>Настройки игры</h2>
+            
+            <div class="form-group">
+                <label>Режим игры:</label>
+                <select id="game-mode">
+                    <option value="pve">Против Бота</option>
+                    <option value="pvp">Игрок против Игрока</option>
+                </select>
+            </div>
+
+            <div id="bot-settings">
+                <div class="form-group">
+                    <label>Вы играете за:</label>
+                    <select id="player-side">
+                        <option value="white">Белых</option>
+                        <option value="black">Черных</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Сложность бота:</label>
+                    <select id="bot-difficulty">
+                        <option value="easy">Легкий (Случайный)</option>
+                        <option value="medium">Средний (Осторожный)</option>
+                        <option value="hard">Сложный (Minimax)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn start" onclick="startGameFromMenu()">Начать битву</button>
+        </div>
+    </div>
+
+    <!-- Evolution/Promotion Modal -->
+    <div id="modal-overlay" class="overlay">
+        <div class="modal-content">
+            <h2 id="modal-title">Заголовок</h2>
+            <p id="modal-subtitle">Текст</p>
+            <div class="modal-options" id="modal-container"></div>
+        </div>
+    </div>
+
+<script>
+/**
+ * КОНФИГУРАЦИЯ
+ */
+const BOARD_SIZE = 8;
+
+const SYMBOLS = {
+    pawn: 'pawn', knight: 'knight', bishop: 'bishop', rook: 'rook', queen: 'queen', king: 'king',
+    spearman: 'spearman', runner: 'runner', torpedo: 'torpedo',
+    camel: 'camel', paladin: 'paladin', knight_knight: 'knight_knight',
+    bomber: 'bomber', ghost: 'ghost', two_color_bishop: 'two_color_bishop',
+    tank: 'tank', car: 'car', statue: 'statue',
+    ring: 'ring', crown: 'crown', queen_upgradeable: 'queen_upgradeable',
+    tnt: 'tnt', dead_end: 'dead_end',
+    spartan: 'spartan', super_runner: 'super_runner',
+    camel_knight: 'camel_knight', endless_knight: 'endless_knight', moose: 'moose',
+    nuke_bishop: 'nuke_bishop', sniper: 'sniper', ship: 'ship',
+    fortress: 'fortress', helicopter: 'helicopter', rocket: 'rocket',
+    unicorn: 'unicorn', pin: 'pin', range: 'range',
+};
+
+const VEC_ORTHO = [{dx:1,dy:0},{dx:-1,dy:0},{dx:0,dy:1},{dx:0,dy:-1}];
+const VEC_DIAG = [{dx:1,dy:1},{dx:1,dy:-1},{dx:-1,dy:1},{dx:-1,dy:-1}];
+const VEC_KNIGHT = [{dx:2,dy:1},{dx:2,dy:-1},{dx:-2,dy:1},{dx:-2,dy:-1},{dx:1,dy:2},{dx:1,dy:-2},{dx:-1,dy:2},{dx:-1,dy:-2}];
+const VEC_CAMEL = [{dx:3,dy:1},{dx:3,dy:-1},{dx:-3,dy:1},{dx:-3,dy:-1},{dx:1,dy:3},{dx:1,dy:-3},{dx:-1,dy:3},{dx:-1,dy:-3}];
+
+const move_audio = new Audio('sounds/move.mp3');
+const capture_audio = new Audio('sounds/capture.mp3');
+
+function slide(vectors) { return vectors.map(v => ({...v, slide: true})); }
+function step(vectors) { return vectors.map(v => ({...v, slide: false})); }
+
+/**
+ * ОПРЕДЕЛЕНИЕ ТИПОВ
+ * Value - базовая ценность для ИИ
+ */
+const PIECE_TYPES = {
+    'pawn': { name: 'Пешка', symbol: SYMBOLS.pawn, role: 'pawn', tier: 1, xpReq: 1, value: 100 },
+    'rook': { name: 'Ладья', symbol: SYMBOLS.rook, moves: slide(VEC_ORTHO), tier: 1, xpReq: 1, role: 'rook', value: 500 },
+    'knight': { name: 'Конь', symbol: SYMBOLS.knight, moves: step(VEC_KNIGHT), tier: 1, xpReq: 1, value: 320 },
+    'bishop': { name: 'Слон', symbol: SYMBOLS.bishop, moves: slide(VEC_DIAG), tier: 1, xpReq: 1, value: 330 },
+    'queen': { name: 'Ферзь', symbol: SYMBOLS.queen, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], tier: 1, xpReq: 2, value: 900 },
+    'king': { name: 'Король', symbol: SYMBOLS.king, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], tier: 1, xpReq: 1, role: 'king', value: 20000 },
+
+    // Tier 2
+    'pawn_runner': { name: 'Бегун', desc: 'ходит диагонально вперед на 1 клетку', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], value: 150 },
+    'pawn_spearman': { name: 'Копейщик', desc: 'бьет клетку перед собой', symbol: SYMBOLS.spearman, tier: 2, xpReq: 1, role: 'pawn', special: 'spear_attack', value: 160 },
+    'pawn_torpedo': { name: 'Торпеда', desc: 'ходит на 2 клетки вперед', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}], value: 150 },
+
+    'knight_camel': { name: 'Верблюд', desc: 'ходит (3+1)', symbol: SYMBOLS.camel, tier: 2, xpReq: 2, moves: step(VEC_CAMEL), value: 350 },
+    'knight_paladin': { name: 'Паладин', desc: 'конь + король', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)], value: 400 },
+    'knight_knight': { name: 'Рыцарь', desc: 'конь + диагональ (1)', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)], value: 380 },
+
+    'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается (3x3)', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3', value: 360 }, 
+    'bishop_ghost': { name: 'Призрак', desc: 'проходит сквозь 1 фигуру', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1, value: 370 },
+    'two_color_bishop': { name: 'Двухцветный слон', desc: 'слон + король', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)], value: 380 },
+
+    'rook_tank': { name: 'Танк', desc: 'ладья + король', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)], value: 550 },
+    'rook_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: 1, value: 580 },
+    'statue': { name: 'Статуя', desc: 'Неуязвима. Телепорт.', symbol: SYMBOLS.statue, tier: 2, xpReq: 999, moves:[], immortal: true, special: 'teleport', value: 200 }, // Низкая ценность, т.к. не атакует
+
+    'queen_camel': { name: 'Королева Верблюдов', desc: 'королева + верблюд', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)], value: 1000 },
+    'queen_knight': { name: 'Королева Коней', desc: 'королева + конь', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)], value: 1000 },
+    'queen_upgradeable': { name: 'Королева V2', desc: 'эволюционирует дальше', symbol: SYMBOLS.queen_upgradeable, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], value: 920 },
+
+    'king_dead_end': { name: 'Король (Обычный)', desc: 'без эволюции', symbol: SYMBOLS.dead_end, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king', value: 20000  },
+    'king_nuke': { name: 'Ядерный Король', desc: 'взрывается (5x5)', symbol: SYMBOLS.tnt, tier: 1, xpReq: 999, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_5', role: 'king', value: 21000  },
+
+    // Tier 3
+    'pawn_spartan': { name: 'Спартанец', desc: 'копейщик + бегун', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack', value: 250 },
+    'pawn_superrunner': { name: 'Супер Бегун', desc: 'ходит как король', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}], value: 250 },
+
+    'knight_camel_hybrid': { name: 'Коне-Верблюд', desc: 'конь + верблюд', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)], value: 500 },
+    'knight_endless': { name: 'Бесконечный конь', desc: 'слайд конем (∞)', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: 999, moves: [...slide(VEC_KNIGHT)], ghost: 10, value: 600 },
+    'knight_king': { name: 'Король Коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)], value: 550 },
+
+    'bishop_nuke': { name: 'Ядерный Слон', desc: 'взрыв (3x3)', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: 999, moves: slide(VEC_DIAG), special: 'explode_3', value: 600 },
+    'bishop_sniper': { name: 'Снайпер', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: 999, moves: [...slide(VEC_DIAG)], ghost: 2, value: 600 },
+    'bishop_ship': { name: 'Корабль', desc: 'конь + слон', symbol: SYMBOLS.ship, tier: 3, xpReq: 999, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)], value: 500 },
+
+    'rook_helicopter': { name: 'Вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)], value: 700 },
+    'rook_sniper':  { name: 'Ракета', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.rocket, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO)], ghost: 2, value: 750 },
+
+    'queen_knight_camel': { name: 'Ультимативная Королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)], value: 1500 },
+    'queen_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2, value: 1200 },
+    'queen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.range, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture', value: 1200}
+};
+
+const EVOLUTION_TREE = {
+    'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo', 'statue'], 
+    'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
+    'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
+    'rook': ['rook_tank', 'rook_ghost', 'statue'],
+    'queen': ['queen_camel', 'queen_knight', 'queen_upgradeable'], 
+    'king': ['king_nuke', 'king_dead_end'],
+
+    'pawn_runner': ['pawn_superrunner', 'pawn_spartan'],
+    'pawn_spearman': ['pawn_spartan'],
+    
+    'knight_camel': ['knight_camel_hybrid', 'knight_endless'],
+    'knight_paladin': ['knight_king', 'rook'],
+    'knight_knight': ['knight_king', 'rook', 'bishop_ship'],
+
+    'two_color_bishop': ['rook', 'bishop_ship'],
+    'bishop_bomber': ['bishop_nuke'],
+    'bishop_ghost': ['bishop_sniper'],
+
+    'rook_tank': ['rook_helicopter', 'queen'],
+    'rook_ghost': ['rook_sniper'],
+
+    'queen_camel': ['queen_knight_camel'],
+    'queen_knight': ['queen_knight_camel'],
+    'queen_upgradeable': ['king', 'queen_ghost', 'queen_range'],
+
+    'pawn_superrunner': ['knight'],
+    'pawn_spartan': ['bishop']
+};
+
+let board = [];
+let currentTurn = 'white';
+let selectedCell = null;
+let possibleMoves = [];
+let gameOver = false;
+let enPassantTarget = null; 
+let white_kings = 1;
+let black_kings = 1;
+
+// --- BOT SETTINGS ---
+let gameMode = 'pve'; 
+let botSide = 'black'; 
+let botDifficulty = 'medium'; 
+let isBotThinking = false;
+
+// --- MENU LOGIC ---
+document.addEventListener('DOMContentLoaded', showStartMenu);
+
+function showStartMenu() {
+    document.getElementById('start-menu-overlay').style.display = 'flex';
+}
+
+function startGameFromMenu() {
+    gameMode = document.getElementById('game-mode').value;
+    const playerSide = document.getElementById('player-side').value;
+    botDifficulty = document.getElementById('bot-difficulty').value;
+    botSide = (playerSide === 'white') ? 'black' : 'white';
+    document.getElementById('start-menu-overlay').style.display = 'none';
+    initGame();
+}
+
+document.getElementById('game-mode').addEventListener('change', function(e) {
+    const botSettings = document.getElementById('bot-settings');
+    botSettings.style.display = (e.target.value === 'pve') ? 'block' : 'none';
+});
+
+
+// --- GAME LOGIC ---
+
+function initGame() {
+    board = createBoard();
+    currentTurn = 'white';
+    selectedCell = null;
+    gameOver = false;
+    possibleMoves = [];
+    enPassantTarget = null;
+    isBotThinking = false;
+    white_kings = 1;
+    black_kings = 1;
+    
+    document.getElementById('game-log').innerHTML = '';
+    log(`Новая игра: ${gameMode.toUpperCase()} ${gameMode === 'pve' ? '(' + botDifficulty + ')' : ''}`);
+    
+    renderBoard();
+    updateInfo();
+
+    if (gameMode === 'pve' && botSide === 'white') {
+        setTimeout(makeBotMove, 800);
+    }
+}
+
+function createBoard() {
+    const newBoard = Array(8).fill(null).map(() => Array(8).fill(null));
+    for(let x=0; x<8; x++) {
+        newBoard[1][x] = createPiece('pawn', 'black');
+        newBoard[6][x] = createPiece('pawn', 'white');
+    }
+    const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+    backRow.forEach((type, x) => {
+        newBoard[0][x] = createPiece(type, 'black');
+        newBoard[7][x] = createPiece(type, 'white');
+    });
+    return newBoard;
+}
+
+function createPiece(type, color) {
+    return {
+        type: type,
+        color: color,
+        xp: 0,
+        hasMoved: false,
+        id: Math.random().toString(36).substr(2, 9)
+    };
+}
+
+function getValidMoves(piece, startX, startY, checkBoard = board) {
+    const moves = [];
+    const def = PIECE_TYPES[piece.type];
+    const isWhite = piece.color === 'white';
+    const direction = isWhite ? -1 : 1;
+
+    if (def.special === 'teleport') {
+        for(let y=0; y<8; y++) {
+            for(let x=0; x<8; x++) {
+                if (!checkBoard[y][x]) {
+                    moves.push({x, y});
+                }
+            }
+        }
+        return moves; 
+    }
+
+    if (def.role === 'pawn') {
+        let dy = direction;
+        if (isValidPos(startX, startY + dy) && !checkBoard[startY + dy][startX]) {
+            moves.push({x: startX, y: startY + dy});
+            if (!piece.hasMoved && isValidPos(startX, startY + dy * 2) && !checkBoard[startY + dy * 2][startX]) {
+                moves.push({x: startX, y: startY + dy * 2, isDoublePawnMove: true});
+            }
+        }
+        [[-1, dy], [1, dy]].forEach(att => {
+            const tx = startX + att[0];
+            const ty = startY + att[1];
+            if (isValidPos(tx, ty)) {
+                const target = checkBoard[ty][tx];
+                if (target && target.color !== piece.color) {
+                    if (!PIECE_TYPES[target.type].immortal) {
+                         moves.push({x: tx, y: ty, isCapture: true});
+                    }
+                }
+                else if (!target && enPassantTarget && enPassantTarget.x === tx && enPassantTarget.y === ty) {
+                     moves.push({x: tx, y: ty, isCapture: true, isEnPassant: true});
+                }
+            }
+        });
+        if (def.special === 'spear_attack') {
+            const forwardY = startY + direction;
+            if (isValidPos(startX, forwardY)) {
+                const target = checkBoard[forwardY][startX];
+                if (target && target.color !== piece.color) {
+                     if (!PIECE_TYPES[target.type].immortal) {
+                         moves.push({x: startX, y: forwardY, isCapture: true});
+                     }
+                }
+            }
+        }
+        if (def.extraMoves) {
+            def.extraMoves.forEach(m => {
+                const actualDy = m.dy * direction; 
+                const tx = startX + m.dx;
+                const ty = startY + actualDy;
+                if (isValidPos(tx, ty) && !checkBoard[ty][tx]) {
+                    moves.push({x: tx, y: ty});
+                }
+            });
+        }
+    }
+
+    if (def.moves) {
+        def.moves.forEach(vec => {
+            const dx = vec.dx;
+            const dy = vec.dy;
+            
+            if (vec.slide) {
+                let obstaclesPassed = 0;
+                const ghostLimit = (def.ghost === true) ? Infinity : (def.ghost || 0);
+
+                for (let i = 1; i < 8; i++) {
+                    const tx = startX + (dx * i);
+                    const ty = startY + (dy * i);
+                    if (!isValidPos(tx, ty)) break;
+                    
+                    const target = checkBoard[ty][tx];
+                    if (!target) {
+                        moves.push({x: tx, y: ty});
+                    } else {
+                        if (target.color !== piece.color) {
+                            if (!PIECE_TYPES[target.type].immortal) {
+                                moves.push({x: tx, y: ty, isCapture: true});
+                            }
+                        }
+                        obstaclesPassed++;
+                        if (obstaclesPassed > ghostLimit) break;
+                    }
+                }
+            } else {
+                const tx = startX + dx;
+                const ty = startY + dy;
+                if (isValidPos(tx, ty)) {
+                    const target = checkBoard[ty][tx];
+                    if (!target) {
+                        moves.push({x: tx, y: ty});
+                    } else if (target.color !== piece.color) {
+                        if (!PIECE_TYPES[target.type].immortal) {
+                            moves.push({x: tx, y: ty, isCapture: true});
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    if (def.role === 'king' && !piece.hasMoved) {
+        const row = isWhite ? 7 : 0;
+        const kRook = checkBoard[row][7];
+        if (kRook && PIECE_TYPES[kRook.type].role === 'rook' && !kRook.hasMoved) {
+            if (!checkBoard[row][5] && !checkBoard[row][6]) {
+                moves.push({x: 6, y: row, isCastling: true, rookX: 7, rookToX: 5});
+            }
+        }
+        const qRook = checkBoard[row][0];
+        if (qRook && PIECE_TYPES[qRook.type].role === 'rook' && !qRook.hasMoved) {
+            if (!checkBoard[row][1] && !checkBoard[row][2] && !checkBoard[row][3]) {
+                moves.push({x: 2, y: row, isCastling: true, rookX: 0, rookToX: 3});
+            }
+        }
+    }
+    return moves;
+}
+
+function isValidPos(x, y) {
+    return x >= 0 && x < 8 && y >= 0 && y < 8;
+}
+
+function cellClick(x, y) {
+    if (gameOver) return;
+    if (gameMode === 'pve' && currentTurn === botSide && isBotThinking) return;
+
+    const clickedPiece = board[y][x];
+    const move = possibleMoves.find(m => m.x === x && m.y === y);
+
+    if (move) {
+        makeMove(selectedCell.x, selectedCell.y, move);
+        return;
+    }
+
+    if (clickedPiece && clickedPiece.color === currentTurn) {
+        selectedCell = {x, y};
+        possibleMoves = getValidMoves(clickedPiece, x, y);
+        renderBoard();
+        updateInfo(clickedPiece);
+    } else {
+        selectedCell = null;
+        possibleMoves = [];
+        renderBoard();
+        updateInfo(null);
+    }
+}
+
+function makeMove(fromX, fromY, move) {
+    const toX = move.x;
+    const toY = move.y;
+    const piece = board[fromY][fromX];
+    let target = board[toY][toX];
+    
+    let captureHappened = false;
+    let enemyType = null;
+    let explosion = false;
+
+    if (move.isEnPassant) {
+        const dir = piece.color === 'white' ? 1 : -1; 
+        const capturedPawnY = toY + dir;
+        target = board[capturedPawnY][toX]; 
+        board[capturedPawnY][toX] = null; 
+        captureHappened = true;
+        log('⚔️ Взятие на проходе!');
+    }
+
+    if (target) {
+        capture_audio.play().catch(e=>{});
+        captureHappened = true;
+        enemyType = target.type;
+        piece.xp += 1;
+        
+        if (PIECE_TYPES[target.type].role === 'king') {
+            if(target.color === 'white') white_kings -= 1;
+            else black_kings -= 1;
+
+            if (white_kings === 0) {
+                alert(`Победа черных!`);
+                gameOver = true;
+            } else if (black_kings === 0) {
+                alert(`Победа белых!`);
+                gameOver = true;
+            }
+            if(gameOver) {
+                board[toY][toX] = piece;
+                board[fromY][fromX] = null;
+                renderBoard();
+                return;
+            }
+        }
+        
+        if (['explode_3', 'detonate_3'].includes(PIECE_TYPES[target.type].special)) {
+            explode(toX, toY, board[toY][toX].color, 1);
+            explosion = true;
+        } else if (['explode_5', 'detonate_5'].includes(PIECE_TYPES[target.type].special)) {
+            explode(toX, toY, board[toY][toX].color, 2);
+            explosion = true;
+        }
+    } else {
+        move_audio.play().catch(e=>{});
+    }
+
+    if(target) {
+        if(PIECE_TYPES[piece.type].special === 'range_capture' || explosion) {
+            board[toY][toX] = null;
+        } else {
+            board[toY][toX] = piece;
+        }
+    } else {
+        board[toY][toX] = piece;
+    }
+
+    if(PIECE_TYPES[piece.type].special !== 'range_capture') {
+        board[fromY][fromX] = null;
+    } else if(!target) {
+        board[fromY][fromX] = null;
+    }
+    
+    piece.hasMoved = true;
+
+    if (move.isCastling) {
+        const rook = board[toY][move.rookX];
+        board[toY][move.rookToX] = rook;
+        board[toY][move.rookX] = null;
+        rook.hasMoved = true;
+        log('🔄 Рокировка!');
+    }
+
+    if (move.isDoublePawnMove) {
+        const dir = piece.color === 'white' ? -1 : 1;
+        enPassantTarget = { x: toX, y: toY - dir }; 
+    } else {
+        enPassantTarget = null;
+    }
+
+    const def = PIECE_TYPES[piece.type];
+    const isAtEnd = (piece.color === 'white' && toY === 0) || (piece.color === 'black' && toY === 7);
+    
+    if (def.role === 'pawn' && isAtEnd) {
+        if (gameMode === 'pve' && piece.color === botSide) {
+             piece.type = 'queen';
+             piece.xp = 0;
+             piece.hasMoved = true;
+             log(`🤖 Бот выбрал превращение в Ферзя`);
+        } else {
+            renderBoard();
+            showPromotionModal(piece);
+            return; 
+        }
+    }
+
+    if (captureHappened && enemyType) {
+        log(`${def.name} рубит ${PIECE_TYPES[enemyType].name} (+1 XP)`);
+        if (def.special && def.special.startsWith('explode')) {
+            const radius = def.special === 'explode_5' ? 2 : 1; 
+            explode(toX, toY, piece.color, radius);
+        }
+    }
+
+    if (canEvolve(piece)) {
+        if (gameMode === 'pve' && piece.color === botSide) {
+            const options = EVOLUTION_TREE[piece.type];
+            // Бот выбирает наиболее "ценную" фигуру, если может, или рандом
+            // Упростим: берем последний вариант, обычно это сильная ветка
+            const choiceIndex = (botDifficulty === 'hard') ? options.length - 1 : Math.floor(Math.random() * options.length);
+            const newType = options[choiceIndex];
+            piece.type = newType;
+            if(piece.type === "king") {
+                if(currentTurn === "white") white_kings += 1;
+                else black_kings += 1;
+            }
+            piece.xp = 0;
+            log(`🤖 Бот эволюционировал в ${PIECE_TYPES[newType].name}!`);
+        } else {
+            renderBoard();
+            showEvolutionModal(piece);
+            return; 
+        }
+    }
+
+    endTurn();
+}
+
+function endTurn() {
+    selectedCell = null;
+    possibleMoves = [];
+    currentTurn = currentTurn === 'white' ? 'black' : 'white';
+    renderBoard();
+    const turnText = document.getElementById('turn-display');
+    turnText.innerText = `Ход: ${currentTurn === 'white' ? 'Белые' : 'Черные'}`;
+
+    if (gameMode === 'pve' && currentTurn === botSide && !gameOver) {
+        isBotThinking = true;
+        setTimeout(makeBotMove, 100); // Быстрый старт
+    } else {
+        isBotThinking = false;
+    }
+}
+
+// --- SMART AI LOGIC (Minimax) ---
+
+// Простые таблицы весов позиций (PST)
+const pst_w = {
+    pawn: [
+        [0,  0,  0,  0,  0,  0,  0,  0],
+        [50, 50, 50, 50, 50, 50, 50, 50],
+        [10, 10, 20, 30, 30, 20, 10, 10],
+        [5,  5, 10, 25, 25, 10,  5,  5],
+        [0,  0,  0, 20, 20,  0,  0,  0],
+        [5, -5,-10,  0,  0,-10, -5,  5],
+        [5, 10, 10,-20,-20, 10, 10, 5],
+        [0,  0,  0,  0,  0,  0,  0,  0]
+    ],
+    knight: [
+        [-50,-40,-30,-30,-30,-30,-40,-50],
+        [-40,-20,  0,  0,  0,  0,-20,-40],
+        [-30,  0, 10, 15, 15, 10,  0,-30],
+        [-30,  5, 15, 20, 20, 15,  5,-30],
+        [-30,  0, 15, 20, 20, 15,  0,-30],
+        [-30,  5, 10, 15, 15, 10,  5,-30],
+        [-40,-20,  0,  5,  5,  0,-20,-40],
+        [-50,-40,-30,-30,-30,-30,-40,-50]
+    ],
+    king: [ // Осторожный король
+        [ -30, -40, -40, -50, -50, -40, -40, -30],
+        [ -30, -40, -40, -50, -50, -40, -40, -30],
+        [ -30, -40, -40, -50, -50, -40, -40, -30],
+        [ -30, -40, -40, -50, -50, -40, -40, -30],
+        [ -20, -30, -30, -40, -40, -30, -30, -20],
+        [ -10, -20, -20, -20, -20, -20, -20, -10],
+        [  20,  20,   0,   0,   0,   0,  20,  20],
+        [  20,  30,  10,   0,   0,  10,  30,  20]
+    ]
+};
+
+// Зеркальные таблицы для черных
+function getPstValue(piece, x, y, isWhite) {
+    if (!pst_w[piece.type] && !pst_w[piece.role]) return 0;
+    const table = pst_w[piece.type] || pst_w[piece.role];
+    if (isWhite) {
+        return table[y][x];
+    } else {
+        return table[7 - y][x];
+    }
+}
+
+// Клонирование доски для симуляции
+function cloneBoardState(srcBoard) {
+    const newBoard = Array(8).fill(null).map(() => Array(8).fill(null));
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            if (srcBoard[y][x]) {
+                newBoard[y][x] = { ...srcBoard[y][x] };
+            }
+        }
+    }
+    return newBoard;
+}
+
+// Оценка доски
+function evaluateBoard(evalBoard, color) {
+    let score = 0;
+    let whiteKingAlive = false;
+    let blackKingAlive = false;
+
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            const p = evalBoard[y][x];
+            if (p) {
+                const def = PIECE_TYPES[p.type];
+                let val = def.value + (p.xp * 10); // XP добавляет ценность
+                
+                // Добавляем позиционную оценку
+                val += getPstValue(p, x, y, p.color === 'white');
+
+                if (p.color === 'white') {
+                    score += val;
+                    if(def.role === 'king') whiteKingAlive = true;
+                } else {
+                    score -= val;
+                    if(def.role === 'king') blackKingAlive = true;
+                }
+            }
+        }
+    }
+
+    if (!whiteKingAlive) return -100000;
+    if (!blackKingAlive) return 100000;
+
+    return color === 'white' ? score : -score;
+}
+
+// Упрощенная функция хода для симуляции (без UI и звуков)
+function simulateMove(simBoard, move) {
+    const p = simBoard[move.fromY][move.fromX];
+    const target = simBoard[move.move.y][move.move.x];
+    
+    // Capture/Explode logic simplified for AI
+    if (target) {
+        // XP gain
+        p.xp++; 
+    }
+    
+    simBoard[move.move.y][move.move.x] = p;
+    simBoard[move.fromY][move.fromX] = null;
+    p.hasMoved = true;
+}
+
+// Minimax with Alpha-Beta
+function minimax(simBoard, depth, alpha, beta, isMaximizing, playerColor) {
+    if (depth === 0) {
+        return evaluateBoard(simBoard, playerColor);
+    }
+
+    const moves = getAllMoves(simBoard, isMaximizing ? playerColor : (playerColor === 'white' ? 'black' : 'white'));
+    
+    if (moves.length === 0) return evaluateBoard(simBoard, playerColor); // Stalemate check needed ideally
+
+    if (isMaximizing) {
+        let maxEval = -Infinity;
+        for (const m of moves) {
+            const nextBoard = cloneBoardState(simBoard);
+            simulateMove(nextBoard, m);
+            const ev = minimax(nextBoard, depth - 1, alpha, beta, false, playerColor);
+            maxEval = Math.max(maxEval, ev);
+            alpha = Math.max(alpha, ev);
+            if (beta <= alpha) break;
+        }
+        return maxEval;
+    } else {
+        let minEval = Infinity;
+        for (const m of moves) {
+            const nextBoard = cloneBoardState(simBoard);
+            simulateMove(nextBoard, m);
+            const ev = minimax(nextBoard, depth - 1, alpha, beta, true, playerColor);
+            minEval = Math.min(minEval, ev);
+            beta = Math.min(beta, ev);
+            if (beta <= alpha) break;
+        }
+        return minEval;
+    }
+}
+
+function getAllMoves(b, color) {
+    const allMoves = [];
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            const p = b[y][x];
+            if (p && p.color === color) {
+                const valid = getValidMoves(p, x, y, b);
+                valid.forEach(v => {
+                    allMoves.push({ fromX: x, fromY: y, move: v });
+                });
+            }
+        }
+    }
+    // Сортировка: взятия проверяем первыми (оптимизация)
+    allMoves.sort((a, b) => (b.move.isCapture ? 1 : 0) - (a.move.isCapture ? 1 : 0));
+    return allMoves;
+}
+
+function makeBotMove() {
+    if (gameOver) return;
+
+    let bestMove = null;
+    const allMoves = getAllMoves(board, botSide);
+    
+    if (allMoves.length === 0) return;
+
+    if (botDifficulty === 'easy') {
+        bestMove = allMoves[Math.floor(Math.random() * allMoves.length)];
+    } 
+    else if (botDifficulty === 'medium') {
+        // Простой 1-ходовый поиск (жадный)
+        let maxScore = -Infinity;
+        // Перемешаем, чтобы не был предсказуемым при равных очках
+        allMoves.sort(() => Math.random() - 0.5);
+        
+        for (const m of allMoves) {
+            const simBoard = cloneBoardState(board);
+            simulateMove(simBoard, m);
+            const score = evaluateBoard(simBoard, botSide);
+            if (score > maxScore) {
+                maxScore = score;
+                bestMove = m;
+            }
+        }
+    } 
+    else if (botDifficulty === 'hard') {
+        // Minimax Depth 2 (Lookahead)
+        let maxEval = -Infinity;
+        let bestMovesList = [];
+        
+        // Оптимизация: Сначала проверяем взятия
+        allMoves.sort((a, b) => (b.move.isCapture ? 1 : 0) - (a.move.isCapture ? 1 : 0));
+
+        for (const m of allMoves) {
+            const simBoard = cloneBoardState(board);
+            simulateMove(simBoard, m);
+            // Запускаем рекурсию (depth 2 значит: Я сходил -> Противник сходил -> Оценка)
+            const ev = minimax(simBoard, 1, -Infinity, Infinity, false, botSide);
+            
+            if (ev > maxEval) {
+                maxEval = ev;
+                bestMovesList = [m];
+            } else if (ev === maxEval) {
+                bestMovesList.push(m);
+            }
+        }
+        
+        // Из лучших ходов выбираем случайный
+        bestMove = bestMovesList[Math.floor(Math.random() * bestMovesList.length)];
+    }
+
+    if (bestMove) {
+        makeMove(bestMove.fromX, bestMove.fromY, bestMove.move);
+    }
+}
+
+function explode(cx, cy, attackerColor, radius) {
+    log(`💥 ВЗРЫВ (Радиус ${radius})!`);
+    for (let dy = -radius; dy <= radius; dy++) {
+        for (let dx = -radius; dx <= radius; dx++) {
+            if (dx===0 && dy===0) continue;
+            const tx = cx + dx;
+            const ty = cy + dy;
+            if (isValidPos(tx, ty)) {
+                const victim = board[ty][tx];
+                if (victim && victim.type !== 'king' && !PIECE_TYPES[victim.type].immortal) { 
+                    const isNuke = radius > 1;
+                    if (isNuke || victim.color !== attackerColor) {
+                        board[ty][tx] = null;
+                    }
+                }
+            }
+        }
+    }
+}
+
+// --- MODALS & RENDER ---
+
+function showModal(title, text, items, callback) {
+    const overlay = document.getElementById('modal-overlay');
+    const container = document.getElementById('modal-container');
+    document.getElementById('modal-title').innerText = title;
+    document.getElementById('modal-subtitle').innerText = text;
+    container.innerHTML = '';
+
+    items.forEach(item => {
+        const def = PIECE_TYPES[item];
+        const card = document.createElement('div');
+        card.className = `modal-card ${def.tier === 3 ? 'tier-3-card' : ''}`;
+        
+        // Changed to .svg
+        const imgPath = `images/white_${def.symbol}.svg`; 
+        card.innerHTML = `
+            <img src="${imgPath}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <div style="display:none; font-size:40px;">?</div>
+            <span class="modal-name">${def.name}</span>
+            <span class="modal-desc">${def.desc || ''}</span>
+        `;
+        card.onclick = () => {
+            overlay.style.display = 'none';
+            callback(item);
+        };
+        container.appendChild(card);
+    });
+
+    overlay.style.display = 'flex';
+}
+
+function canEvolve(piece) {
+    const evolutions = EVOLUTION_TREE[piece.type];
+    if (!evolutions || evolutions.length === 0) return false;
+    const def = PIECE_TYPES[piece.type];
+    return piece.xp >= def.xpReq;
+}
+
+function showEvolutionModal(piece) {
+    const options = EVOLUTION_TREE[piece.type];
+    showModal('Эволюция!', 'Ваша фигура мутирует.', options, (newType) => {
+        piece.type = newType;
+        if(piece.type === "king") {
+            if(currentTurn === "white") white_kings += 1;
+            else black_kings += 1;
+        }
+        piece.xp = 0;
+        log(`🧬 Эволюция завершена!`);
+        endTurn();
+    });
+}
+
+function showPromotionModal(piece) {
+    const options = ['queen', 'rook', 'bishop', 'knight'];
+    showModal('Превращение!', 'Пешка дошла до края.', options, (newType) => {
+        piece.type = newType;
+        piece.xp = 0;
+        piece.hasMoved = true; 
+        log(`🎖 Превращение в ${PIECE_TYPES[newType].name}!`);
+        endTurn();
+    });
+}
+
+function renderBoard() {
+    const boardEl = document.getElementById('board');
+    boardEl.innerHTML = '';
+
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            const cell = document.createElement('div');
+            cell.className = `cell ${(x + y) % 2 === 0 ? 'light' : 'dark'}`;
+            cell.onclick = () => cellClick(x, y);
+
+            const move = possibleMoves.find(m => m.x === x && m.y === y);
+            if (move) {
+                cell.classList.add('possible-move');
+                if (board[y][x] || move.isCapture) cell.classList.add('capture');
+                if (move.isCastling || move.isEnPassant) cell.classList.add('special-move');
+            }
+            if (selectedCell && selectedCell.x === x && selectedCell.y === y) {
+                cell.classList.add('selected');
+            }
+
+            const piece = board[y][x];
+            if (piece) {
+                const pieceEl = document.createElement('div');
+                const def = PIECE_TYPES[piece.type];
+                pieceEl.className = `piece ${piece.color} tier-${def.tier}`;
+                if (def.immortal) pieceEl.classList.add('immortal');
+
+                // IMAGE LOGIC (SVG)
+                const img = document.createElement('img');
+                const imageName = `${piece.color}_${def.symbol}.svg`; // Now looks for .svg
+                img.src = `images/${imageName}`;
+                
+                // Fallback text if image missing
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    const textSpan = document.createElement('span');
+                    textSpan.style.fontSize = '12px';
+                    textSpan.style.fontWeight = 'bold';
+                    textSpan.innerText = def.name; 
+                    pieceEl.appendChild(textSpan);
+                };
+
+                pieceEl.appendChild(img);
+                
+                if (piece.xp > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'lvl-badge';
+                    badge.innerText = `${piece.xp}/${def.xpReq}`;
+                    pieceEl.appendChild(badge);
+                }
+                
+                cell.appendChild(pieceEl);
+            }
+            boardEl.appendChild(cell);
+        }
+    }
+}
+
+function updateInfo(piece) {
+    const infoPanel = document.getElementById('piece-info');
+    if (!piece) {
+        infoPanel.innerText = "Нажмите на фигуру для инфо...";
+        return;
+    }
+
+    const def = PIECE_TYPES[piece.type];
+    const nextEvos = EVOLUTION_TREE[piece.type] || [];
+    const hasEvo = nextEvos.length > 0;
+    
+    let immortalBadge = def.immortal ? '<span style="font-size:0.6em; background:#9b59b6; color:#fff; padding:2px 5px; border-radius:4px; margin-left:5px;">Бессмертный</span>' : '';
+
+    infoPanel.innerHTML = `
+        <div style="font-size: 1.4em; margin-bottom:5px;">
+            <strong>${def.name}</strong> 
+            <span style="font-size:0.6em; background:#f1c40f; color:#000; padding:2px 5px; border-radius:4px;">Tier ${def.tier}</span>
+            ${immortalBadge}
+        </div>
+        <div style="font-size: 0.9em; color: #ccc; margin-bottom: 10px;">${def.desc || ''}</div>
+        
+        ${hasEvo ? 
+            `Прогресс: <b>${piece.xp} / ${def.xpReq}</b> XP<br>
+            <small style="color:#aaa">Далее: ${nextEvos.map(t => PIECE_TYPES[t].name).join(', ')}</small>` 
+            : 
+            `<b style="color:#f1c40f">МАКСИМАЛЬНЫЙ УРОВЕНЬ</b>`
+        }
+    `;
+}
+
+function log(msg) {
+    const logEl = document.getElementById('game-log');
+    const entry = document.createElement('div');
+    entry.innerText = `> ${msg}`;
+    entry.style.padding = "2px 0";
+    entry.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
+    logEl.prepend(entry); 
+}
+
+initGame();
+
+</script>
+</body>
+</html>
