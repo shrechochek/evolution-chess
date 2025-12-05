@@ -10,7 +10,8 @@
 
 ## how to create mods
 ### first of all you should set symbols, that your mod use
-```
+
+```json
 "SYMBOLS": {
     "pawn": "pawn",
     "king": "king",
@@ -24,7 +25,8 @@
 ```
 
 ### after that you should write how figures would move
-```
+
+```json
 "PIECE_TYPES": {
     "pawn": { 
       "name": "Боевая Слизь", 
@@ -71,7 +73,8 @@
 ```
 
 ### then you must write the evolution tree
-```
+
+```json
 "EVOLUTION_TREE": {
     "pawn": ["mutant"],
     "mutant": [],
@@ -81,7 +84,8 @@
     "bishop": [],
     "queen": []
   }
-  ```
+```
+
 ### and finally if you use photos, that are not in the original respository you must upload them to the mod folder
 
 <!-- ### you can look at mod example at /evolution-chess-2-alfa/mod example -->
