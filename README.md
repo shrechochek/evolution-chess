@@ -6,7 +6,7 @@
 ## how pieces evolve?
 ### when piece eat another piece first piece can evolve into another piece
 
-### you can see evolution tree  [_here ](https://miro.com/app/board/uXjVI-ZUrws=/)
+### you can see evolution tree [_here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 
 Programmer: [_shrechochek_](https://github.com/shrechochek)
