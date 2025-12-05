@@ -1,12 +1,11 @@
-**chess where pieces can evolve**
+# chess where pieces can evolve
 
-
+## how to play
+[ play online ](https://shrechochek.github.io/evolution-chess/)
 
 [_pieces evolution table_](https://miro.com/app/board/uXjVI-ZUrws=/)
 
-
-<!--- [_our website_](https://shrechochek.github.io/evolution-chess/) --->
-[ play online ](https://shrechochek.github.io/evolution-chess/)
+### or you can download respository and run site on your own pc
 
 
 
