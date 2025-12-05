@@ -307,7 +307,7 @@ const PIECE_TYPES = {
     'knight_paladin': { name: 'Паладин', desc: 'конь + вертикаль и горизонталь', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
     'knight_knight': { name: 'Рыцарь', desc: 'конь + диагональ (1)', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
 
-    'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается (3x3)', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, 
+    'bishop_bomber': { name: 'Взрывной слон', desc: 'взрывает фигуру, которая его съела', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'revenge' }, 
     'bishop_ghost': { name: 'Призрак', desc: 'проходит сквозь 1 фигуру', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 },
     'two_color_bishop': { name: 'Двухцветный слон', desc: 'слон + король', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
 
@@ -637,6 +637,8 @@ function makeMove(fromX, fromY, move) {
             } else {
                 board[toY][toX] = piece;
             }
+        } else if(PIECE_TYPES[target.type].special === 'revenge') {
+            board[toY][toX] = null;
         } else {
             board[toY][toX] = piece;
         }
