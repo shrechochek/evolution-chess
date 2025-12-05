@@ -8,10 +8,85 @@
 
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
-## how to create modes
-### you can look at mod example at /evolution-chess-2-alfa/mod example
+## how to create mods
+### first of all you should set symbols, that your mod use
+```
+"SYMBOLS": {
+    "pawn": "pawn",
+    "king": "king",
+    "rook": "rook",
+    "knight": "knight",
+    "bishop": "bishop",
+    "queen": "queen",
+    "slime": "pawn",
+    "mutant": "rook"
+  },
+```
 
-### нou must upload to the mod file all the photos that are not in the original repository
+### after that you should write how figures would move
+```
+"PIECE_TYPES": {
+    "pawn": { 
+      "name": "Боевая Слизь", 
+      "symbol": "slime", 
+      "role": "pawn", 
+      "tier": 1, 
+      "xpReq": 1 
+    },
+    "mutant": { 
+      "name": "Мутант", 
+      "desc": "Ходит как ладья, но недалеко", 
+      "symbol": "mutant", 
+      "tier": 2, 
+      "xpReq": 5, 
+      "moves": [
+        {"dx":1,"dy":0,"slide":false},
+        {"dx":-1,"dy":0,"slide":false},
+        {"dx":0,"dy":1,"slide":false},
+        {"dx":0,"dy":-1,"slide":false}
+      ] 
+    },
+    "king": { 
+      "name": "Король Слизней", 
+      "symbol": "king", 
+      "role": "king", 
+      "tier": 1, 
+      "xpReq": 999, 
+      "moves": [
+        {"dx":1,"dy":0,"slide":false},
+        {"dx":-1,"dy":0,"slide":false},
+        {"dx":0,"dy":1,"slide":false},
+        {"dx":0,"dy":-1,"slide":false},
+        {"dx":1,"dy":1,"slide":false},
+        {"dx":1,"dy":-1,"slide":false},
+        {"dx":-1,"dy":1,"slide":false},
+        {"dx":-1,"dy":-1,"slide":false}
+      ]
+    },
+    "rook": { "name": "Ладья", "symbol": "rook", "moves": [{"dx":1,"dy":0,"slide":true},{"dx":-1,"dy":0,"slide":true},{"dx":0,"dy":1,"slide":true},{"dx":0,"dy":-1,"slide":true}], "tier": 1, "xpReq": 999 },
+    "knight": { "name": "Конь", "symbol": "knight", "moves": [{"dx":2,"dy":1,"slide":false}], "tier": 1, "xpReq": 999 },
+    "bishop": { "name": "Слон", "symbol": "bishop", "moves": [{"dx":1,"dy":1,"slide":true}], "tier": 1, "xpReq": 999 },
+    "queen": { "name": "Ферзь", "symbol": "queen", "moves": [{"dx":1,"dy":1,"slide":true},{"dx":1,"dy":0,"slide":true}], "tier": 1, "xpReq": 999 }
+  }
+```
+
+### then you must write the evolution tree
+```
+"EVOLUTION_TREE": {
+    "pawn": ["mutant"],
+    "mutant": [],
+    "king": [],
+    "rook": [],
+    "knight": [],
+    "bishop": [],
+    "queen": []
+  }
+  ```
+### and finally if you use photos, that are not in the original respository you must upload them to the mod folder
+
+<!-- ### you can look at mod example at /evolution-chess-2-alfa/mod example -->
+
+<!-- ### you must upload to the mod file all the photos that are not in the original repository -->
 
 ## authors
 Programmer: [_shrechochek_](https://github.com/shrechochek)
