@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шахматы с Эволюцией: SVG версия</title>
+    <title>Шахматы с Эволюцией: SVG версия + MODS (Folder)</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -218,6 +218,34 @@
             font-weight: bold;
             font-size: 1.1em;
         }
+        
+        /* Стили для загрузки модов */
+        .mod-upload-container {
+            margin-top: 10px;
+            text-align: left;
+        }
+        /* Скрываем стандартный инпут */
+        .mod-upload-container input[type="file"] {
+            display: none;
+        }
+        .mod-upload-label {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+            border-bottom: 3px solid #2980b9;
+        }
+        .mod-upload-label:hover {
+            background: #2980b9;
+        }
+        .mod-upload-label:active {
+            transform: translateY(2px);
+            border-bottom: none;
+        }
     </style>
 </head>
 <body>
@@ -233,11 +261,23 @@
                 <div class="turn-indicator" id="turn-display">Ход: Белые</div>
                 <div id="piece-info">Выберите фигуру...</div>
             </div>
+            
             <div class="panel">
                 <h3>Журнал событий</h3>
                 <div class="log" id="game-log"></div>
             </div>
+            
+            <!-- <div class="panel"> -->
+                <!-- <h3>Загрузка Мода (Папка)</h3> -->
+                <!-- <div style="font-size: 0.8em; color: #bbb; margin-bottom: 10px;">
+                    Выберите папку, в которой лежат .json файл мода и .svg изображения.
+                </div> -->
+            <!-- </div> -->
             <button class="reset-btn" onclick="initGame()">Новая игра</button>
+            <div class="mod-upload-container">
+                <label for="mod-input" class="mod-upload-label">Загрузить мод</label>
+                <input type="file" id="mod-input" webkitdirectory directory multiple onchange="loadMod(this)">
+            </div>
         </div>
     </div>
 
@@ -255,9 +295,13 @@
  */
 const BOARD_SIZE = 8;
 
+// ХРАНИЛИЩЕ ДЛЯ КАРТИНОК МОДОВ
+let CUSTOM_ASSETS = {}; // Объект для хранения Blob-ссылок на загруженные svg
+
 // ИМЕНА ФАЙЛОВ (без расширения)
 // Теперь игра будет искать .svg файлы
-const SYMBOLS = {
+// Изменено на let для поддержки модов
+let SYMBOLS = {
     // Basic
     pawn: 'pawn', knight: 'knight', bishop: 'bishop', rook: 'rook', queen: 'queen', king: 'king',
     // Tier 2
@@ -288,8 +332,9 @@ function step(vectors) { return vectors.map(v => ({...v, slide: false})); }
 
 /**
  * ОПРЕДЕЛЕНИЕ ТИПОВ
+ * Изменено на let для поддержки модов
  */
-const PIECE_TYPES = {
+let PIECE_TYPES = {
     // === TIER 1 ===
     'pawn': { name: 'Пешка', symbol: SYMBOLS.pawn, role: 'pawn', tier: 1, xpReq: 1 },
     'rook': { name: 'Ладья', symbol: SYMBOLS.rook, moves: slide(VEC_ORTHO), tier: 1, xpReq: 1, role: 'rook' },
@@ -342,7 +387,11 @@ const PIECE_TYPES = {
     'queen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.range, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
 
-const EVOLUTION_TREE = {
+/**
+ * ДЕРЕВО ЭВОЛЮЦИИ
+ * Изменено на let для поддержки модов
+ */
+let EVOLUTION_TREE = {
     'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo'], 
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
     'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
@@ -398,14 +447,19 @@ function initGame() {
 
 function createBoard() {
     const newBoard = Array(8).fill(null).map(() => Array(8).fill(null));
+    
+    const hasType = (t) => PIECE_TYPES[t] !== undefined;
+
     for(let x=0; x<8; x++) {
-        newBoard[1][x] = createPiece('pawn', 'black');
-        newBoard[6][x] = createPiece('pawn', 'white');
+        if(hasType('pawn')) newBoard[1][x] = createPiece('pawn', 'black');
+        if(hasType('pawn')) newBoard[6][x] = createPiece('pawn', 'white');
     }
     const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
     backRow.forEach((type, x) => {
-        newBoard[0][x] = createPiece(type, 'black');
-        newBoard[7][x] = createPiece(type, 'white');
+        if(hasType(type)) {
+            newBoard[0][x] = createPiece(type, 'black');
+            newBoard[7][x] = createPiece(type, 'white');
+        }
     });
     return newBoard;
 }
@@ -735,17 +789,47 @@ function showModal(title, text, items, callback) {
 
     items.forEach(item => {
         const def = PIECE_TYPES[item];
+        if (!def) return; 
+
         const card = document.createElement('div');
         card.className = `modal-card ${def.tier === 3 ? 'tier-3-card' : ''}`;
         
-        // Changed to .svg
-        const imgPath = `images/white_${def.symbol}.svg`; 
-        card.innerHTML = `
-            <img src="${imgPath}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-            <div style="display:none; font-size:40px;">?</div>
-            <span class="modal-name">${def.name}</span>
-            <span class="modal-desc">${def.desc || ''}</span>
-        `;
+        // MOD LOGIC FOR IMAGES (MODAL)
+        const img = document.createElement('img');
+        const color = currentTurn; // В модалке показываем цвет текущего игрока
+        const imgName = `${color}_${def.symbol}`;
+        
+        if (CUSTOM_ASSETS[imgName]) {
+             img.src = CUSTOM_ASSETS[imgName];
+        } else {
+             img.src = `images/${imgName}.svg`;
+        }
+
+        img.onerror = function() {
+            this.style.display = 'none';
+            this.nextElementSibling.style.display='block';
+        };
+
+        card.innerHTML = '';
+        card.appendChild(img);
+        
+        // Fallback placeholder
+        const placeholder = document.createElement('div');
+        placeholder.style.display = 'none';
+        placeholder.style.fontSize = '40px';
+        placeholder.innerText = '?';
+        card.appendChild(placeholder);
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'modal-name';
+        nameSpan.innerText = def.name;
+        card.appendChild(nameSpan);
+
+        const descSpan = document.createElement('span');
+        descSpan.className = 'modal-desc';
+        descSpan.innerText = def.desc || '';
+        card.appendChild(descSpan);
+
         card.onclick = () => {
             overlay.style.display = 'none';
             callback(item);
@@ -778,7 +862,9 @@ function showEvolutionModal(piece) {
 }
 
 function showPromotionModal(piece) {
-    const options = ['queen', 'rook', 'bishop', 'knight'];
+    const defaultOptions = ['queen', 'rook', 'bishop', 'knight'];
+    const options = defaultOptions.filter(t => PIECE_TYPES[t] !== undefined);
+    
     showModal('Превращение!', 'Пешка дошла до края.', options, (newType) => {
         piece.type = newType;
         piece.xp = 0;
@@ -812,15 +898,28 @@ function renderBoard() {
             if (piece) {
                 const pieceEl = document.createElement('div');
                 const def = PIECE_TYPES[piece.type];
+                if (!def) {
+                    pieceEl.innerText = "?";
+                    cell.appendChild(pieceEl);
+                    boardEl.appendChild(cell);
+                    continue; 
+                }
+
                 pieceEl.className = `piece ${piece.color} tier-${def.tier}`;
                 if (def.immortal) pieceEl.classList.add('immortal');
 
-                // IMAGE LOGIC (SVG)
+                // MOD LOGIC FOR IMAGES (BOARD)
                 const img = document.createElement('img');
-                const imageName = `${piece.color}_${def.symbol}.svg`; // Now looks for .svg
-                img.src = `images/${imageName}`;
+                const imgName = `${piece.color}_${def.symbol}`;
                 
-                // Fallback text if image missing
+                // Проверяем, есть ли загруженная кастомная картинка
+                if (CUSTOM_ASSETS[imgName]) {
+                    img.src = CUSTOM_ASSETS[imgName];
+                } else {
+                    // Иначе ищем стандартный файл
+                    img.src = `images/${imgName}.svg`;
+                }
+                
                 img.onerror = function() {
                     this.style.display = 'none';
                     const textSpan = document.createElement('span');
@@ -869,11 +968,71 @@ function updateInfo(piece) {
         
         ${hasEvo ? 
             `Прогресс: <b>${piece.xp} / ${def.xpReq}</b> XP<br>
-            <small style="color:#aaa">Далее: ${nextEvos.map(t => PIECE_TYPES[t].name).join(', ')}</small>` 
+            <small style="color:#aaa">Далее: ${nextEvos.map(t => PIECE_TYPES[t] !== undefined ? PIECE_TYPES[t].name : t).join(', ')}</small>` 
             : 
             `<b style="color:#f1c40f">МАКСИМАЛЬНЫЙ УРОВЕНЬ</b>`
         }
     `;
+}
+
+// --- MOD SYSTEM ---
+
+function loadMod(input) {
+    // В input.files находится список всех файлов из выбранной папки
+    const files = Array.from(input.files);
+    
+    if(files.length === 0) return;
+
+    // 1. Очистка старых ассетов (освобождение памяти)
+    Object.values(CUSTOM_ASSETS).forEach(url => URL.revokeObjectURL(url));
+    CUSTOM_ASSETS = {};
+
+    // 2. Поиск JSON файла
+    const jsonFile = files.find(f => f.name.endsWith('.json'));
+
+    // 3. Обработка картинок (.svg)
+    files.forEach(f => {
+        if(f.name.toLowerCase().endsWith('.svg')) {
+            // Ключ будет имя файла без расширения
+            // Пример: "white_slime.svg" -> ключ "white_slime"
+            const key = f.name.replace('.svg', '');
+            // Создаем Blob URL
+            const url = URL.createObjectURL(f);
+            CUSTOM_ASSETS[key] = url;
+            console.log(`Loaded asset: ${key}`);
+        }
+    });
+
+    // 4. Загрузка логики
+    if (jsonFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const modData = JSON.parse(e.target.result);
+                
+                if (!modData.PIECE_TYPES || !modData.EVOLUTION_TREE) {
+                    alert("Ошибка мода: отсутствуют PIECE_TYPES или EVOLUTION_TREE");
+                    return;
+                }
+
+                if (modData.SYMBOLS) SYMBOLS = modData.SYMBOLS;
+                PIECE_TYPES = modData.PIECE_TYPES;
+                EVOLUTION_TREE = modData.EVOLUTION_TREE;
+
+                log(`📂 ПАКЕТ ЗАГРУЖЕН: ${jsonFile.name}`);
+                log(`🖼 Загружено спрайтов: ${Object.keys(CUSTOM_ASSETS).length}`);
+                
+                initGame();
+                input.value = '';
+            } catch (err) {
+                console.error(err);
+                alert("Ошибка чтения JSON файла мода!");
+            }
+        };
+        reader.readAsText(jsonFile);
+    } else {
+        alert("В папке не найден .json файл конфигурации!");
+    }
 }
 
 function log(msg) {
