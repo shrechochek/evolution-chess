@@ -1,10 +1,12 @@
 # chess where pieces can evolve
 
 ## how to play
-you can [ play online ](https://shrechochek.github.io/evolution-chess/)
-or you can download respository and run site on your own pc
+### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc
 
-[_pieces evolution table_](https://miro.com/app/board/uXjVI-ZUrws=/)
+## how pieces evolve?
+### when piece eat another piece first piece can evolve into another piece
+
+### you can see evolution tree  [_here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 
 Programmer: [_shrechochek_](https://github.com/shrechochek)
