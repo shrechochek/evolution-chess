@@ -304,8 +304,8 @@ const PIECE_TYPES = {
     'pawn_torpedo': { name: 'Торпеда', desc: 'ходит на 2 клетки вперед', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
 
     'knight_camel': { name: 'Верблюд', desc: 'ходит (3+1)', symbol: SYMBOLS.camel, tier: 2, xpReq: 2, moves: step(VEC_CAMEL) },
-    'knight_paladin': { name: 'Паладин', desc: 'конь + король', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
-    'knight_knight': { name: 'Рыцарь', desc: 'конь + диагональ (1)', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
+    'knight_paladin': { name: 'Паладин', desc: 'конь + вертикаль и горизонталь', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
+    'knight_knight': { name: 'Рыцарь', desc: 'конь + диагональ (1)', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
 
     'bishop_bomber': { name: 'Бомбардир', desc: 'взрывается (3x3)', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'detonate_3' }, 
     'bishop_ghost': { name: 'Призрак', desc: 'проходит сквозь 1 фигуру', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 },
@@ -629,8 +629,14 @@ function makeMove(fromX, fromY, move) {
     }
 
     if(target) {
-        if(PIECE_TYPES[piece.type].special === 'range_capture' || explosion) {
+        if(PIECE_TYPES[piece.type].special === 'range_capture') {
             board[toY][toX] = null;
+        } else if(explosion) {
+            if(PIECE_TYPES[piece.type].role !== 'king' && PIECE_TYPES[piece.type].role !== 'pawn') {
+                board[toY][toX] = null;
+            } else {
+                board[toY][toX] = piece;
+            }
         } else {
             board[toY][toX] = piece;
         }
@@ -705,7 +711,7 @@ function explode(cx, cy, attackerColor, radius) {
             const ty = cy + dy;
             if (isValidPos(tx, ty)) {
                 const victim = board[ty][tx];
-                if (victim && victim.type !== 'king' && !PIECE_TYPES[victim.type].immortal) { 
+                if (victim && PIECE_TYPES[victim.type].role !== 'king' && !PIECE_TYPES[victim.type].immortal && PIECE_TYPES[victim.type].role !== "pawn") { 
                     const isNuke = radius > 1;
                     if (isNuke || victim.color !== attackerColor) {
                         board[ty][tx] = null;
