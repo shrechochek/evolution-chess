@@ -36,10 +36,10 @@
       "special": "spear_attack"
 },
 ```
-#### "name" you must write name of figure
-#### "symbol" you must use one of symbols, that you set earlier
-#### "desc" you must write a description of figure
-#### "role" you can set special role for you figure
+"name" you must write name of figure
+"symbol" you must use one of symbols, that you set earlier
+"desc" you must write a description of figure
+"role" you can set special role for you figure
     1. king - (can castle, if you have 0 kings you lose, can not be blown)
     2. pawn - (can be promoted, can not be blown, can eat en passant)
     
