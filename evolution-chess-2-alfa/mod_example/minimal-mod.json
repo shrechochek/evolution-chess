@@ -32,7 +32,7 @@
     },
     "king": { "name": "Король", "symbol": "king", "role": "king", "moves": [{"dx":1,"dy":0,"slide":false},{"dx":-1,"dy":0,"slide":false},{"dx":0,"dy":1,"slide":false},{"dx":0,"dy":-1,"slide":false},
                                                                                     {"dx":1,"dy":1,"slide":false},{"dx":1,"dy":-1,"slide":false},{"dx":-1,"dy":1,"slide":false},{"dx":-1,"dy":-1,"slide":false}], "tier": 1, "xpReq": 999},
-    "rook": { "name": "Ладья", "symbol": "rook", "moves": [{"dx":1,"dy":0,"slide":true},{"dx":-1,"dy":0,"slide":true},{"dx":0,"dy":1,"slide":true},{"dx":0,"dy":-1,"slide":true}], "tier": 1, "xpReq": 999 },
+    "rook": { "name": "Ладья", "symbol": "rook", "moves": [{"dx":1,"dy":0,"slide":true},{"dx":-1,"dy":0,"slide":true},{"dx":0,"dy":1,"slide":true},{"dx":0,"dy":-1,"slide":true}], "tier": 1, "xpReq": 999, "role": "rook" },
     "knight": { "name": "Конь", "symbol": "knight", "moves": [{"dx":2,"dy":1,"slide":false},{"dx":2,"dy":-1,"slide":false},{"dx":-2,"dy":1,"slide":false},{"dx":-2,"dy":-1,"slide":false},
                                                               {"dx":1,"dy":2,"slide":false},{"dx":-1,"dy":2,"slide":false},{"dx":1,"dy":-2,"slide":false},{"dx":-1,"dy":-2,"slide":false}], "tier": 1, "xpReq": 999 },
     "bishop": { "name": "Слон", "symbol": "bishop", "moves": [{"dx":1,"dy":1,"slide":true},{"dx":-1,"dy":1,"slide":true},{"dx":1,"dy":-1,"slide":true},{"dx":-1,"dy":-1,"slide":true}], "tier": 1, "xpReq": 999 },
