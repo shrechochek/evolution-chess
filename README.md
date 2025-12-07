@@ -9,7 +9,8 @@
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ## how to create mods
-### you must create folder with .json file and photos for pieces(if you use pieces that are not in original respository)
+### you must create folder with .json file
+### also if you use photos that are not in original respository you should upload them to mod folder
 ### first of all you must set name for photos that you use
 
 ```json
