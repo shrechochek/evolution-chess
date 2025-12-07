@@ -3,9 +3,9 @@
 ## contents
 - [contents](#contents)
 - [how to play?](#how-to-play?)
-- [how pieces evolve?](#how-to-play)
 - [how pieces evolve?](#how-pieces-evolve?)
-- [authors](authors)
+- [how to create mods?](#how-to-create-mods?)
+- [authors](#authors)
 
 ## how to play?
 ### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc
