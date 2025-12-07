@@ -56,7 +56,7 @@
 ### "ghost" you can set how much pieces your figure can go through
 ### "immortal" you can make your pieces immortal
 
-> # **!WARNING!** test
+> # **!WARNING!** you should rewrite all standart pieces logic
 
 
 ### and finally you must write the evolution tree
@@ -90,7 +90,7 @@
 
 <!-- ### you can look at mod example at /evolution-chess-2-alfa/mod example -->
 
-### if you still dont understand how modes 
+### if you still don't understand how to create mods or want to see a specific example you can check /evolution-chess-2-alfa/mod_example folder 
 
 ## authors
 Programmer: [_shrechochek_](https://github.com/shrechochek)
