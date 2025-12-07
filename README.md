@@ -38,7 +38,6 @@
 >       "special": "spear_attack"
 > },
 > ```
-
 > * ### "name" you can write name of figure
 > * ### "symbol" you can use one of symbols, that you set earlier
 > * ### "desc" you can write a description of figure
@@ -56,7 +55,7 @@
 > > 6. range_capture - (figure can capture without moving)
 > * ### "ghost" you can set how much pieces your figure can go through
 > * ### "immortal" you can make your pieces immortal
-
+> * 
 > # **!WARNING!** you should rewrite all standart pieces logic
 
 
@@ -75,19 +74,19 @@
 > ### in this evolution tree pawn can evolve into star
 
 ### your final mod structure should look like this
-```json
-{
-    "SYMBOLS": {
-    
-    },
-    "PIECE_TYPES": {
-    
-    }
-    "EVOLUTION_TREE": {
-    
-    }
-}
-```
+> ```json
+> {
+>     "SYMBOLS": {
+>     
+>     },
+>     "PIECE_TYPES": {
+>     
+>     }
+>     "EVOLUTION_TREE": {
+>     
+>     }
+> }
+> ```
 
 ### if you still don't understand how to create mods or want to see a specific example 
 ### you can check /evolution-chess-2-alfa/mod_example folder 
