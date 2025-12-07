@@ -10,7 +10,7 @@
 
 ## how to create mods
 1. ### first of all you must create folder with .json file
-2. ### also if you use photos that are not in original respository you should upload them to mod folder
+2. ### if you use photos that are not in original respository you should upload them to mod folder
 3. ### then you must set name for photos that you use
 
 ```json
