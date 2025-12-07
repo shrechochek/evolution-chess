@@ -1,2 +1,5 @@
 index_files:
   - "evolution-chess-2-alfa/evolution-chess.html"
+
+theme: jekyll-theme-minimal
+title: Evolution Chess
