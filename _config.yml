@@ -6,3 +6,6 @@ title: Evolution Chess
 
 include:
   - "evolution-chess-2-alfa"
+
+exclude:
+  - "README.md"
