@@ -9,6 +9,7 @@
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ## how to create mods
+### you must create folder with .json file inside and photos for pieces(if you use photos, that are not in original respository)
 ### first of all you must set name for photos that you use
 
 ```json
@@ -55,8 +56,10 @@
 ### "ghost" you can set how much pieces your figure can go through
 ### "immortal" you can make your pieces immortal
 
+<span style="color: #ff0000;">you must rewrite all standart pieces too</span>
 
-### then you must write the evolution tree
+
+### and finally you must write the evolution tree
 ```json
 "EVOLUTION_TREE": {
     "pawn": ["star"],
@@ -69,8 +72,6 @@
   }
 ```
 ### in this evolution tree pawn can evolve into star
-
-### and finally if you use photos, that are not in the original respository you must upload them to the mod folder
 
 ### your final mod structure should look like this
 ```json
@@ -88,6 +89,8 @@
 ```
 
 <!-- ### you can look at mod example at /evolution-chess-2-alfa/mod example -->
+
+### if you still dont understand how modes 
 
 ## authors
 Programmer: [_shrechochek_](https://github.com/shrechochek)
