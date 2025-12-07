@@ -26,7 +26,7 @@
 },
 ```
 
-### after that you must write information about pieces
+4. ### after that you must write information about pieces
 ```json
 "pawn": { 
       "name": "копейщик", 
@@ -60,7 +60,7 @@
 > # **!WARNING!** you should rewrite all standart pieces logic
 
 
-### and finally you must write the evolution tree
+5. ### and finally you must write the evolution tree
 ```json
 "EVOLUTION_TREE": {
     "pawn": ["star"],
