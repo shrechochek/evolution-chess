@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Шахматы с Эволюцией: SVG версия + MODS (Folder)</title>
+    <title>Шахматы с Эволюцией: SVG версия + MODS (Fixed Castling)</title>
     <style>
         :root {
             --bg-color: #2c3e50;
@@ -89,14 +89,8 @@
             width: 90%;
             height: 90%;
             object-fit: contain;
-            /* SVG тени могут работать иначе, но фильтр оставим для объема */
             filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
         }
-
-        /* Эффект для бессмертных фигур */
-        /* .piece.immortal img {
-            filter: drop-shadow(0 0 8px #9b59b6);
-        } */
 
         /* Бейджик уровня */
         .lvl-badge {
@@ -224,7 +218,6 @@
             margin-top: 10px;
             text-align: left;
         }
-        /* Скрываем стандартный инпут */
         .mod-upload-container input[type="file"] {
             display: none;
         }
@@ -251,7 +244,7 @@
 <body>
 
     <h1>Шахматы: Эволюция Фигур V3</h1>
-    <div class="subtitle">made by shrechochek</div>
+    <div class="subtitle">made by shrechochek (Fixed Castling)</div>
 
     <div class="game-container">
         <div id="board"></div>
@@ -267,12 +260,6 @@
                 <div class="log" id="game-log"></div>
             </div>
             
-            <!-- <div class="panel"> -->
-                <!-- <h3>Загрузка Мода (Папка)</h3> -->
-                <!-- <div style="font-size: 0.8em; color: #bbb; margin-bottom: 10px;">
-                    Выберите папку, в которой лежат .json файл мода и .svg изображения.
-                </div> -->
-            <!-- </div> -->
             <button class="reset-btn" onclick="initGame()">Новая игра</button>
             <div class="mod-upload-container">
                 <label for="mod-input" class="mod-upload-label">Загрузить мод</label>
@@ -290,17 +277,10 @@
     </div>
 
 <script>
-/**
- * КОНФИГУРАЦИЯ
- */
 const BOARD_SIZE = 8;
 
-// ХРАНИЛИЩЕ ДЛЯ КАРТИНОК МОДОВ
-let CUSTOM_ASSETS = {}; // Объект для хранения Blob-ссылок на загруженные svg
+let CUSTOM_ASSETS = {}; 
 
-// ИМЕНА ФАЙЛОВ (без расширения)
-// Теперь игра будет искать .svg файлы
-// Изменено на let для поддержки модов
 let SYMBOLS = {
     // Basic
     pawn: 'pawn', knight: 'knight', bishop: 'bishop', rook: 'rook', queen: 'queen', king: 'king',
@@ -330,10 +310,6 @@ const capture_audio = new Audio('sounds/capture.mp3');
 function slide(vectors) { return vectors.map(v => ({...v, slide: true})); }
 function step(vectors) { return vectors.map(v => ({...v, slide: false})); }
 
-/**
- * ОПРЕДЕЛЕНИЕ ТИПОВ
- * Изменено на let для поддержки модов
- */
 let PIECE_TYPES = {
     // === TIER 1 ===
     'pawn': { name: 'Пешка', symbol: SYMBOLS.pawn, role: 'pawn', tier: 1, xpReq: 1 },
@@ -387,10 +363,6 @@ let PIECE_TYPES = {
     'queen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.range, tier: 3, xpReq: 999, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
 
-/**
- * ДЕРЕВО ЭВОЛЮЦИИ
- * Изменено на let для поддержки модов
- */
 let EVOLUTION_TREE = {
     'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo'], 
     'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
@@ -440,7 +412,6 @@ function initGame() {
     possibleMoves = [];
     enPassantTarget = null;
     document.getElementById('game-log').innerHTML = '';
-    // log('Игра началась! Используйте SVG изображения в папке images/');
     renderBoard();
     updateInfo();
 }
@@ -474,7 +445,23 @@ function createPiece(type, color) {
     };
 }
 
-function getValidMoves(piece, startX, startY, checkBoard = board) {
+function isSquareAttacked(tx, ty, attackerColor, checkBoard) {
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            const piece = checkBoard[y][x];
+            if (piece && piece.color === attackerColor) {
+                const moves = getValidMoves(piece, x, y, checkBoard, true);
+                
+                if (moves.some(m => m.x === tx && m.y === ty)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+function getValidMoves(piece, startX, startY, checkBoard = board, ignoreCastling = false) {
     const moves = [];
     const def = PIECE_TYPES[piece.type];
     const isWhite = piece.color === 'white';
@@ -581,18 +568,34 @@ function getValidMoves(piece, startX, startY, checkBoard = board) {
         });
     }
 
-    if (def.role === 'king' && !piece.hasMoved) {
+    if (def.role === 'king' && !piece.hasMoved && !ignoreCastling) {
         const row = isWhite ? 7 : 0;
+        const oppColor = isWhite ? 'black' : 'white';
+        
         const kRook = checkBoard[row][7];
         if (kRook && PIECE_TYPES[kRook.type].role === 'rook' && !kRook.hasMoved) {
+            // Проверка пустоты клеток
             if (!checkBoard[row][5] && !checkBoard[row][6]) {
-                moves.push({x: 6, y: row, isCastling: true, rookX: 7, rookToX: 5});
+                if (
+                    !isSquareAttacked(4, row, oppColor, checkBoard) &&
+                    !isSquareAttacked(5, row, oppColor, checkBoard) &&
+                    !isSquareAttacked(6, row, oppColor, checkBoard)
+                ) {
+                    moves.push({x: 6, y: row, isCastling: true, rookX: 7, rookToX: 5});
+                }
             }
         }
+        
         const qRook = checkBoard[row][0];
         if (qRook && PIECE_TYPES[qRook.type].role === 'rook' && !qRook.hasMoved) {
             if (!checkBoard[row][1] && !checkBoard[row][2] && !checkBoard[row][3]) {
-                moves.push({x: 2, y: row, isCastling: true, rookX: 0, rookToX: 3});
+                if (
+                    !isSquareAttacked(4, row, oppColor, checkBoard) &&
+                    !isSquareAttacked(3, row, oppColor, checkBoard) &&
+                    !isSquareAttacked(2, row, oppColor, checkBoard)
+                ) {
+                    moves.push({x: 2, y: row, isCastling: true, rookX: 0, rookToX: 3});
+                }
             }
         }
     }
@@ -978,32 +981,24 @@ function updateInfo(piece) {
 // --- MOD SYSTEM ---
 
 function loadMod(input) {
-    // В input.files находится список всех файлов из выбранной папки
     const files = Array.from(input.files);
     
     if(files.length === 0) return;
 
-    // 1. Очистка старых ассетов (освобождение памяти)
     Object.values(CUSTOM_ASSETS).forEach(url => URL.revokeObjectURL(url));
     CUSTOM_ASSETS = {};
 
-    // 2. Поиск JSON файла
     const jsonFile = files.find(f => f.name.endsWith('.json'));
 
-    // 3. Обработка картинок (.svg)
     files.forEach(f => {
         if(f.name.toLowerCase().endsWith('.svg')) {
-            // Ключ будет имя файла без расширения
-            // Пример: "white_slime.svg" -> ключ "white_slime"
             const key = f.name.replace('.svg', '');
-            // Создаем Blob URL
             const url = URL.createObjectURL(f);
             CUSTOM_ASSETS[key] = url;
             console.log(`Loaded asset: ${key}`);
         }
     });
 
-    // 4. Загрузка логики
     if (jsonFile) {
         const reader = new FileReader();
         reader.onload = function(e) {
