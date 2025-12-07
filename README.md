@@ -9,7 +9,7 @@
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ## how to create mods
-### you must create folder with .json file inside and photos for pieces(if you use photos, that are not in original respository)
+### you must create folder with .json file and photos for pieces(if you use pieces that are not in original respository)
 ### first of all you must set name for photos that you use
 
 ```json
@@ -90,7 +90,8 @@
 
 <!-- ### you can look at mod example at /evolution-chess-2-alfa/mod example -->
 
-### if you still don't understand how to create mods or want to see a specific example you can check /evolution-chess-2-alfa/mod_example folder 
+### if you still don't understand how to create mods or want to see a specific example 
+### you can check /evolution-chess-2-alfa/mod_example folder 
 
 ## authors
 Programmer: [_shrechochek_](https://github.com/shrechochek)
