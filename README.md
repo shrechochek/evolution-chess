@@ -51,7 +51,7 @@
 > teleport - (piece can teleport to every square of board if square is not occupied with another figure)\
 > explode_n - (destroy everything within radius n, when this piece capture or captured, expect pawns and kings)\
 > detonate_n - (destroy everything within radius n, when this piece captured, expect pawns and kings)\
-> range_capture - (figure can capture without moving)\
+> range_capture - (figure can capture without moving)
 ### "ghost" you can set how much pieces your figure can go through
 ### "immortal" you can make your pieces immortal
 
