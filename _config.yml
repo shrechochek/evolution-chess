@@ -3,3 +3,6 @@ index_files:
 
 theme: jekyll-theme-minimal
 title: Evolution Chess
+
+include:
+  - "evolution-chess-2-alfa"
