@@ -49,7 +49,8 @@
 > * ### "desc" you can write a description of figure
 > * ### "role" you can set special role for you figure
 > > 1. king - (can castle, if you have 0 kings you lose, can not be blown)\
-> > 2. pawn - (can be promoted, can not be blown, can eat en passant)
+> > 2. pawn - (can be promoted, can not be blown, can eat en passant)\
+> > 3. rook - (can participate in castling)
 > * ### "tier" you can set a tier of figure
 > * ### "xpReq" you can set how much xp it requiers to evolve (use 999 if figure should not evolve)
 > * ### "special" you can set special ability of figure
