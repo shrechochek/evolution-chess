@@ -13,31 +13,31 @@
 2. ### if you use photos that are not in original respository you should upload them to mod folder
 3. ### then you must set name for photos that you use
 
-```json
-"SYMBOLS": {
-    "pawn": "pawn",
-    "king": "king",
-    "rook": "rook",
-    "knight": "knight",
-    "bishop": "bishop",
-    "queen": "queen",
-    "spearman": "spearman",
-    "star": "star"
-},
-```
+> ```json
+> "SYMBOLS": {
+>     "pawn": "pawn",
+>     "king": "king",
+>     "rook": "rook",
+>     "knight": "knight",
+>     "bishop": "bishop",
+>     "queen": "queen",
+>     "spearman": "spearman",
+>     "star": "star"
+> },
+> ```
 
 4. ### after that you must write information about pieces
-```json
-"pawn": { 
-      "name": "копейщик", 
-      "symbol": "spearman", 
-      "desc": "пешка, которая бьет клетку перд собой",
-      "role": "pawn", 
-      "tier": 1, 
-      "xpReq": 1,
-      "special": "spear_attack"
-},
-```
+> ```json
+> "pawn": { 
+>       "name": "копейщик", 
+>       "symbol": "spearman", 
+>       "desc": "пешка, которая бьет клетку перд собой",
+>       "role": "pawn", 
+>       "tier": 1, 
+>       "xpReq": 1,
+>       "special": "spear_attack"
+> },
+> ```
 
 > * ### "name" you can write name of figure
 > * ### "symbol" you can use one of symbols, that you set earlier
