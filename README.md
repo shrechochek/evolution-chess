@@ -56,7 +56,7 @@
 ### "ghost" you can set how much pieces your figure can go through
 ### "immortal" you can make your pieces immortal
 
-> **!WARNING!** test
+> # **!WARNING!** test
 
 
 ### and finally you must write the evolution tree
