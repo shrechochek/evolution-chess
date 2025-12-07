@@ -72,7 +72,7 @@
     "queen": []
   }
 ```
-### in this evolution tree pawn can evolve into star
+> ### in this evolution tree pawn can evolve into star
 
 ### your final mod structure should look like this
 ```json
@@ -88,8 +88,6 @@
     }
 }
 ```
-
-<!-- ### you can look at mod example at /evolution-chess-2-alfa/mod example -->
 
 ### if you still don't understand how to create mods or want to see a specific example 
 ### you can check /evolution-chess-2-alfa/mod_example folder 
