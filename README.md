@@ -61,17 +61,17 @@
 
 
 5. ### and finally you must write the evolution tree
-```json
-"EVOLUTION_TREE": {
-    "pawn": ["star"],
-    "mutant": [],
-    "king": [],
-    "rook": [],
-    "knight": [],
-    "bishop": [],
-    "queen": []
-  }
-```
+> ```json
+> "EVOLUTION_TREE": {
+>     "pawn": ["star"],
+>     "mutant": [],
+>     "king": [],
+>     "rook": [],
+>     "knight": [],
+>     "bishop": [],
+>     "queen": []
+>   }
+> ```
 > ### in this evolution tree pawn can evolve into star
 
 ### your final mod structure should look like this
