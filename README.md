@@ -56,7 +56,7 @@
 ### "ghost" you can set how much pieces your figure can go through
 ### "immortal" you can make your pieces immortal
 
-<span style="color: #ff0000;">you must rewrite all standart pieces too</span>
+<span style="color: red;">you should rewrite all standart pieces</span>
 
 
 ### and finally you must write the evolution tree
