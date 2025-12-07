@@ -9,9 +9,7 @@
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ## how to create mods
-### first of all you should set name for photos that you use
-
-#### example
+### first of all you must set name for photos that you use
 
 ```json
 "SYMBOLS": {
@@ -21,58 +19,32 @@
     "knight": "knight",
     "bishop": "bishop",
     "queen": "queen",
-    "slime": "pawn",
-    "mutant": "rook"
-  },
+    "spearman": "spearman",
+    "star": "star"
+},
 ```
 
-### after that you should write how figures would move
-
+### after that you must write information about pieces
 ```json
-"PIECE_TYPES": {
-    "pawn": { 
-      "name": "Боевая Слизь", 
-      "symbol": "slime", 
+"pawn": { 
+      "name": "копейщик", 
+      "symbol": "spearman", 
+      "desc": "пешка, которая бьет клетку перд собой",
       "role": "pawn", 
       "tier": 1, 
-      "xpReq": 1 
-    },
-    "mutant": { 
-      "name": "Мутант", 
-      "desc": "Ходит как ладья, но недалеко", 
-      "symbol": "mutant", 
-      "tier": 2, 
-      "xpReq": 5, 
-      "moves": [
-        {"dx":1,"dy":0,"slide":false},
-        {"dx":-1,"dy":0,"slide":false},
-        {"dx":0,"dy":1,"slide":false},
-        {"dx":0,"dy":-1,"slide":false}
-      ] 
-    },
-    "king": { 
-      "name": "Король Слизней", 
-      "symbol": "king", 
-      "role": "king", 
-      "tier": 1, 
-      "xpReq": 999, 
-      "moves": [
-        {"dx":1,"dy":0,"slide":false},
-        {"dx":-1,"dy":0,"slide":false},
-        {"dx":0,"dy":1,"slide":false},
-        {"dx":0,"dy":-1,"slide":false},
-        {"dx":1,"dy":1,"slide":false},
-        {"dx":1,"dy":-1,"slide":false},
-        {"dx":-1,"dy":1,"slide":false},
-        {"dx":-1,"dy":-1,"slide":false}
-      ]
-    },
-    "rook": { "name": "Ладья", "symbol": "rook", "moves": [{"dx":1,"dy":0,"slide":true},{"dx":-1,"dy":0,"slide":true},{"dx":0,"dy":1,"slide":true},{"dx":0,"dy":-1,"slide":true}], "tier": 1, "xpReq": 999 },
-    "knight": { "name": "Конь", "symbol": "knight", "moves": [{"dx":2,"dy":1,"slide":false}], "tier": 1, "xpReq": 999 },
-    "bishop": { "name": "Слон", "symbol": "bishop", "moves": [{"dx":1,"dy":1,"slide":true}], "tier": 1, "xpReq": 999 },
-    "queen": { "name": "Ферзь", "symbol": "queen", "moves": [{"dx":1,"dy":1,"slide":true},{"dx":1,"dy":0,"slide":true}], "tier": 1, "xpReq": 999 }
-  }
+      "xpReq": 1,
+      "special": "spear_attack"
+},
 ```
+### "name" you must write name of figure
+### "symbol" you must use one of symbols, that you set earlier
+### "desc" you must write a description of figure
+### "role" you can set special role for you figure
+    1. king - (can castle, if you have 0 kings you lose, can not be blown)
+    2. pawn - (can be promoted, can not be blown, can eat en passant)
+    
+
+
 
 ### then you must write the evolution tree
 
