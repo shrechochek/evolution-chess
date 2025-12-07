@@ -36,21 +36,30 @@
       "special": "spear_attack"
 },
 ```
-### "name" you must write name of figure
-### "symbol" you must use one of symbols, that you set earlier
-### "desc" you must write a description of figure
-### "role" you can set special role for you figure
-> king - (can castle, if you have 0 kings you lose, can not be blown)
-> pawn - (can be promoted, can not be blown, can eat en passant)
-    
 
+### "name" you can write name of figure
+### "symbol" you can use one of symbols, that you set earlier
+### "desc" you can write a description of figure
+### "role" you can set special role for you figure
+> king - (can castle, if you have 0 kings you lose, can not be blown)\
+> pawn - (can be promoted, can not be blown, can eat en passant)
+### "tier" you can set a tier of figure
+### "xpReq" you can set how much xp it requiers to evolve (use 999 if figure should not evolve)
+### "special" you can set special ability of figure
+> spear_attack - (figure can capture piece ahead)\
+> revenge - (if piece is captured it destroy piece that captured it)\
+> teleport - (piece can teleport to every square of board if square is not occupied with another figure)\
+> explode_n - (destroy everything within radius n, when this piece capture or captured, expect pawns and kings)\
+> detonate_n - (destroy everything within radius n, when this piece captured, expect pawns and kings)\
+> range_capture - (figure can capture without moving)\
+### "ghost" you can set how much pieces your figure can go through
+### "immortal" you can make your pieces immortal
 
 
 ### then you must write the evolution tree
-
 ```json
 "EVOLUTION_TREE": {
-    "pawn": ["mutant"],
+    "pawn": ["star"],
     "mutant": [],
     "king": [],
     "rook": [],
@@ -59,12 +68,26 @@
     "queen": []
   }
 ```
+### in this evolution tree pawn can evolve into star
 
 ### and finally if you use photos, that are not in the original respository you must upload them to the mod folder
 
-<!-- ### you can look at mod example at /evolution-chess-2-alfa/mod example -->
+### your final mod structure should look like this
+```json
+{
+    "SYMBOLS": {
+    
+    },
+    "PIECE_TYPES": {
+    
+    }
+    "EVOLUTION_TREE": {
+    
+    }
+}
+```
 
-<!-- ### you must upload to the mod file all the photos that are not in the original repository -->
+<!-- ### you can look at mod example at /evolution-chess-2-alfa/mod example -->
 
 ## authors
 Programmer: [_shrechochek_](https://github.com/shrechochek)
