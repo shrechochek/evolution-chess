@@ -3,18 +3,18 @@
 ## contents
 - [contents](#contents)
 - [how to play?](#how-to-play)
-- [how pieces evolve?](#how-pieces-evolve?)
-- [how to create mods?](#how-to-create-mods?)
+- [how pieces evolve?](#how-pieces-evolve)
+- [how to create mods?](#how-to-create-mods)
 - [authors](#authors)
 
 ## how to play
 ### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc
 
-## how pieces evolve?
+## how pieces evolve
 ### when piece eat another piece first piece can evolve into another piece
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
-## how to create mods?
+## how to create mods
 1. ### first of all you must create folder with .json file
 2. ### if you use photos that are not in original respository you should upload them to mod folder
 3. ### then you must set name for photos that you use
