@@ -9,7 +9,9 @@
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ## how to create mods
-### first of all you should set symbols, that your mod use
+### first of all you should set name for photos that you use
+
+#### example
 
 ```json
 "SYMBOLS": {
