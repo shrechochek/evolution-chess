@@ -699,7 +699,26 @@ function makeMove(fromX, fromY, move) {
                 board[toY][toX] = piece;
             }
         } else if(PIECE_TYPES[target.type].special === 'revenge') {
-            board[toY][toX] = null;
+            if(PIECE_TYPES[piece.type].role === 'king') {
+                if(target.color === 'white') black_kings -= 1;
+                else white_kings -= 1;
+
+                if (white_kings === 0) {
+                    alert(`Победа черных!`);
+                    gameOver = true;
+                } else if (black_kings === 0) {
+                    alert(`Победа белых!`);
+                    gameOver = true;
+                }
+                if(gameOver) {
+                    board[toY][toX] = null;
+                    board[fromY][fromX] = null;
+                    renderBoard();
+                    return;
+                }
+            } else {
+                board[toY][toX] = null;
+            }
         } else {
             board[toY][toX] = piece;
         }
