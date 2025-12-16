@@ -60,6 +60,8 @@
 > > 4. explode_n - (destroy everything within radius n, when this piece capture or captured, expect pawns and kings)
 > > 5. detonate_n - (destroy everything within radius n, when this piece captured, expect pawns and kings)
 > > 6. range_capture - (figure can capture without moving)
+> > 7. explode_all_n - (destroy everything within radius n, when this piece captured or capture)
+> > 8. swap_ally - (piece can change places with another figure of its color)
 > * ### "ghost" you can set how much pieces your figure can go through
 > * ### "immortal" you can make your pieces immortal
 > # **!WARNING!** you should rewrite all standart pieces logic
