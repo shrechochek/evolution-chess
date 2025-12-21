@@ -213,6 +213,30 @@
             font-weight: bold;
             font-size: 1.1em;
         }
+
+        button.ai-btn-white {
+            background: #3ce79a;
+            color: white;
+            border: none;
+            padding: 12px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        button.ai-btn-black {
+            background: #228659;
+            color: white;
+            border: none;
+            padding: 12px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
         
         /* Стили для загрузки модов */
         .mod-upload-container {
@@ -245,6 +269,7 @@
 <body>
 
     <h1>Шахматы c эволюцией</h1>
+    <!-- <h1>фигры эволюционируют, когда съедают другие фигуры</h1> -->
     <div class="subtitle">made by shrechochek</div>
 
     <div class="game-container">
@@ -350,7 +375,7 @@ let PIECE_TYPES = {
 
     'knight_camel_hybrid': { name: 'Коне-Верблюд', desc: 'конь + верблюд', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
     'knight_endless': { name: 'Бесконечный конь', desc: 'слайд конем (∞)', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: -1, moves: [...slide(VEC_KNIGHT)], ghost: 10 },
-    'knight_king': { name: 'Король Коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)], role: 'king' },
+    'knight_king': { name: 'Король Коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)]},
 
     'bishop_nuke': { name: 'Ядерный Слон', desc: 'взрыв (3x3)', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: -1, moves: slide(VEC_DIAG), special: 'explode_3' },
     'bishop_sniper': { name: 'Снайпер', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: -1, moves: [...slide(VEC_DIAG)], ghost: 2 },
@@ -400,9 +425,10 @@ let currentTurn = 'white';
 let selectedCell = null;
 let possibleMoves = [];
 let gameOver = false;
-let enPassantTarget = null; 
+let enPassantTarget = null;
 let white_kings = 0;
 let black_kings = 0;
+let aiSide = null; // Глобальная переменная для стороны ИИ
 
 // --- FUNCTIONS ---
 
@@ -413,8 +439,9 @@ function initGame() {
     gameOver = false;
     possibleMoves = [];
     enPassantTarget = null;
+    aiSide = null; // Сбрасываем сторону ИИ при новой игре
     document.getElementById('game-log').innerHTML = '';
-    
+
     updateGameStatus();
     renderBoard();
     updateInfo();
@@ -825,8 +852,21 @@ function makeMove(fromX, fromY, move) {
 
     if (canEvolve(piece) && explosion === false) {
         renderBoard();
-        showEvolutionModal(piece);
-        return; 
+        if (piece.color === aiSide) {
+            // Автоматическая эволюция для ИИ - выбираем первую доступную опцию
+            const options = EVOLUTION_TREE[piece.type];
+            if (options && options.length > 0) {
+                const newType = options[0]; // Выбираем первую доступную эволюцию
+                piece.type = newType;
+                piece.xp = 0;
+                log(`🧬 Эволюция ИИ завершена: ${PIECE_TYPES[newType].name}`);
+                updateGameStatus();
+            }
+        } else {
+            // Показываем модальное окно для игрока
+            showEvolutionModal(piece);
+            return;
+        }
     }
 
     endTurn();
@@ -1138,9 +1178,498 @@ function log(msg) {
     entry.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
     logEl.prepend(entry); 
 }
+// ================== AI ENGINE for "Шахматы с эволюцией" ==================
+// Интеграция с существующими переменными/функциями страницы:
+// - board (8x8 array of piece objects)
+// - PIECE_TYPES (definitions)
+// - getValidMoves(piece, x, y, checkBoard, ignoreCastling)
+// - makeMove(fromX, fromY, move)  <-- используется для применения хода в UI
+// - renderBoard(), updateInfo(), log(), initGame()
+// - глобальная enPassantTarget (движок временно перезаписывает её при симуляции)
+// =======================================================================
+
+(function(){
+    // Параметры ИИ — настраиваемые
+    const AI_CONFIG = {
+        timePerMoveMs: 1500,   // лимит времени на ход (ms) — меняйте для "сложности"
+        maxDepthHardCap: 4,    // абсолютный максимум глубины итеративного углубления
+        mode: 'full',       // 'classic' | 'full'  -- classic: только обычные шахматные фигуры
+        useQuiescence: true
+    };
+
+    // Классификация классических фигур
+    const CLASSIC_SET = new Set(['pawn','knight','bishop','rook','queen','king']);
+
+    // Zobrist hashing
+    const Zobrist = {
+        table: {},   // pieceType_color_squareIndex -> BigInt
+        sideToMove: 0n,
+        initialized: false,
+        init() {
+            if (this.initialized) return;
+            this.sideToMove = rand64();
+            const pieceTypes = Object.keys(PIECE_TYPES);
+            for (const p of pieceTypes) {
+                this.table[p] = { white: Array(64).fill(0n), black: Array(64).fill(0n) };
+                for (let sq=0; sq<64; sq++){
+                    this.table[p].white[sq] = rand64();
+                    this.table[p].black[sq] = rand64();
+                }
+            }
+            this.initialized = true;
+        },
+        hashBoard(board, epTarget, side) {
+            // board[y][x] -> piece or null
+            let h = 0n;
+            for (let y=0; y<8; y++){
+                for (let x=0; x<8; x++){
+                    const p = board[y][x];
+                    if (p) {
+                        const idx = y*8 + x;
+                        const color = p.color;
+                        const type = p.type;
+                        if (this.table[type] && this.table[type][color]) {
+                            h ^= this.table[type][color][idx];
+                        }
+                    }
+                }
+            }
+            if (side === 'black') h ^= this.sideToMove;
+            if (epTarget) {
+                // fold en-passant x coordinate (0..7) into hash
+                h ^= BigInt(epTarget.x + 1) * 0x9e3779b97f4a7c15n; // magic
+            }
+            return h.toString(); // string key for Map
+        }
+    };
+
+    function rand64(){
+        // формируем 64-битное случайное BigInt
+        const hi = Math.floor(Math.random() * 0x100000000);
+        const lo = Math.floor(Math.random() * 0x100000000);
+        return (BigInt(hi) << 32n) ^ BigInt(lo);
+    }
+
+    // Клонирование доски и фигур — используется для симуляции ходов
+    function cloneBoard(srcBoard) {
+        const b = Array(8).fill(null).map(()=>Array(8).fill(null));
+        for (let y=0;y<8;y++){
+            for (let x=0;x<8;x++){
+                const p = srcBoard[y][x];
+                if (p) {
+                    b[y][x] = {
+                        type: p.type,
+                        color: p.color,
+                        xp: p.xp || 0,
+                        hasMoved: p.hasMoved || false,
+                        id: p.id || null
+                    };
+                }
+            }
+        }
+        return b;
+    }
+
+    // Утилиты: получить все ходы для стороны на данном board
+    function generateAllMoves(boardState, side, epTarget) {
+        // getValidMoves использует глобальную enPassantTarget — временно подменим
+        const oldEP = enPassantTarget;
+        enPassantTarget = epTarget;
+        const moves = []; // {fromX,fromY, move}
+        for (let y=0;y<8;y++){
+            for (let x=0;x<8;x++){
+                const p = boardState[y][x];
+                if (!p || p.color !== side) continue;
+                // Режим classic: пропустить нетипичные фигуры (если включено)
+                if (AI_CONFIG.mode === 'classic' && !CLASSIC_SET.has(p.type)) continue;
+                try {
+                    const mlist = getValidMoves(p, x, y, boardState, true) || [];
+                    for (const m of mlist) {
+                        moves.push({fromX:x, fromY:y, move:m});
+                    }
+                } catch (e) {
+                    // на всякий случай — если getValidMoves падает для модиф. фигур
+                    // пропускаем эти фигуры (в классическом режиме это ожидаемо)
+                    //console.warn("getValidMoves error:", e);
+                }
+            }
+        }
+        enPassantTarget = oldEP;
+        return moves;
+    }
+
+    // Применение хода на симулированной доске — возвращает новый epTarget
+    function applyPseudoMove(boardState, fromX, fromY, move) {
+        // работает с cloned board
+        const toX = move.x, toY = move.y;
+        const piece = boardState[fromY][fromX];
+        let epTarget = null;
+
+        // handle en passant capture
+        if (move.isEnPassant) {
+            const dir = piece.color === 'white' ? 1 : -1;
+            const capturedY = toY + dir;
+            boardState[capturedY][toX] = null;
+        }
+
+        // handle capture (we simply overwrite)
+        const target = boardState[toY][toX];
+        if (target) {
+            // increment xp on attacker in search world
+            piece.xp = (piece.xp || 0) + 1;
+        }
+
+        // move piece
+        boardState[toY][toX] = Object.assign({}, piece);
+        boardState[fromY][fromX] = null;
+        boardState[toY][toX].hasMoved = true;
+
+        // castling
+        if (move.isCastling) {
+            const rook = boardState[toY][move.rookX];
+            boardState[toY][move.rookToX] = rook;
+            boardState[toY][move.rookX] = null;
+            if (boardState[toY][move.rookToX]) boardState[toY][move.rookToX].hasMoved = true;
+        }
+
+        // double pawn move -> set enPassant target
+        if (move.isDoublePawnMove) {
+            const dir = piece.color === 'white' ? -1 : 1;
+            epTarget = { x: toX, y: toY - dir };
+        } else {
+            epTarget = null;
+        }
+
+        // promotion handling (простое): если пешка дошла до конца, превращаем в ферзя (если есть)
+        const def = PIECE_TYPES[boardState[toY][toX].type];
+        if (def && def.role === 'pawn') {
+            const isWhite = boardState[toY][toX].color === 'white';
+            if ((isWhite && toY === 0) || (!isWhite && toY === 7)) {
+                if (PIECE_TYPES['queen']) boardState[toY][toX].type = 'queen';
+            }
+        }
+        return epTarget;
+    }
+
+    // Оценочная функция — материал + piece-square + мобильность + король
+    const pieceValues = {
+        pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 20000
+    };
+    // простые piece-square tables (имеют смысл для классических фигур)
+    const PST = {
+        pawn: [
+            0,0,0,0,0,0,0,0,
+            50,50,50,50,50,50,50,50,
+            10,10,20,30,30,20,10,10,
+            5,5,10,25,25,10,5,5,
+            0,0,0,20,20,0,0,0,
+            5,-5,-10,0,0,-10,-5,5,
+            5,10,10,-20,-20,10,10,5,
+            0,0,0,0,0,0,0,0
+        ],
+        knight: [
+            -50,-40,-30,-30,-30,-30,-40,-50,
+            -40,-20,0,0,0,0,-20,-40,
+            -30,0,10,15,15,10,0,-30,
+            -30,5,15,20,20,15,5,-30,
+            -30,0,15,20,20,15,0,-30,
+            -30,5,10,15,15,10,5,-30,
+            -40,-20,0,5,5,0,-20,-40,
+            -50,-40,-30,-30,-30,-30,-40,-50
+        ],
+        bishop: Array(64).fill(0),
+        rook: Array(64).fill(0),
+        queen: Array(64).fill(0),
+        king: Array(64).fill(0)
+    };
+
+    function evaluateBoard(boardState, sideToMove) {
+        let score = 0;
+        let whiteMob = 0, blackMob = 0;
+        for (let y=0;y<8;y++){
+            for (let x=0;x<8;x++){
+                const p = boardState[y][x];
+                if (!p) continue;
+                const type = p.type;
+                const color = p.color;
+                const v = (pieceValues[type] || 0);
+                const sq = y*8 + x;
+                let pstVal = 0;
+                if (PST[type]) {
+                    pstVal = (color === 'white' ? PST[type][sq] : PST[type][63 - sq]);
+                }
+                const val = v + pstVal;
+                score += (color === 'white') ? val : -val;
+
+                // mobility approx (cheap): count moves
+                try {
+                    const oldEP = enPassantTarget;
+                    enPassantTarget = null; // quick approx
+                    const mvs = getValidMoves(p, x, y, boardState, true) || [];
+                    enPassantTarget = oldEP;
+                    if (color === 'white') whiteMob += mvs.length;
+                    else blackMob += mvs.length;
+                } catch(e){}
+            }
+        }
+        score += 2 * (whiteMob - blackMob);
+        return (sideToMove === 'white') ? score : -score;
+    }
+
+    // Quiescence search (разрешаем только взятия)
+    function quiescence(alpha, beta, boardState, side, epTarget, tt, depthLimit) {
+        const stand_pat = evaluateBoard(boardState, side);
+        if (stand_pat >= beta) return beta;
+        if (alpha < stand_pat) alpha = stand_pat;
+
+        // generate captures only
+        const moves = generateAllMoves(boardState, side, epTarget).filter(it => {
+            const tgt = boardState[it.move.y][it.move.x];
+            return tgt !== null || it.move.isEnPassant;
+        });
+
+        // order captures by simple MVV-LVA (capture value) using target value
+        moves.sort((a,b) => {
+            const ta = boardState[a.move.y][a.move.x];
+            const tb = boardState[b.move.y][b.move.x];
+            const va = ta ? (pieceValues[ta.type]||0) : 0;
+            const vb = tb ? (pieceValues[tb.type]||0) : 0;
+            return vb - va;
+        });
+
+        for (const m of moves) {
+            const newBoard = cloneBoard(boardState);
+            const newEP = applyPseudoMove(newBoard, m.fromX, m.fromY, m.move);
+            const oldGlobalEP = enPassantTarget;
+            enPassantTarget = newEP;
+            const score = -quiescence(-beta, -alpha, newBoard, side === 'white' ? 'black' : 'white', newEP, tt, depthLimit-1);
+            enPassantTarget = oldGlobalEP;
+            if (score >= beta) return beta;
+            if (score > alpha) alpha = score;
+        }
+        return alpha;
+    }
+
+    // Альфа-бета с итеративным углублением и ТТ
+    function alphaBeta(boardState, depth, alpha, beta, side, epTarget, tt, ply) {
+        const hash = Zobrist.hashBoard(boardState, epTarget, side);
+        if (tt.has(hash)) {
+            const entry = tt.get(hash);
+            if (entry.depth >= depth) {
+                if (entry.flag === 'EXACT') return entry.value;
+                if (entry.flag === 'LOWER' && entry.value > alpha) alpha = entry.value;
+                if (entry.flag === 'UPPER' && entry.value < beta) beta = entry.value;
+                if (alpha >= beta) return entry.value;
+            }
+        }
+
+        if (depth === 0) {
+            if (AI_CONFIG.useQuiescence) {
+                return quiescence(alpha, beta, boardState, side, epTarget, tt, 6);
+            } else {
+                return evaluateBoard(boardState, side);
+            }
+        }
+
+        let bestValue = -Infinity;
+        let bestMove = null;
+
+        // generate moves
+        let moves = generateAllMoves(boardState, side, epTarget);
+
+        // move ordering heuristics: prefer captures
+        moves.sort((a,b) => {
+            const ta = boardState[a.move.y][a.move.x];
+            const tb = boardState[b.move.y][b.move.x];
+            const va = ta ? (pieceValues[ta.type]||0) : 0;
+            const vb = tb ? (pieceValues[tb.type]||0) : 0;
+            return (vb - va);
+        });
+
+        if (moves.length === 0) {
+            // no moves -> evaluate (checkmate/stalemate handling not detailed)
+            return evaluateBoard(boardState, side);
+        }
+
+        for (const m of moves) {
+            const newBoard = cloneBoard(boardState);
+            const newEP = applyPseudoMove(newBoard, m.fromX, m.fromY, m.move);
+
+            const oldGlobalEP = enPassantTarget;
+            enPassantTarget = newEP;
+            const score = -alphaBeta(newBoard, depth-1, -beta, -alpha, side === 'white' ? 'black' : 'white', newEP, tt, ply+1);
+            enPassantTarget = oldGlobalEP;
+
+            if (score > bestValue) {
+                bestValue = score;
+                bestMove = m;
+            }
+            if (bestValue > alpha) alpha = bestValue;
+            if (alpha >= beta) break;
+        }
+
+        // store in TT
+        let flag = 'EXACT';
+        if (bestValue <= alpha) flag = 'UPPER';
+        else if (bestValue >= beta) flag = 'LOWER';
+        tt.set(hash, { value: bestValue, depth: depth, flag: flag, bestMove: bestMove });
+
+        return bestValue;
+    }
+
+    // Основная функция итеративного углубления, возвращает лучший ход {fromX,fromY,move}
+    function findBestMove(rootBoard, side, timeLimitMs) {
+        Zobrist.init();
+        const start = performance.now();
+        const tt = new Map();
+        let best = null;
+        let bestScore = -Infinity;
+        let depth = 1;
+        const maxDepth = AI_CONFIG.maxDepthHardCap;
+
+        let epTargetRoot = enPassantTarget; // текущее глобальное
+
+        while (true) {
+            if (depth > maxDepth) break;
+            const now = performance.now();
+            if (now - start > timeLimitMs) break;
+
+            // iterative deepening
+            try {
+                const clonedBoard = cloneBoard(rootBoard);
+                const score = alphaBeta(clonedBoard, depth, -Infinity, Infinity, side, epTargetRoot, tt, 0);
+                // extract best move from TT if available
+                const rootHash = Zobrist.hashBoard(rootBoard, epTargetRoot, side);
+                let bestFromTT = null;
+                if (tt.has(rootHash) && tt.get(rootHash).bestMove) {
+                    bestFromTT = tt.get(rootHash).bestMove;
+                    best = bestFromTT;
+                    bestScore = tt.get(rootHash).value;
+                }
+            } catch(e) {
+                console.error("search error", e);
+            }
+
+            depth++;
+            if (performance.now() - start > timeLimitMs) break;
+        }
+
+        return { move: best, score: bestScore };
+    }
+
+    // AI loop & UI integration
+    // aiSide теперь глобальная переменная
+    let autoPlay = false;
+    let thinking = false;
+
+    function aiPlayOneMove() {
+        if (gameOver) return;
+        if (!aiSide) return;
+        if (currentTurn !== aiSide) return;
+        if (thinking) return;
+        thinking = true;
+        log(`🤖 ИИ (${aiSide}) думает...`);
+        // snapshot board
+        const rootBoard = cloneBoard(board);
+        const timeLimit = AI_CONFIG.timePerMoveMs;
+
+        setTimeout(() => {
+            try {
+                const res = findBestMove(rootBoard, aiSide, timeLimit);
+                if (!res.move) {
+                    log("ИИ не нашёл допустимого хода (пасс?)");
+                    thinking = false;
+                    return;
+                }
+                // Выполнить ход на реальной доске через makeMove
+                makeMove(res.move.fromX, res.move.fromY, res.move.move);
+            } catch (e) {
+                console.error("AI move failed", e);
+            } finally {
+                thinking = false;
+                if (autoPlay && !gameOver) {
+                    // если после хода ход переходит к ИИ сопернику, то запустить следующий
+                    setTimeout(aiPlayOneMove, 200);
+                }
+            }
+        }, 30); // небольшая задержка для UI
+    }
+
+    // UI: добавить контролы в сайдбар (если есть)
+    function setupUIControls() {
+        const sideBar = document.querySelector('.sidebar');
+        if (!sideBar) return;
+        const panel = document.createElement('div');
+        panel.className = 'panel';
+        panel.style.display = 'flex';
+        panel.style.flexDirection = 'column';
+        panel.style.gap = '8px';
+
+        // buttons
+        const btnWhite = document.createElement('button');
+        btnWhite.className = 'ai-btn-white';
+        btnWhite.textContent = 'Играть против ИИ (За белых)';
+        btnWhite.onclick = () => { aiSide = 'black'; autoPlay = false; log("Игрок играет белыми. ИИ — чёрные."); setTimeout(aiPlayOneMove, 10); };
+        const btnBlack = document.createElement('button');
+        btnBlack.className = 'ai-btn-black';
+        btnBlack.textContent = 'Играть против ИИ (За чёрных)';
+        btnBlack.onclick = () => { aiSide = 'white'; autoPlay = false; log("Игрок играет чёрными. ИИ — белые."); setTimeout(aiPlayOneMove, 10); };
+        const btnAuto = document.createElement('button');
+        btnAuto.textContent = 'ИИ vs ИИ (Auto)';
+        btnAuto.onclick = () => { autoPlay = !autoPlay; aiSide = 'black'; log("AI vs AI: " + (autoPlay ? "включено" : "выключено")); if (autoPlay) setTimeout(aiPlayOneMove, 50); };
+        const selMode = document.createElement('select');
+        const optClassic = document.createElement('option'); optClassic.value='classic'; optClassic.textContent='Classic subset (fast)';
+        const optFull = document.createElement('option'); optFull.value='full'; optFull.textContent='Full (slow, all pieces)';
+        selMode.appendChild(optClassic); selMode.appendChild(optFull);
+        selMode.value = AI_CONFIG.mode;
+        selMode.onchange = () => { AI_CONFIG.mode = selMode.value; log(`AI режим: ${AI_CONFIG.mode}`); };
+
+        const inputTime = document.createElement('input');
+        inputTime.type = 'number';
+        inputTime.value = AI_CONFIG.timePerMoveMs;
+        inputTime.min = 100;
+        inputTime.step = 100;
+        inputTime.title = "ms per move";
+        inputTime.onchange = () => { AI_CONFIG.timePerMoveMs = Math.max(100, Number(inputTime.value)); log(`AI time per move: ${AI_CONFIG.timePerMoveMs}ms`); };
+
+        sideBar.appendChild(btnWhite);
+        sideBar.appendChild(btnBlack);
+        // panel.appendChild(btnAuto);
+        // panel.appendChild(document.createTextNode('Режим поиска:'));
+        // panel.appendChild(selMode);
+        // panel.appendChild(document.createTextNode('Время на ход (ms):'));
+        // panel.appendChild(inputTime);
+
+        // sideBar.appendChild(panel);
+    }
+
+    // Hook: запуск ИИ когда приходит его ход (наблюдение за currentTurn)
+    // Будем проверять через setInterval, это простой способ без глубокого вмешательства.
+    function attachAutoWatcher(){
+        setInterval(() => {
+            if (gameOver) return;
+            if (!aiSide) return;
+            if (currentTurn === aiSide && !thinking) {
+                aiPlayOneMove();
+            }
+        }, 300);
+    }
+
+    // Инициализация
+    Zobrist.init();
+    setupUIControls();
+    attachAutoWatcher();
+
+    // Экспорт в window для отладки
+    window.EVOLVE_AI = {
+        findBestMove, aiPlayOneMove, setAIConfig: (cfg)=>Object.assign(AI_CONFIG, cfg), getConfig: ()=>AI_CONFIG
+    };
+
+    log('✅ AI engine loaded. Use sidebar controls to start games.');
+})();
+
 
 initGame();
-
 </script>
 </body>
 </html>
