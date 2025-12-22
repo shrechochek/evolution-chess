@@ -5,8 +5,8 @@
 - [how to play?](#how-to-play)
 - [how pieces evolve?](#how-pieces-evolve)
 - [how to create mods?](#how-to-create-mods)
-- [authors](#authors)
 - [screenshots from game](#screenshots-from-game)
+- [authors](#authors)
 
 ## how to play
 ### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc
@@ -14,11 +14,6 @@
 ## how pieces evolve
 ### when piece eat another piece first piece can evolve into another piece
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
-
-## screenshots from game
-![site example photo](docs/game-example-photos/game-example-1.png)
-![site example photo](docs/game-example-photos/game-example-2.png)
-![site example photo](docs/game-example-photos/game-example-3.png)
 
 ## how to create mods
 1. ### first of all you must create folder with .json file
@@ -103,6 +98,11 @@
 > ```
 
 ##### **if you still don't understand how to create mods or want to see a specific example you can check /evolution-chess-2-alfa/mod_example folder**
+
+## screenshots from game
+![site example photo](docs/game-example-photos/game-example-1.png)
+![site example photo](docs/game-example-photos/game-example-2.png)
+![site example photo](docs/game-example-photos/game-example-3.png)
 
 ## authors
 Programmer: [_shrechochek_](https://github.com/shrechochek)
