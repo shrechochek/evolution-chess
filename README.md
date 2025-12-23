@@ -22,9 +22,6 @@ You can play Evolution Chess in two ways:
 ---
 
 ## Game Example
-<!-- ![site example photo](docs/game-example-photos/game-example-1.png)
-<!-- ![site example photo](docs/game-example-photos/game-example-2.png)
-![site example photo](docs/game-example-photos/game-example-3.png) -->
 <img src="docs/game-example-photos/game-example-1.png" width="700">
 
 ---
@@ -95,44 +92,36 @@ If you use custom images:
 > * ### "immortal" you can make your pieces immortal
 
 > [!WARNING]
-> you should rewrite all standart pieces logic
+> You should rewrite all standart pieces logic
 
 > [!TIP]
-> standart pieces logic is already described in test mode you can use it
+> Standart pieces logic is already described in test mode you can use it
 
-5. ### and finally you must write the evolution tree
-> ```json
-> "EVOLUTION_TREE": {
->     "pawn": ["star"],
->     "mutant": [],
->     "king": [],
->     "rook": [],
->     "knight": [],
->     "bishop": [],
->     "queen": []
->   }
-> ```
-
-> [!NOTE]
-> ### in this evolution tree pawn can evolve into star
-
-### your final mod structure should look like this
-> ```json
-> {
->     "SYMBOLS": {
->     
->     },
->     "PIECE_TYPES": {
->     
->     }
->     "EVOLUTION_TREE": {
->     
->     }
-> }
-> ```
+### 5. Write down evolution tree
+```json
+"EVOLUTION_TREE": {
+  "pawn": ["star"],
+  "mutant": [],
+  "king": [],
+  "rook": [],
+  "knight": [],
+  "bishop": [],
+  "queen": []
+}
+```
 
 > [!NOTE]
-> if you still don't understand how to create mods or want to see a specific example you can check <br>
+> ### In this evolution tree pawn can evolve into star
+
+### Final mod structure
+```text
+mod/
+ ├── images/
+ └── mod.json
+```
+
+> [!NOTE]
+> If you still don't understand how to create mods or want to see a specific example you can check <br>
 > */evolution-chess-2-alfa/mod_example* folder
 <!-- ##### **if you still don't understand how to create mods or want to see a specific example you can check /evolution-chess-2-alfa/mod_example folder** -->
 
