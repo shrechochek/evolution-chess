@@ -5,17 +5,17 @@ Chess where pieces evolve during the game
 ## contents
 - [How to play](#how-to-play)
 - [How pieces evolve](#how-pieces-evolve)
-- [How to create mods?](#how-to-create-mods)
+- [How to create mods](#how-to-create-mods)
 - [Game example](#game-example)
 - [Authors](#authors)
 ---
 
-## how to play
+## How to Play
 ### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc
 
 ---
 
-## game example
+## Game Example
 <!-- ![site example photo](docs/game-example-photos/game-example-1.png)
 <!-- ![site example photo](docs/game-example-photos/game-example-2.png)
 ![site example photo](docs/game-example-photos/game-example-3.png) -->
@@ -23,13 +23,13 @@ Chess where pieces evolve during the game
 
 ---
 
-## how pieces evolve
+## How Pieces Evolve
 ### when piece eat another piece first piece can evolve into another piece
 ### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ---
 
-## how to create mods
+## How to Create Mods
 1. ### first of all you must create folder with *.json* file
 2. ### if you use photos that are not in original respository you should upload them to /images folder in your mod(recommended) or upload them directly into mod folder
 3. ### then you must set name for photos that you use
