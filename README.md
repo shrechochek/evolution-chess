@@ -17,6 +17,9 @@ You can play Evolution Chess in two ways:
 1. 🌐 [**Play online**](https://shrechochek.github.io/evolution-chess/)
 2. 💻 Download respository and run on your own PC
 
+> [!NOTE]
+> ### You can play against your friends or AI
+
 ---
 
 ## Game Example
