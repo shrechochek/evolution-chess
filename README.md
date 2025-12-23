@@ -1,6 +1,10 @@
 # Evolution Chess
 Chess where pieces evolve
 
+> 🌍 **Languages**  
+> [English](README.md) | [Русский](docs/ru/README.md)
+
+---
 
 ## contents
 - [How to play](#how-to-play)
