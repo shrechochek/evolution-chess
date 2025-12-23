@@ -10,7 +10,8 @@ Chess where pieces evolve during the game
 - [Authors](#authors)
 ---
 
-You can play in two ways:
+### You can play Evolution Chess in two ways:
+
 - 1. [ play online ](https://shrechochek.github.io/evolution-chess/)
 - 2. Download respository and run on your own PC
 
