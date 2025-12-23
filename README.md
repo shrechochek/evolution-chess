@@ -4,8 +4,8 @@ Chess where pieces evolve
 ---
 
 > [!IMPORTANT]
-> ### 🌍 **Languages**  
-> ### [🇺🇸](README.md)  |  [🇷🇺](docs/ru/README.md)
+>  🌍 **Languages**  
+>  [us🇺🇸](README.md)  |  [ru🇷🇺](docs/ru/README.md)
 
 ---
 
