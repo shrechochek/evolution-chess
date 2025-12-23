@@ -126,6 +126,5 @@ mod/
 ---
 
 ## authors
-Programmer: [_shrechochek_](https://github.com/shrechochek)
-
-Artist: [_Serebr1k_](https://github.com/Serebr1k-code)
+- **Programmer**: [_shrechochek_](https://github.com/shrechochek)
+- **Artist**: [_Serebr1k_](https://github.com/Serebr1k-code)
