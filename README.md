@@ -77,8 +77,17 @@ If you use custom images:
   - `rook` — participates in castling
 - **`tier`** — evolution tier
 - **`xpReq`** — XP required to evolve (`-1` = no evolution)
-- 
-
+- **`special`** - special ability
+  - `spear_attack` - attack square ahead
+  - `revenge` - destroy the figure that ate it
+  - `teleport` - teleport to every square without piece on it
+  - `explode_n` - destroy everything within radius n, when this piece captured or capture
+  - `detonate_n` - destroy everything within radius n, when this piece capture or captured, expect pawns and kings
+  - `explde_all_n` - destroy everything within radius n, when this piece captured or capture
+  - `range_capture` - capture without moving
+  - `swap_ally` - swap places with same color piece
+- **`ghost`** - can go through n pieces (you must set n)
+- **`ghost`** - can not be captured
 
 <!-- > * ### "name" you can write name of figure
 > * ### "symbol" you can use one of symbols, that you set earlier
