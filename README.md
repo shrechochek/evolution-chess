@@ -7,7 +7,6 @@
 - [how to create mods?](#how-to-create-mods)
 - [screenshots from game](#game-example)
 - [authors](#authors)
-- 
 ---
 
 ## how to play
