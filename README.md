@@ -47,8 +47,7 @@ If you use custom images:
 - or place them directly in the mod folder
 
 
-3. then you must set name for photos that you use
-
+### 3. Set symbols for pieces
 > ```json
 > "SYMBOLS": {
 >     "pawn": "pawn",
@@ -62,7 +61,7 @@ If you use custom images:
 > },
 > ```
 
-4. ### after that you must write information about pieces
+### 4. Describe pieces information
 > ```json
 > "pawn": { 
 >       "name": "копейщик", 
