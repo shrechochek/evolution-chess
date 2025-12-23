@@ -5,7 +5,7 @@ Chess where pieces evolve
 
 > [!IMPORTANT]
 >  🌍 **Languages**  
->  [us🇺🇸](README.md)  |  [ru🇷🇺](docs/ru/README.md)
+>  [🇺🇸(en)](README.md)  |  [🇷🇺(en)](docs/ru/README.md)
 
 ---
 
