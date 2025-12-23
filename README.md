@@ -27,7 +27,7 @@ You can play Evolution Chess in two ways:
 ## How Pieces Evolve
 When a piece captures another piece, it gains experience and can evolve into a new piece
 
-[**evolution tree**](https://miro.com/app/board/uXjVI-ZUrws=/)
+[**Evolution tree**](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ---
 
