@@ -69,6 +69,9 @@
 > [!WARNING]
 > you should rewrite all standart pieces logic
 
+> [!TIP]
+> standart pieces logic is already described in test mode you can use it
+
 5. ### and finally you must write the evolution tree
 > ```json
 > "EVOLUTION_TREE": {
