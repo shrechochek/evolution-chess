@@ -1,5 +1,5 @@
 # Evolution Chess
-Chess where pieces evolve during the game
+Chess where pieces evolve
 
 
 ## contents
@@ -29,15 +29,16 @@ Chess where pieces evolve during the game
 ---
 
 ## How Pieces Evolve
-when piece eat another piece first piece can evolve into another piece
+When a piece captures another piece, it gains experience and can evolve into a new piece
+
 [**evolution tree**](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ---
 
 ## How to Create Mods
-1. ### first of all you must create folder with *.json* file
-2. ### if you use photos that are not in original respository you should upload them to /images folder in your mod(recommended) or upload them directly into mod folder
-3. ### then you must set name for photos that you use
+1. first of all you must create folder with *.json* file
+2. if you use photos that are not in original respository you should upload them to /images folder in your mod(recommended) or upload them directly into mod folder
+3. then you must set name for photos that you use
 
 > ```json
 > "SYMBOLS": {
