@@ -8,6 +8,7 @@ Chess where pieces evolve during the game
 - [How to create mods](#how-to-create-mods)
 - [Game example](#game-example)
 - [Authors](#authors)
+
 ---
 
 ### You can play Evolution Chess in two ways:
@@ -28,8 +29,8 @@ Chess where pieces evolve during the game
 ---
 
 ## How Pieces Evolve
-### when piece eat another piece first piece can evolve into another piece
-### you can see evolution tree [ here ](https://miro.com/app/board/uXjVI-ZUrws=/)
+when piece eat another piece first piece can evolve into another piece
+[**evolution tree**](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ---
 
