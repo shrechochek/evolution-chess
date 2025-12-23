@@ -113,7 +113,7 @@ If you use custom images:
 > [!NOTE]
 > ### In this evolution tree pawn can evolve into star
 
-### Final `.json` structure
+### Final `.json` file structure
 ```json
 {
   "SYMBOLS": {...},
