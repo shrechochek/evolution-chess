@@ -59,17 +59,18 @@ If you use custom images:
 ```
 
 ### 4. Describe pieces information
-> ```json
-> "pawn": { 
->       "name": "копейщик", 
->       "symbol": "spearman", 
->       "desc": "пешка, которая бьет клетку перд собой",
->       "role": "pawn", 
->       "tier": 1, 
->       "xpReq": 1,
->       "special": "spear_attack"
-> },
-> ```
+```json
+pawn": { 
+  "name": "копейщик", 
+  "symbol": "spearman", 
+  "desc": "пешка, которая бьет клетку перд собой",
+  "role": "pawn", 
+  "tier": 1, 
+  "xpReq": 1,
+  "special": "spear_attack"
+},
+```
+
 > * ### "name" you can write name of figure
 > * ### "symbol" you can use one of symbols, that you set earlier
 > * ### "desc" you can write a description of figure
