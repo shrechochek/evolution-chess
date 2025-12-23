@@ -87,28 +87,7 @@ If you use custom images:
   - `range_capture` - capture without moving
   - `swap_ally` - swap places with same color piece
 - **`ghost`** - can go through n pieces (you must set n)
-- **`ghost`** - can not be captured
-
-<!-- > * ### "name" you can write name of figure
-> * ### "symbol" you can use one of symbols, that you set earlier
-> * ### "desc" you can write a description of figure
-> * ### "role" you can set special role for you figure
-> > 1. king - (can castle, if you have 0 kings you lose, can not be blown)
-> > 2. pawn - (can be promoted, can not be blown, can eat en passant)
-> > 3. rook - (can participate in castling)
-> * ### "tier" you can set a tier of figure
-> * ### "xpReq" you can set how much xp it requiers to evolve (use 999 if figure should not evolve)
-> * ### "special" you can set special ability of figure
-> > 1. spear_attack - (figure can capture piece ahead)
-> > 2. revenge - (if piece is captured it destroy piece that captured it)
-> > 3. teleport - (piece can teleport to every square of board if square is not occupied with another figure)
-> > 4. explode_n - (destroy everything within radius n, when this piece capture or captured, expect pawns and kings)
-> > 5. detonate_n - (destroy everything within radius n, when this piece captured, expect pawns and kings)
-> > 6. range_capture - (figure can capture without moving)
-> > 7. explode_all_n - (destroy everything within radius n, when this piece captured or capture)
-> > 8. swap_ally - (piece can change places with another figure of its color)
-> * ### "ghost" you can set how much pieces your figure can go through
-> * ### "immortal" you can make your pieces immortal -->
+- **`immortal`** - can not be captured
 
 > [!WARNING]
 > You should rewrite all standart pieces logic
