@@ -1,6 +1,8 @@
 # Evolution Chess
 Chess where pieces evolve
 
+---
+
 > [!IMPORTANT]
 > 🌍 **Languages**  
 > [🇺🇸](README.md)  |  [🇷🇺](docs/ru/README.md)
