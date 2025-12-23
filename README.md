@@ -97,6 +97,8 @@
 >     "queen": []
 >   }
 > ```
+
+> [!NOTE]
 > ### in this evolution tree pawn can evolve into star
 
 ### your final mod structure should look like this
