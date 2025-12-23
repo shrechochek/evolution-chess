@@ -10,8 +10,11 @@ Chess where pieces evolve during the game
 - [Authors](#authors)
 ---
 
-## How to Play
-### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc
+You can play in two ways:
+- 1. [ play online ](https://shrechochek.github.io/evolution-chess/)
+- 2. Download respository and run on your own PC
+
+<!-- ### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc -->
 
 ---
 
