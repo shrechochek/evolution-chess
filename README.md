@@ -65,6 +65,7 @@
 > > 8. swap_ally - (piece can change places with another figure of its color)
 > * ### "ghost" you can set how much pieces your figure can go through
 > * ### "immortal" you can make your pieces immortal
+
 > [!WARNING]
 > you should rewrite all standart pieces logic
 
