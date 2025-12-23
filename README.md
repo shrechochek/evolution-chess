@@ -60,7 +60,7 @@ If you use custom images:
 
 ### 4. Describe pieces information
 ```json
-pawn": { 
+"pawn": { 
   "name": "копейщик", 
   "symbol": "spearman", 
   "desc": "пешка, которая бьет клетку перд собой",
