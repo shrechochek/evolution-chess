@@ -3,12 +3,11 @@ Chess where pieces evolve during the game
 
 
 ## contents
-- [contents](#contents)
-- [how to play?](#how-to-play)
-- [how pieces evolve?](#how-pieces-evolve)
-- [how to create mods?](#how-to-create-mods)
-- [screenshots from game](#game-example)
-- [authors](#authors)
+- [How to play](#how-to-play)
+- [How pieces evolve](#how-pieces-evolve)
+- [How to create mods?](#how-to-create-mods)
+- [Game example](#game-example)
+- [Authors](#authors)
 ---
 
 ## how to play
