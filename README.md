@@ -14,8 +14,8 @@ Chess where pieces evolve
 ## How to play
 You can play Evolution Chess in two ways:
 
-1. [**Play online**](https://shrechochek.github.io/evolution-chess/)
-2. Download respository and run on your own PC
+1. 🌐 [**Play online**](https://shrechochek.github.io/evolution-chess/)
+2. 💻 Download respository and run on your own PC
 
 ---
 
@@ -31,7 +31,7 @@ When a piece captures another piece, it gains experience and can evolve into a n
 
 ---
 
-## How to Create Mods
+## How to Create Mods 🗂
 ### 1. Create a mod folder
 Create a folder with `.json` file
 
@@ -113,7 +113,7 @@ If you use custom images:
 > [!NOTE]
 > ### In this evolution tree pawn can evolve into star
 
-### Final `.json` file structure
+### Final `.json` structure
 ```json
 {
   "SYMBOLS": {...},
