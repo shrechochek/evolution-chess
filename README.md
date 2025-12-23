@@ -116,7 +116,8 @@
 > ```
 
 > [!NOTE]
-> if you still don't understand how to create mods or want to see a specific example you can check /evolution-chess-2-alfa/mod_example folder
+> if you still don't understand how to create mods or want to see a specific example you can check
+> */evolution-chess-2-alfa/mod_example* folder
 <!-- ##### **if you still don't understand how to create mods or want to see a specific example you can check /evolution-chess-2-alfa/mod_example folder** -->
 
 ---
