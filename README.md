@@ -67,6 +67,9 @@
 > * ### "immortal" you can make your pieces immortal
 <!-- > # **[!WARNING]** you should rewrite all standart pieces logic -->
 > [!WARNING]
+```diff
++ green test
+```
 <!-- > # [!WARNING] you should rewrite all standart pieces logic -->
 
 
