@@ -66,10 +66,8 @@
 > * ### "ghost" you can set how much pieces your figure can go through
 > * ### "immortal" you can make your pieces immortal
 <!-- > # **[!WARNING]** you should rewrite all standart pieces logic -->
-> [!WARNING]
-```diff
-+ green test
-```
+[!WARNING]
+yellow text
 <!-- > # [!WARNING] you should rewrite all standart pieces logic -->
 
 
