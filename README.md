@@ -1,4 +1,6 @@
-# chess where pieces can evolve
+# Evolution Chess
+Chess where pieces evolve during the game
+
 
 ## contents
 - [contents](#contents)
