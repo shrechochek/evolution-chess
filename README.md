@@ -25,6 +25,7 @@ You can play Evolution Chess in two ways:
 ## Game Example
 <img src="docs/game-example-photos/game-example-1.png" width="700">
 
+📸 More screenshots: [docs/game-example-photos](docs/game-example-photos)
 ---
 
 ## How Pieces Evolve
