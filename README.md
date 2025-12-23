@@ -5,14 +5,14 @@
 - [how to play?](#how-to-play)
 - [how pieces evolve?](#how-pieces-evolve)
 - [how to create mods?](#how-to-create-mods)
-- [screenshots from game](#screenshots-from-game)
+- [screenshots from game](#game-example)
 - [authors](#authors)
 
 ## how to play
 ### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc
 
 
-## screenshots from game
+## game example
 ![site example photo](docs/game-example-photos/game-example-1.png)
 <!-- ![site example photo](docs/game-example-photos/game-example-2.png)
 ![site example photo](docs/game-example-photos/game-example-3.png) -->
