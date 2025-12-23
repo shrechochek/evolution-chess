@@ -16,7 +16,7 @@
 <!-- ![site example photo](docs/game-example-photos/game-example-1.png)
 <!-- ![site example photo](docs/game-example-photos/game-example-2.png)
 ![site example photo](docs/game-example-photos/game-example-3.png) -->
-<img src="docs/game-example-photos/game-example-1.png" height="300">
+<img src="docs/game-example-photos/game-example-1.png" height="500">
 
 ## how pieces evolve
 ### when piece eat another piece first piece can evolve into another piece
