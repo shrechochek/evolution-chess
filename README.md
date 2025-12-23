@@ -48,18 +48,18 @@ If you use custom images:
 
 
 ### 3. Set symbols for pieces
-> ```json
-> "SYMBOLS": {
->     "pawn": "pawn",
->     "king": "king",
->     "rook": "rook",
->     "knight": "knight",
->     "bishop": "bishop",
->     "queen": "queen",
->     "spearman": "spearman",
->     "star": "star"
-> },
-> ```
+```json
+"SYMBOLS": {
+  "pawn": "pawn",
+  "king": "king",
+  "rook": "rook",
+  "knight": "knight",
+  "bishop": "bishop",
+  "queen": "queen",
+  "spearman": "spearman",
+  "star": "star"
+},
+```
 
 ### 4. Describe pieces information
 > ```json
