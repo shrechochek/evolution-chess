@@ -66,10 +66,9 @@
 > * ### "ghost" you can set how much pieces your figure can go through
 > * ### "immortal" you can make your pieces immortal
 <!-- > # **[!WARNING]** you should rewrite all standart pieces logic -->
-[!WARNING]
-yellow text
 <!-- > # [!WARNING] you should rewrite all standart pieces logic -->
-
+> [!WARNING]
+> This feature is experimental.
 
 5. ### and finally you must write the evolution tree
 > ```json
