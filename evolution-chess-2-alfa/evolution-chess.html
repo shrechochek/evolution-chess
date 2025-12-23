@@ -381,7 +381,7 @@ let PIECE_TYPES = {
     'bishop_sniper': { name: 'Снайпер', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: -1, moves: [...slide(VEC_DIAG)], ghost: 2 },
     'bishop_ship': { name: 'Корабль', desc: 'конь + слон', symbol: SYMBOLS.ship, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
 
-    'rook_helicopter': { name: 'Вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
+    'rook_helicopter': { name: 'Вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: -1, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
     'rook_sniper':  { name: 'Ракета', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.rocket, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO)], ghost: 2 },
 
     'queen_knight_camel': { name: 'Ультимативная Королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
