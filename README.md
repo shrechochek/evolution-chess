@@ -57,15 +57,17 @@ If you use custom images:
 
 ### 4. Describe pieces information
 ```json
-"pawn": { 
-  "name": "копейщик", 
-  "symbol": "spearman", 
-  "desc": "пешка, которая бьет клетку перд собой",
-  "role": "pawn", 
-  "tier": 1, 
-  "xpReq": 1,
-  "special": "spear_attack"
-},
+"PIECE_TYPES": {
+  "pawn": { 
+    "name": "копейщик", 
+    "symbol": "spearman", 
+    "desc": "пешка, которая бьет клетку перд собой",
+    "role": "pawn", 
+    "tier": 1, 
+    "xpReq": 1,
+    "special": "spear_attack"
+  }
+}
 ```
 
 - **`name`** — display name of the piece
@@ -110,6 +112,15 @@ If you use custom images:
 
 > [!NOTE]
 > ### In this evolution tree pawn can evolve into star
+
+### Final json structure
+```json
+{
+  "SYMBOLS": {...},
+  "PIECE_TYPES": {...},
+  "EVOLUTION_TREE": {...}
+}
+```
 
 ### Final mod structure
 ```text
