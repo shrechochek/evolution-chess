@@ -10,14 +10,12 @@ Chess where pieces evolve
 - [Authors](#authors)
 
 ---
-### How to play
 
+## How to play
 You can play Evolution Chess in two ways:
 
 1. [**Play online**](https://shrechochek.github.io/evolution-chess/)
 2. Download respository and run on your own PC
-
-<!-- ### you can [ play online ](https://shrechochek.github.io/evolution-chess/) or you can download respository and run site on your own pc -->
 
 ---
 
@@ -34,7 +32,6 @@ When a piece captures another piece, it gains experience and can evolve into a n
 ---
 
 ## How to Create Mods
-
 ### 1. Create a mod folder
 Create a folder with `.json` file
 
@@ -71,7 +68,19 @@ If you use custom images:
 },
 ```
 
-> * ### "name" you can write name of figure
+- **`name`** — display name of the piece
+- **`symbol`** — symbol defined in `SYMBOLS`
+- **`desc`** — description of the piece
+- **`role`** — special role:
+  - `king` — can castle, losing all kings means defeat
+  - `pawn` — can promote, en passant enabled
+  - `rook` — participates in castling
+- **`tier`** — evolution tier
+- **`xpReq`** — XP required to evolve (`-1` = no evolution)
+- 
+
+
+<!-- > * ### "name" you can write name of figure
 > * ### "symbol" you can use one of symbols, that you set earlier
 > * ### "desc" you can write a description of figure
 > * ### "role" you can set special role for you figure
@@ -90,7 +99,7 @@ If you use custom images:
 > > 7. explode_all_n - (destroy everything within radius n, when this piece captured or capture)
 > > 8. swap_ally - (piece can change places with another figure of its color)
 > * ### "ghost" you can set how much pieces your figure can go through
-> * ### "immortal" you can make your pieces immortal
+> * ### "immortal" you can make your pieces immortal -->
 
 > [!WARNING]
 > You should rewrite all standart pieces logic
