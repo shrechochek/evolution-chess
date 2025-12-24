@@ -214,6 +214,32 @@
             font-size: 1.1em;
         }
 
+        /* Settings icon */
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .settings-icon:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .settings-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: white;
+        }
+
         button.ai-btn-white {
             background: #3ce79a;
             color: white;
@@ -268,8 +294,12 @@
 </head>
 <body>
 
-    <h1>Шахматы c эволюцией</h1>
-    <!-- <h1>фигры эволюционируют, когда съедают другие фигуры</h1> -->
+    <div class="settings-icon" onclick="showSettingsModal()" title="Settings">
+        <div>
+            <p>⚙️</p>
+        </div>
+    </div>
+    <h1 id="game-title">Chess with Evolution</h1>
     <div class="subtitle">made by shrechochek</div>
 
     <div class="game-container">
@@ -277,18 +307,18 @@
 
         <div class="sidebar">
             <div class="panel">
-                <div class="turn-indicator" id="turn-display">Ход: Белые</div>
-                <div id="piece-info">Выберите фигуру...</div>
+                <div class="turn-indicator" id="turn-display">Turn: White</div>
+                <div id="piece-info">Select a piece...</div>
             </div>
-            
+
             <div class="panel">
-                <h3>Журнал событий</h3>
+                <h3 id="event-log-title">Event Log</h3>
                 <div class="log" id="game-log"></div>
             </div>
-            
-            <button class="reset-btn" onclick="initGame()">Новая игра</button>
+
+            <button class="reset-btn" onclick="initGame()">New Game</button>
             <div class="mod-upload-container">
-                <label for="mod-input" class="mod-upload-label">Загрузить мод</label>
+                <label for="mod-input" class="mod-upload-label">Load Mod</label>
                 <input type="file" id="mod-input" webkitdirectory directory multiple onchange="loadMod(this)">
             </div>
         </div>
@@ -296,13 +326,354 @@
 
     <div id="modal-overlay">
         <div class="modal-content">
-            <h2 id="modal-title">Заголовок</h2>
-            <p id="modal-subtitle">Текст</p>
+            <h2 id="modal-title">Title</h2>
+            <p id="modal-subtitle">Text</p>
             <div class="modal-options" id="modal-container"></div>
         </div>
     </div>
 
+    <div id="settings-modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 200; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2>Settings</h2>
+            <div style="margin-top: 20px;">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Language:</label>
+                    <select id="language-select" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ddd; background: white; color: #333;">
+                        <option value="en">English</option>
+                        <option value="ru">Русский</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
+                    <button onclick="closeSettingsModal()" style="padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer;">Cancel</button>
+                    <button onclick="saveSettings()" style="padding: 8px 16px; background: #f1c40f; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
+// Translation system
+const translations = {
+    en: {
+        title: "Chess with Evolution",
+        subtitle: "made by shrechochek",
+        turn_white: "Turn: White",
+        turn_black: "Turn: Black",
+        select_piece: "Select a piece...",
+        event_log: "Event Log",
+        new_game: "New Game",
+        load_mod: "Load Mod",
+        evolution_title: "Evolution!",
+        evolution_text: "Your piece is mutating.",
+        promotion_title: "Promotion!",
+        promotion_text: "Pawn reached the end.",
+        max_level: "MAXIMUM LEVEL",
+        immortal: "Immortal",
+        tier: "Tier",
+        progress: "Progress",
+        next: "Next",
+        vs_ai_white: "Play vs AI (White)",
+        vs_ai_black: "Play vs AI (Black)",
+        ai_thinking: "🤖 AI ({side}) is thinking...",
+        ai_loaded: "✅ AI engine loaded. Use sidebar controls to start games.",
+        ai_no_move: "AI found no valid move (pass?)",
+        draw_kings_destroyed: "Draw! All kings destroyed.",
+        white_wins: "White wins!",
+        black_wins: "Black wins!",
+        castling: "🔄 Castling!",
+        en_passant: "⚔️ En passant!",
+        evolution_complete: "🧬 Evolution completed!",
+        promotion: "🎖 Promotion to {piece}!",
+        piece_capture: "{piece} takes {target} (+1 XP)",
+        revenge_explode: "💥 Revenge explosion!",
+        explosion: "💥 EXPLOSION (Radius {radius})!",
+        mod_loaded: "📂 MOD LOADED: {name}",
+        sprites_loaded: "🖼 Loaded sprites: {count}",
+        mod_error: "Mod loading error: PIECE_TYPES or EVOLUTION_TREE missing",
+        json_error: "Error reading JSON mod file!",
+        no_json_found: "No .json config file found in folder!",
+        // Piece names
+        pawn: "Pawn",
+        knight: "Knight",
+        bishop: "Bishop",
+        rook: "Rook",
+        queen: "Queen",
+        king: "King",
+        spearman: "Spearman",
+        runner: "Runner",
+        torpedo: "Torpedo",
+        camel: "Camel",
+        paladin: "Paladin",
+        knight_knight: "Knight Knight",
+        bomber: "Bomber",
+        ghost: "Ghost",
+        two_color_bishop: "Two-Color Bishop",
+        swap_bishop: "Swap Bishop",
+        tank: "Tank",
+        car: "Car",
+        statue: "Statue",
+        ring: "Ring",
+        crown: "Crown",
+        queen_upgradeable: "Queen V2",
+        tnt: "Nuclear King",
+        spartan: "Spartan",
+        super_runner: "Super Runner",
+        camel_knight: "Camel-Knight",
+        endless_knight: "Endless Knight",
+        moose: "Moose",
+        nuke_bishop: "Nuclear Bishop",
+        sniper: "Sniper",
+        ship: "Ship",
+        helicopter: "Helicopter",
+        rocket: "Rocket",
+        unicorn: "Unicorn",
+        pin: "Pin",
+        range: "Range",
+        // Piece descriptions
+        pawn_desc: "Basic pawn",
+        spearman_desc: "Strikes forward",
+        runner_desc: "Moves diagonally forward by 1",
+        torpedo_desc: "Moves forward by 2",
+        camel_desc: "Moves (3+1)",
+        paladin_desc: "Knight + orthogonal (1) and diagonal (1)",
+        knight_knight_desc: "Knight + diagonal (1)",
+        bomber_desc: "Explodes when captured",
+        ghost_desc: "Passes through 1 piece",
+        two_color_bishop_desc: "Bishop + King",
+        swap_bishop_desc: "Swaps with allied pieces",
+        tank_desc: "Rook + diagonal (1)",
+        car_desc: "Rook + passes through 1 piece",
+        statue_desc: "Teleports anywhere",
+        ring_desc: "Queen + Camel",
+        crown_desc: "Queen + Knight",
+        queen_upgradeable_desc: "Evolves further",
+        tnt_desc: "Explodes (5x5)",
+        spartan_desc: "Spearman + Runner",
+        super_runner_desc: "Moves like King",
+        camel_knight_desc: "Knight + Camel",
+        endless_knight_desc: "Slides as Knight (∞)",
+        moose_desc: "Knight + orthogonal (1) and diagonal (1)",
+        nuke_bishop_desc: "Explosion (3x3)",
+        sniper_desc: "Passes through 2 pieces",
+        ship_desc: "Knight + Bishop",
+        helicopter_desc: "Rook + Knight",
+        rocket_desc: "Rook + passes through 2 pieces",
+        unicorn_desc: "Queen + Knight + Camel",
+        pin_desc: "Queen + passes through 2 pieces",
+        range_desc: "Queen + ranged capture",
+        // Settings
+        settings: "Settings",
+        language: "Language",
+        english: "English",
+        russian: "Русский"
+    },
+    ru: {
+        title: "Шахматы c эволюцией",
+        subtitle: "made by shrechochek",
+        turn_white: "Ход: Белые",
+        turn_black: "Ход: Черные",
+        select_piece: "Выберите фигуру...",
+        event_log: "Журнал событий",
+        new_game: "Новая игра",
+        load_mod: "Загрузить мод",
+        evolution_title: "Эволюция!",
+        evolution_text: "Ваша фигура мутирует.",
+        promotion_title: "Превращение!",
+        promotion_text: "Пешка дошла до края.",
+        max_level: "МАКСИМАЛЬНЫЙ УРОВЕНЬ",
+        immortal: "Бессмертный",
+        tier: "Уровень",
+        progress: "Прогресс",
+        next: "Далее",
+        vs_ai_white: "Играть против ИИ (За белых)",
+        vs_ai_black: "Играть против ИИ (За чёрных)",
+        ai_thinking: "🤖 ИИ ({side}) думает...",
+        ai_loaded: "✅ AI engine loaded. Use sidebar controls to start games.",
+        ai_no_move: "ИИ не нашёл допустимого хода (пасс?)",
+        draw_kings_destroyed: "Ничья! Все короли уничтожены.",
+        white_wins: "Победа белых!",
+        black_wins: "Победа черных!",
+        castling: "🔄 Рокировка!",
+        en_passant: "⚔️ Взятие на проходе!",
+        evolution_complete: "🧬 Эволюция завершена!",
+        promotion: "🎖 Превращение в {piece}!",
+        piece_capture: "{piece} рубит {target} (+1 XP)",
+        revenge_explode: "💥 Взрыв мести!",
+        explosion: "💥 ВЗРЫВ (Радиус {radius})!",
+        mod_loaded: "📂 ПАКЕТ ЗАГРУЖЕН: {name}",
+        sprites_loaded: "🖼 Загружено спрайтов: {count}",
+        mod_error: "Ошибка мода: отсутствуют PIECE_TYPES или EVOLUTION_TREE",
+        json_error: "Ошибка чтения JSON файла мода!",
+        no_json_found: "В папке не найден .json файл конфигурации!",
+        // Piece names
+        pawn: "Пешка",
+        knight: "Конь",
+        bishop: "Слон",
+        rook: "Ладья",
+        queen: "Ферзь",
+        king: "Король",
+        spearman: "Копейщик",
+        runner: "Бегун",
+        torpedo: "Торпеда",
+        camel: "Верблюд",
+        paladin: "Паладин",
+        knight_knight: "Рыцарь",
+        bomber: "Взрывной слон",
+        ghost: "Призрак",
+        two_color_bishop: "Двухцветный слон",
+        swap_bishop: "Свап слон",
+        tank: "Танк",
+        car: "Машина",
+        statue: "Статуя",
+        ring: "Кольцо",
+        crown: "Корона",
+        queen_upgradeable: "Ферзь V2",
+        tnt: "Ядерный Король",
+        spartan: "Спартанец",
+        super_runner: "Супер Бегун",
+        camel_knight: "Коне-Верблюд",
+        endless_knight: "Бесконечный конь",
+        moose: "Лось",
+        nuke_bishop: "Ядерный Слон",
+        sniper: "Снайпер",
+        ship: "Корабль",
+        helicopter: "Вертолет",
+        rocket: "Ракета",
+        unicorn: "Единорог",
+        pin: "Булавка",
+        range: "Дальний",
+        // Piece descriptions
+        pawn_desc: "Обычная пешка",
+        spearman_desc: "Бьет клетку перед собой",
+        runner_desc: "ходит диагонально вперед на 1 клетку",
+        torpedo_desc: "ходит на 2 клетки вперед",
+        camel_desc: "ходит (3+1)",
+        paladin_desc: "конь + вертикаль (1) и горизонталь (1)",
+        knight_knight_desc: "конь + диагональ (1)",
+        bomber_desc: "взрывает фигуру, которая его съела",
+        ghost_desc: "проходит сквозь 1 фигуру",
+        two_color_bishop_desc: "слон + король",
+        swap_bishop_desc: "Меняется местами с фигурами своего цвета",
+        tank_desc: "ладья + диагональ (1)",
+        car_desc: "ладья + проходит сквозь 1 фигуру",
+        statue_desc: "ходит на любую клетку доски",
+        ring_desc: "ферзь + верблюд",
+        crown_desc: "ферзь + конь",
+        queen_upgradeable_desc: "эволюционирует дальше",
+        tnt_desc: "взрывается (5x5)",
+        spartan_desc: "копейщик + бегун",
+        super_runner_desc: "ходит как король",
+        camel_knight_desc: "конь + верблюд",
+        endless_knight_desc: "слайд конем (∞)",
+        moose_desc: "конь + вертикаль (1) и горизонталь (1)",
+        nuke_bishop_desc: "взрыв (3x3)",
+        sniper_desc: "проходит сквозь 2 фигуры",
+        ship_desc: "конь + слон",
+        helicopter_desc: "ладья + конь",
+        rocket_desc: "ладья + проходит сквозь 2 фигуры",
+        unicorn_desc: "ферзь + конь + верблюд",
+        pin_desc: "ферзь + проходит сквозь 2 фигуры",
+        range_desc: "ферзь + дальняя атака",
+        // Settings
+        settings: "Настройки",
+        language: "Язык",
+        english: "English",
+        russian: "Русский"
+    }
+};
+
+let currentLanguage = 'en'; // Default to English
+
+function t(key, params = {}) {
+    const text = translations[currentLanguage][key] || key;
+    return text.replace(/{(\w+)}/g, (match, param) => params[param] || match);
+}
+
+function getPieceDisplayName(type) {
+    return t(PIECE_TYPES[type].name);
+}
+
+function getPieceDescription(type) {
+    const descKey = PIECE_TYPES[type].desc;
+    return descKey ? t(descKey) : '';
+}
+
+function switchLanguage(lang) {
+    currentLanguage = lang;
+    localStorage.setItem('evolution-chess-language', lang);
+    updateUILanguage();
+}
+
+function updateUILanguage() {
+    // Update title
+    document.getElementById('game-title').textContent = t('title');
+
+    // Update turn indicator
+    const turnText = document.getElementById('turn-display');
+    const currentTurnText = currentTurn === 'white' ? t('turn_white') : t('turn_black');
+    turnText.innerText = currentTurnText;
+
+    // Update piece info
+    const infoPanel = document.getElementById('piece-info');
+    if (!selectedCell || !board[selectedCell.y][selectedCell.x]) {
+        infoPanel.innerText = t('select_piece');
+    }
+
+    // Update event log header
+    document.getElementById('event-log-title').textContent = t('event_log');
+
+    // Update buttons
+    document.querySelector('.reset-btn').textContent = t('new_game');
+    document.querySelector('.mod-upload-label').textContent = t('load_mod');
+
+    // Update AI buttons
+    const aiBtnWhite = document.querySelector('.ai-btn-white');
+    const aiBtnBlack = document.querySelector('.ai-btn-black');
+    if (aiBtnWhite) aiBtnWhite.textContent = t('vs_ai_white');
+    if (aiBtnBlack) aiBtnBlack.textContent = t('vs_ai_black');
+
+    // Update settings modal if open
+    const settingsModal = document.getElementById('settings-modal-overlay');
+    if (settingsModal && settingsModal.style.display !== 'none') {
+        updateSettingsModal();
+    }
+}
+
+function showSettingsModal() {
+    const modal = document.getElementById('settings-modal-overlay');
+    const langSelect = document.getElementById('language-select');
+    langSelect.value = currentLanguage;
+    modal.style.display = 'flex';
+}
+
+function closeSettingsModal() {
+    document.getElementById('settings-modal-overlay').style.display = 'none';
+}
+
+function saveSettings() {
+    const langSelect = document.getElementById('language-select');
+    const newLang = langSelect.value;
+    switchLanguage(newLang);
+    closeSettingsModal();
+}
+
+function updateSettingsModal() {
+    // Update settings modal content if needed
+    const modal = document.getElementById('settings-modal-overlay');
+    if (modal.style.display !== 'none') {
+        const langSelect = document.getElementById('language-select');
+        langSelect.value = currentLanguage;
+
+        // Update modal title and labels
+        modal.querySelector('h2').textContent = t('settings');
+        modal.querySelector('label').textContent = t('language') + ':';
+        modal.querySelectorAll('option')[0].textContent = t('english');
+        modal.querySelectorAll('option')[1].textContent = t('russian');
+        modal.querySelectorAll('button')[0].textContent = 'Cancel'; // Keep English for now
+        modal.querySelectorAll('button')[1].textContent = 'Save'; // Keep English for now
+    }
+}
+
 const BOARD_SIZE = 8;
 
 let CUSTOM_ASSETS = {}; 
@@ -338,55 +709,55 @@ function step(vectors) { return vectors.map(v => ({...v, slide: false})); }
 
 let PIECE_TYPES = {
     // === TIER 1 ===
-    'pawn': { name: 'Пешка', symbol: SYMBOLS.pawn, role: 'pawn', tier: 1, xpReq: 1 },
-    'rook': { name: 'Ладья', symbol: SYMBOLS.rook, moves: slide(VEC_ORTHO), tier: 1, xpReq: 1, role: 'rook' },
-    'knight': { name: 'Конь', symbol: SYMBOLS.knight, moves: step(VEC_KNIGHT), tier: 1, xpReq: 1 },
-    'bishop': { name: 'Слон', symbol: SYMBOLS.bishop, moves: slide(VEC_DIAG), tier: 1, xpReq: 1 },
-    'queen': { name: 'Ферзь', symbol: SYMBOLS.queen, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], tier: 1, xpReq: 2 },
-    'king': { name: 'Король', symbol: SYMBOLS.king, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], tier: 1, xpReq: -1, role: 'king' },
+    'pawn': { name: 'pawn', symbol: SYMBOLS.pawn, role: 'pawn', tier: 1, xpReq: 1 },
+    'rook': { name: 'rook', symbol: SYMBOLS.rook, moves: slide(VEC_ORTHO), tier: 1, xpReq: 1, role: 'rook' },
+    'knight': { name: 'knight', symbol: SYMBOLS.knight, moves: step(VEC_KNIGHT), tier: 1, xpReq: 1 },
+    'bishop': { name: 'bishop', symbol: SYMBOLS.bishop, moves: slide(VEC_DIAG), tier: 1, xpReq: 1 },
+    'queen': { name: 'queen', symbol: SYMBOLS.queen, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], tier: 1, xpReq: 2 },
+    'king': { name: 'king', symbol: SYMBOLS.king, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], tier: 1, xpReq: -1, role: 'king' },
 
     // === TIER 2 ===
-    'pawn_runner': { name: 'Бегун', desc: 'ходит диагонально вперед на 1 клетку', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
-    'pawn_spearman': { name: 'Копейщик', desc: 'бьет клетку перед собой', symbol: SYMBOLS.spearman, tier: 2, xpReq: 1, role: 'pawn', special: 'spear_attack' },
-    'pawn_torpedo': { name: 'Торпеда', desc: 'ходит на 2 клетки вперед', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
+    'pawn_runner': { name: 'runner', desc: 'runner_desc', symbol: SYMBOLS.runner, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}] },
+    'pawn_spearman': { name: 'spearman', desc: 'spearman_desc', symbol: SYMBOLS.spearman, tier: 2, xpReq: 1, role: 'pawn', special: 'spear_attack' },
+    'pawn_torpedo': { name: 'torpedo', desc: 'torpedo_desc', symbol: SYMBOLS.torpedo, tier: 2, xpReq: 1, role: 'pawn', extraMoves: [{dx:0,dy:2}] },
 
-    'knight_camel': { name: 'Верблюд', desc: 'ходит (3+1)', symbol: SYMBOLS.camel, tier: 2, xpReq: 2, moves: step(VEC_CAMEL) },
-    'knight_paladin': { name: 'Паладин', desc: 'конь + вертикаль (1) и горизонталь (1)', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
-    'knight_knight': { name: 'Рыцарь', desc: 'конь + диагональ (1)', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
+    'knight_camel': { name: 'camel', desc: 'camel_desc', symbol: SYMBOLS.camel, tier: 2, xpReq: 2, moves: step(VEC_CAMEL) },
+    'knight_paladin': { name: 'paladin', desc: 'paladin_desc', symbol: SYMBOLS.paladin, tier: 2, xpReq: 2, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO)] },
+    'knight_knight': { name: 'knight_knight', desc: 'knight_knight_desc', symbol: SYMBOLS.knight_knight, tier: 2, xpReq: 1, moves: [...step(VEC_KNIGHT), ...step(VEC_DIAG)] },
 
-    'bishop_bomber': { name: 'Взрывной слон', desc: 'взрывает фигуру, которая его съела', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'revenge' }, 
-    'bishop_ghost': { name: 'Призрак', desc: 'проходит сквозь 1 фигуру', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 },
-    'two_color_bishop': { name: 'Двухцветный слон', desc: 'слон + король', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
-    'bishop_swapper': { name: 'Свап слон', desc: 'Меняется местами с фигурами своего цвета', symbol: SYMBOLS.swap_bishop, tier: 2, xpReq: -1, moves: slide(VEC_DIAG), special: 'swap_ally'},
+    'bishop_bomber': { name: 'bomber', desc: 'bomber_desc', symbol: SYMBOLS.bomber, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), special: 'revenge' },
+    'bishop_ghost': { name: 'ghost', desc: 'ghost_desc', symbol: SYMBOLS.ghost, tier: 2, xpReq: 2, moves: slide(VEC_DIAG), ghost: 1 },
+    'two_color_bishop': { name: 'two_color_bishop', desc: 'two_color_bishop_desc', symbol: SYMBOLS.two_color_bishop, tier: 2, xpReq: 1, moves: [...slide(VEC_DIAG), ...step(VEC_ORTHO), ...step(VEC_DIAG)] },
+    'bishop_swapper': { name: 'swap_bishop', desc: 'swap_bishop_desc', symbol: SYMBOLS.swap_bishop, tier: 2, xpReq: -1, moves: slide(VEC_DIAG), special: 'swap_ally'},
 
-    'rook_tank': { name: 'Танк', desc: 'ладья + король', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)] },
-    'rook_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: 1 },
-    'statue': { name: 'Статуя', desc: 'ходит на любую клетку доски', symbol: SYMBOLS.statue, tier: 2, xpReq: -1, moves:[], immortal: true, special: 'teleport' },
+    'rook_tank': { name: 'tank', desc: 'tank_desc', symbol: SYMBOLS.tank, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO), ...step(VEC_DIAG)] },
+    'rook_ghost': { name: 'car', desc: 'car_desc', symbol: SYMBOLS.car, tier: 2, xpReq: 2, moves: [...slide(VEC_ORTHO)], ghost: 1 },
+    'statue': { name: 'statue', desc: 'statue_desc', symbol: SYMBOLS.statue, tier: 2, xpReq: -1, moves:[], immortal: true, special: 'teleport' },
 
-    'queen_camel': { name: 'Королева Верблюдов', desc: 'королева + верблюд', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
-    'queen_knight': { name: 'Королева Коней', desc: 'королева + конь', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
-    'queen_upgradeable': { name: 'Королева V2', desc: 'эволюционирует дальше', symbol: SYMBOLS.queen_upgradeable, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
+    'queen_camel': { name: 'ring', desc: 'ring_desc', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
+    'queen_knight': { name: 'crown', desc: 'crown_desc', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
+    'queen_upgradeable': { name: 'queen_upgradeable', desc: 'queen_upgradeable_desc', symbol: SYMBOLS.queen_upgradeable, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
 
-    'king_nuke': { name: 'Ядерный Король', desc: 'взрывается (5x5)', symbol: SYMBOLS.tnt, tier: 1, xpReq: -1, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_all_5', role: 'king'  },
+    'king_nuke': { name: 'tnt', desc: 'tnt_desc', symbol: SYMBOLS.tnt, tier: 1, xpReq: -1, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_all_5', role: 'king'  },
 
     // === TIER 3 ===
-    'pawn_spartan': { name: 'Спартанец', desc: 'копейщик + бегун', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack' },
-    'pawn_superrunner': { name: 'Супер Бегун', desc: 'ходит как король', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
+    'pawn_spartan': { name: 'spartan', desc: 'spartan_desc', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack' },
+    'pawn_superrunner': { name: 'super_runner', desc: 'super_runner_desc', symbol: SYMBOLS.super_runner, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1},{dx:1,dy:0},{dx:-1,dy:0},{dx:-1,dy:-1},{dx:1,dy:-1},{dx:0,dy:-1}] },
 
-    'knight_camel_hybrid': { name: 'Коне-Верблюд', desc: 'конь + верблюд', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
-    'knight_endless': { name: 'Бесконечный конь', desc: 'слайд конем (∞)', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: -1, moves: [...slide(VEC_KNIGHT)], ghost: 10 },
-    'knight_king': { name: 'Король Коней', desc: 'конь + король', symbol: SYMBOLS.moose, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)]},
+    'knight_camel_hybrid': { name: 'camel_knight', desc: 'camel_knight_desc', symbol: SYMBOLS.camel_knight, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
+    'knight_endless': { name: 'endless_knight', desc: 'endless_knight_desc', symbol: SYMBOLS.endless_knight, tier: 3, xpReq: -1, moves: [...slide(VEC_KNIGHT)], ghost: 10 },
+    'knight_king': { name: 'moose', desc: 'moose_desc', symbol: SYMBOLS.moose, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...step(VEC_ORTHO), ...step(VEC_DIAG)]},
 
-    'bishop_nuke': { name: 'Ядерный Слон', desc: 'взрыв (3x3)', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: -1, moves: slide(VEC_DIAG), special: 'explode_3' },
-    'bishop_sniper': { name: 'Снайпер', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.sniper, tier: 3, xpReq: -1, moves: [...slide(VEC_DIAG)], ghost: 2 },
-    'bishop_ship': { name: 'Корабль', desc: 'конь + слон', symbol: SYMBOLS.ship, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
+    'bishop_nuke': { name: 'nuke_bishop', desc: 'nuke_bishop_desc', symbol: SYMBOLS.nuke_bishop, tier: 3, xpReq: -1, moves: slide(VEC_DIAG), special: 'explode_3' },
+    'bishop_sniper': { name: 'sniper', desc: 'sniper_desc', symbol: SYMBOLS.sniper, tier: 3, xpReq: -1, moves: [...slide(VEC_DIAG)], ghost: 2 },
+    'bishop_ship': { name: 'ship', desc: 'ship_desc', symbol: SYMBOLS.ship, tier: 3, xpReq: -1, moves: [...step(VEC_KNIGHT), ...slide(VEC_DIAG)] },
 
-    'rook_helicopter': { name: 'Вертолет', desc: 'ладья + конь', symbol: SYMBOLS.helicopter, tier: 2, xpReq: -1, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
-    'rook_sniper':  { name: 'Ракета', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.rocket, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO)], ghost: 2 },
+    'rook_helicopter': { name: 'helicopter', desc: 'helicopter_desc', symbol: SYMBOLS.helicopter, tier: 2, xpReq: -1, moves: [...slide(VEC_ORTHO), ...step(VEC_KNIGHT)] },
+    'rook_sniper':  { name: 'rocket', desc: 'rocket_desc', symbol: SYMBOLS.rocket, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO)], ghost: 2 },
 
-    'queen_knight_camel': { name: 'Ультимативная Королева', desc: 'королева + конь + верблюд', symbol: SYMBOLS.unicorn, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
-    'queen_ghost': { name: 'Призрак', desc: 'проходит сквозь 2 фигуры', symbol: SYMBOLS.pin, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 },
-    'queen_range': { name: 'Дальняя Королева', desc: 'дальняя атака', symbol: SYMBOLS.range, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
+    'queen_knight_camel': { name: 'unicorn', desc: 'unicorn_desc', symbol: SYMBOLS.unicorn, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT), ...step(VEC_CAMEL)] },
+    'queen_ghost': { name: 'pin', desc: 'pin_desc', symbol: SYMBOLS.pin, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 },
+    'queen_range': { name: 'range', desc: 'range_desc', symbol: SYMBOLS.range, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
 
 let EVOLUTION_TREE = {
@@ -462,13 +833,13 @@ function updateGameStatus() {
     }
 
     if (white_kings === 0 && black_kings === 0) {
-        alert(`Ничья! Все короли уничтожены.`);
+        alert(t('draw_kings_destroyed'));
         gameOver = true;
     } else if (white_kings === 0) {
-        alert(`Победа черных!`);
+        alert(t('black_wins'));
         gameOver = true;
     } else if (black_kings === 0) {
-        alert(`Победа белых!`);
+        alert(t('white_wins'));
         gameOver = true;
     }
 }
@@ -706,7 +1077,7 @@ function makeMove(fromX, fromY, move) {
         
         piece.hasMoved = true;
         
-        log(`🔄 ${PIECE_TYPES[piece.type].name} поменялся с ${PIECE_TYPES[target.type].name}`);
+        log(`🔄 ${getPieceDisplayName(piece.type)} swapped with ${getPieceDisplayName(target.type)}`);
         move_audio.play().catch(e=>{});
 
 
@@ -736,7 +1107,7 @@ function makeMove(fromX, fromY, move) {
         target = board[capturedPawnY][toX]; 
         board[capturedPawnY][toX] = null; 
         captureHappened = true;
-        log('⚔️ Взятие на проходе!');
+        log(t('en_passant'));
     }
 
     if (target) {
@@ -804,7 +1175,7 @@ function makeMove(fromX, fromY, move) {
         board[toY][move.rookToX] = rook;
         board[toY][move.rookX] = null;
         rook.hasMoved = true;
-        log('🔄 Рокировка!');
+        log(t('castling'));
     }
 
     // Взятие на проходе (метка)
@@ -829,7 +1200,7 @@ function makeMove(fromX, fromY, move) {
 
     // Взрывы атакующего (Ядерный король, Бомбер и т.д.)
     if (captureHappened && enemyType) {
-        log(`${def.name} рубит ${PIECE_TYPES[enemyType].name} (+1 XP)`);
+        log(t('piece_capture', { piece: getPieceDisplayName(piece.type), target: getPieceDisplayName(enemyType) }));
         
         if (def.special && def.special.startsWith('explode_all')) {
             // Убрана ошибочная логика ручного декремента королей здесь!
@@ -859,7 +1230,7 @@ function makeMove(fromX, fromY, move) {
                 const newType = options[0]; // Выбираем первую доступную эволюцию
                 piece.type = newType;
                 piece.xp = 0;
-                log(`🧬 Эволюция ИИ завершена: ${PIECE_TYPES[newType].name}`);
+                log(`🧬 AI evolution completed: ${getPieceDisplayName(newType)}`);
                 updateGameStatus();
             }
         } else {
@@ -878,11 +1249,11 @@ function endTurn() {
     currentTurn = currentTurn === 'white' ? 'black' : 'white';
     renderBoard();
     const turnText = document.getElementById('turn-display');
-    turnText.innerText = `Ход: ${currentTurn === 'white' ? 'Белые' : 'Черные'}`;
+    turnText.innerText = currentTurn === 'white' ? t('turn_white') : t('turn_black');
 }
 
 function explode(cx, cy, attackerColor, radius) {
-    log(`💥 ВЗРЫВ (Радиус ${radius})!`);
+    log(t('explosion', { radius }));
     for (let dy = -radius; dy <= radius; dy++) {
         for (let dx = -radius; dx <= radius; dx++) {
             // if (dx===0 && dy===0) log("delete");
@@ -903,7 +1274,7 @@ function explode(cx, cy, attackerColor, radius) {
 }
 
 function explode_all(cx, cy, attackerColor, radius) {
-    log(`💥 ВЗРЫВ (Радиус ${radius})!`);
+    log(t('explosion', { radius }));
     for (let dy = -radius; dy <= radius; dy++) {
         for (let dx = -radius; dx <= radius; dx++) {
             // if (dx===0 && dy===0) continue; // Центр взрыва (сам атакующий) не уничтожается
@@ -965,12 +1336,12 @@ function showModal(title, text, items, callback) {
 
         const nameSpan = document.createElement('span');
         nameSpan.className = 'modal-name';
-        nameSpan.innerText = def.name;
+        nameSpan.innerText = getPieceDisplayName(item);
         card.appendChild(nameSpan);
 
         const descSpan = document.createElement('span');
         descSpan.className = 'modal-desc';
-        descSpan.innerText = def.desc || '';
+        descSpan.innerText = getPieceDescription(item);
         card.appendChild(descSpan);
 
         card.onclick = () => {
@@ -992,10 +1363,10 @@ function canEvolve(piece) {
 
 function showEvolutionModal(piece) {
     const options = EVOLUTION_TREE[piece.type];
-    showModal('Эволюция!', 'Ваша фигура мутирует.', options, (newType) => {
+    showModal(t('evolution_title'), t('evolution_text'), options, (newType) => {
         piece.type = newType;
         piece.xp = 0;
-        log(`🧬 Эволюция завершена!`);
+        log(t('evolution_complete'));
         // Проверяем статус игры после эволюции (вдруг число королей изменилось)
         updateGameStatus();
         endTurn();
@@ -1005,12 +1376,12 @@ function showEvolutionModal(piece) {
 function showPromotionModal(piece) {
     const defaultOptions = ['queen', 'rook', 'bishop', 'knight'];
     const options = defaultOptions.filter(t => PIECE_TYPES[t] !== undefined);
-    
-    showModal('Превращение!', 'Пешка дошла до края.', options, (newType) => {
+
+    showModal(t('promotion_title'), t('promotion_text'), options, (newType) => {
         piece.type = newType;
         piece.xp = 0;
-        piece.hasMoved = true; 
-        log(`🎖 Превращение в ${PIECE_TYPES[newType].name}!`);
+        piece.hasMoved = true;
+        log(t('promotion', { piece: getPieceDisplayName(newType) }));
         updateGameStatus();
         endTurn();
     });
@@ -1091,29 +1462,29 @@ function renderBoard() {
 function updateInfo(piece) {
     const infoPanel = document.getElementById('piece-info');
     if (!piece) {
-        infoPanel.innerText = "Нажмите на фигуру для инфо...";
+        infoPanel.innerText = t('select_piece');
         return;
     }
 
     const def = PIECE_TYPES[piece.type];
     const nextEvos = EVOLUTION_TREE[piece.type] || [];
     const hasEvo = nextEvos.length > 0;
-    
-    let immortalBadge = def.immortal ? '<span style="font-size:0.6em; background:#9b59b6; color:#fff; padding:2px 5px; border-radius:4px; margin-left:5px;">Бессмертный</span>' : '';
+
+    let immortalBadge = def.immortal ? `<span style="font-size:0.6em; background:#9b59b6; color:#fff; padding:2px 5px; border-radius:4px; margin-left:5px;">${t('immortal')}</span>` : '';
 
     infoPanel.innerHTML = `
         <div style="font-size: 1.4em; margin-bottom:5px;">
-            <strong>${def.name}</strong> 
-            <span style="font-size:0.6em; background:#f1c40f; color:#000; padding:2px 5px; border-radius:4px;">Tier ${def.tier}</span>
+            <strong>${getPieceDisplayName(piece.type)}</strong>
+            <span style="font-size:0.6em; background:#f1c40f; color:#000; padding:2px 5px; border-radius:4px;">${t('tier')} ${def.tier}</span>
             ${immortalBadge}
         </div>
-        <div style="font-size: 0.9em; color: #ccc; margin-bottom: 10px;">${def.desc || ''}</div>
-        
-        ${hasEvo ? 
-            `Прогресс: <b>${piece.xp} / ${def.xpReq}</b> XP<br>
-            <small style="color:#aaa">Далее: ${nextEvos.map(t => PIECE_TYPES[t] !== undefined ? PIECE_TYPES[t].name : t).join(', ')}</small>` 
-            : 
-            `<b style="color:#f1c40f">МАКСИМАЛЬНЫЙ УРОВЕНЬ</b>`
+        <div style="font-size: 0.9em; color: #ccc; margin-bottom: 10px;">${getPieceDescription(piece.type)}</div>
+
+        ${hasEvo ?
+            `${t('progress')}: <b>${piece.xp} / ${def.xpReq}</b> XP<br>
+            <small style="color:#aaa">${t('next')}: ${nextEvos.map(t => PIECE_TYPES[t] !== undefined ? getPieceDisplayName(t) : t).join(', ')}</small>`
+            :
+            `<b style="color:#f1c40f">${t('max_level')}</b>`
         }
     `;
 }
@@ -1154,8 +1525,8 @@ function loadMod(input) {
                 PIECE_TYPES = modData.PIECE_TYPES;
                 EVOLUTION_TREE = modData.EVOLUTION_TREE;
 
-                log(`📂 ПАКЕТ ЗАГРУЖЕН: ${jsonFile.name}`);
-                log(`🖼 Загружено спрайтов: ${Object.keys(CUSTOM_ASSETS).length}`);
+                log(t('mod_loaded', { name: jsonFile.name }));
+                log(t('sprites_loaded', { count: Object.keys(CUSTOM_ASSETS).length }));
                 
                 initGame();
                 input.value = '';
@@ -1568,7 +1939,7 @@ function log(msg) {
         if (currentTurn !== aiSide) return;
         if (thinking) return;
         thinking = true;
-        log(`🤖 ИИ (${aiSide}) думает...`);
+        log(t('ai_thinking', { side: aiSide }));
         // snapshot board
         const rootBoard = cloneBoard(board);
         const timeLimit = AI_CONFIG.timePerMoveMs;
@@ -1577,7 +1948,7 @@ function log(msg) {
             try {
                 const res = findBestMove(rootBoard, aiSide, timeLimit);
                 if (!res.move) {
-                    log("ИИ не нашёл допустимого хода (пасс?)");
+                    log(t('ai_no_move'));
                     thinking = false;
                     return;
                 }
@@ -1601,28 +1972,28 @@ function log(msg) {
         if (!sideBar) return;
         const panel = document.createElement('div');
         panel.className = 'panel';
-        panel.style.display = 'flex';
+        // panel.style.display = 'flex';
         panel.style.flexDirection = 'column';
         panel.style.gap = '8px';
 
         // buttons
         const btnWhite = document.createElement('button');
         btnWhite.className = 'ai-btn-white';
-        btnWhite.textContent = 'Играть против ИИ (За белых)';
-        btnWhite.onclick = () => { aiSide = 'black'; autoPlay = false; log("Игрок играет белыми. ИИ — чёрные."); setTimeout(aiPlayOneMove, 10); };
+        btnWhite.textContent = t('vs_ai_white');
+        btnWhite.onclick = () => { aiSide = 'black'; autoPlay = false; log("Player plays white. AI — black."); setTimeout(aiPlayOneMove, 10); };
         const btnBlack = document.createElement('button');
         btnBlack.className = 'ai-btn-black';
-        btnBlack.textContent = 'Играть против ИИ (За чёрных)';
-        btnBlack.onclick = () => { aiSide = 'white'; autoPlay = false; log("Игрок играет чёрными. ИИ — белые."); setTimeout(aiPlayOneMove, 10); };
+        btnBlack.textContent = t('vs_ai_black');
+        btnBlack.onclick = () => { aiSide = 'white'; autoPlay = false; log("Player plays black. AI — white."); setTimeout(aiPlayOneMove, 10); };
         const btnAuto = document.createElement('button');
         btnAuto.textContent = 'ИИ vs ИИ (Auto)';
-        btnAuto.onclick = () => { autoPlay = !autoPlay; aiSide = 'black'; log("AI vs AI: " + (autoPlay ? "включено" : "выключено")); if (autoPlay) setTimeout(aiPlayOneMove, 50); };
+        btnAuto.onclick = () => { autoPlay = !autoPlay; aiSide = 'black'; log("AI vs AI: " + (autoPlay ? "enabled" : "disabled")); if (autoPlay) setTimeout(aiPlayOneMove, 50); };
         const selMode = document.createElement('select');
         const optClassic = document.createElement('option'); optClassic.value='classic'; optClassic.textContent='Classic subset (fast)';
         const optFull = document.createElement('option'); optFull.value='full'; optFull.textContent='Full (slow, all pieces)';
         selMode.appendChild(optClassic); selMode.appendChild(optFull);
         selMode.value = AI_CONFIG.mode;
-        selMode.onchange = () => { AI_CONFIG.mode = selMode.value; log(`AI режим: ${AI_CONFIG.mode}`); };
+        selMode.onchange = () => { AI_CONFIG.mode = selMode.value; log(`AI mode: ${AI_CONFIG.mode}`); };
 
         const inputTime = document.createElement('input');
         inputTime.type = 'number';
@@ -1665,9 +2036,19 @@ function log(msg) {
         findBestMove, aiPlayOneMove, setAIConfig: (cfg)=>Object.assign(AI_CONFIG, cfg), getConfig: ()=>AI_CONFIG
     };
 
-    log('✅ AI engine loaded. Use sidebar controls to start games.');
+    log(t('ai_loaded'));
 })();
 
+// Initialize language from localStorage or default to English
+const savedLanguage = localStorage.getItem('evolution-chess-language');
+if (savedLanguage && translations[savedLanguage]) {
+    currentLanguage = savedLanguage;
+} else {
+    currentLanguage = 'en'; // Default to English
+}
+
+// Update UI with current language
+updateUILanguage();
 
 initGame();
 </script>
