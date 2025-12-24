@@ -32,7 +32,7 @@
 ## Пример игры
 <img src="../../docs/game-example-photos/game-example-1.png" width="700">
 
-📸 Больше скриншотов: [../../game-example-photos](../../game-example-photos)
+📸 Больше скриншотов: [../game-example-photos](../game-example-photos)
 
 ---
 
