@@ -30,7 +30,7 @@
 ---
 
 ## Пример игры
-<img src="../../game-images/game-example-photos/game-example-1.png" width="700">
+<img src="../../game-images/game-example-1.png" width="700">
 
 📸 Больше скриншотов: [здесь](../../game-images)
 
@@ -147,7 +147,7 @@ mod/
 
 > [!NOTE]
 > Если вы всё ещё не понимаете, как создавать моды, посмотрите пример в папке  
-> `evolution-chess-2-alfa/mod_example`
+> [`пример мода`](../../mods/mod_example)
 
 ---
 
