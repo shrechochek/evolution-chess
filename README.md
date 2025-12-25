@@ -87,7 +87,7 @@ If you use custom images:
 - **`symbol`** — symbol defined in `SYMBOLS`
 - **`desc`** — description of the piece
 - **`role`** — special role:
-<!--  - `king` — can castle, losing all kings means defeat
+  <!--  - `king` — can castle, losing all kings means defeat
   - `pawn` — can promote, en passant enabled
   - `rook` — participates in castling -->
   | Role   | Description |
