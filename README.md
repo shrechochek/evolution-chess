@@ -21,7 +21,6 @@ Chess where pieces evolve
 
 ---
 
-<!-- ## 🎮 How to play -->
 <h2 id="how-to-play">🎮 How to Play</h2>
 You can play Evolution Chess in two ways:
 
@@ -33,14 +32,13 @@ You can play Evolution Chess in two ways:
 
 ---
 
-<!-- ## 🏙 Game Example -->
 <h2 id="game-example">🏙 Game Example</h2>
 <img src="resources/game-images/game-example-1.png" width="700">
 
 📸 More screenshots: [here](resources/game-images)
+
 ---
 
-<!-- ## 🪄 How Pieces Evolve -->
 <h2 id="how-pieces-evolve">🪄 How Pieces Evolve</h2>
 When a piece captures another piece, it gains experience and can evolve into a new piece
 
@@ -48,7 +46,6 @@ When a piece captures another piece, it gains experience and can evolve into a n
 
 ---
 
-<!-- ## 🗂 How to Create Mods -->
 <h2 id="how-to-create-mods">🗂 How to Create Mods</h2>
 
 ### 1. Create a mod folder
@@ -154,7 +151,6 @@ mod/
 
 ---
 
-<!-- ## 🧑‍🤝‍🧑 Contributing -->
 <h2 id="contributing">🧑‍🤝‍🧑 Contributing</h2>
 
 Pull requests are welcome!
@@ -164,7 +160,8 @@ You can help by:
 - Fixing bugs
 - Suggesting ideas
 
-<!-- ## 🧑‍💻 Authors -->
+---
+
 <h2 id="authors">🧑‍💻 Authors </h2>
   
 - 🧑‍💻 **Programmer**: [_shrechochek_](https://github.com/shrechochek)
