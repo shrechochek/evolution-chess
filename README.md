@@ -156,6 +156,7 @@ mod/
 
 <!-- ## 🧑‍🤝‍🧑 Contributing -->
 <h2 id="contributing">🧑‍🤝‍🧑 Contributing</h2>
+
 Pull requests are welcome!
 You can help by:
 - Creatingnew mods
@@ -165,5 +166,6 @@ You can help by:
 
 <!-- ## 🧑‍💻 Authors -->
 <h2 id="authors">🧑‍💻 Authors/h2>
+  
 - 🧑‍💻 **Programmer**: [_shrechochek_](https://github.com/shrechochek)
 - 🎨 **Artist**: [_Serebr1k_](https://github.com/Serebr1k-code)
