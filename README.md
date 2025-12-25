@@ -1,5 +1,6 @@
 # Evolution Chess
 Chess where pieces evolve
+![Stars Counter](https://img.shields.io/github/stars/shrechochek/evolution-chess?style=for-the-badge&labelColor=%232e383c&color=%23dbbc7f)
 
 ---
 
