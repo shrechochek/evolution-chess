@@ -45,7 +45,7 @@ When a piece captures another piece, it gains experience and can evolve into a n
 
 ---
 
-## 🗂 How to Create Mods
+## How to Create Mods
 ### 1. Create a mod folder
 Create a folder with `.json` file
 
