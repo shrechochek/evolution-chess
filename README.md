@@ -18,6 +18,7 @@ Chess where pieces evolve
 - 🗂 [How to create mods](#how-to-create-mods)
 - 🧑‍🤝‍🧑 [Contributing](#Contributing)
 - 🧑‍💻 [Authors](#authors)
+- 🧭 [Roadmap](#roadmap)
 
 ---
 
@@ -159,6 +160,18 @@ You can help by:
 - Improving engine
 - Fixing bugs
 - Suggesting ideas
+
+---
+
+<h2 id="roadmap">🧭 Roadmap</h2>
+
+- [x] Playable alfa
+- [x] 2 layers of evolution
+- [x] Mods support
+- [x] Adaptive engine
+- [x] Better UI for phones
+- [ ] Better engine
+- [ ] Multiplayer website
 
 ---
 
