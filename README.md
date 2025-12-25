@@ -12,12 +12,12 @@ Chess where pieces evolve
 ---
 
 ## Contents
-- [🎮 How to play](#how-to-play)
-- [🏙 Game example](#game-example)
-- [🪄 How pieces evolve](#how-pieces-evolve)
-- [🗂 How to create mods](#how-to-create-mods)
-- [🧑‍🤝‍🧑 Contributing](#Contributing)
-- [🧑‍💻 Authors](#authors)
+- 🎮 [How to play](#how-to-play)
+- 🏙 [Game example](#game-example)
+- 🪄 [How pieces evolve](#how-pieces-evolve)
+- 🗂 [How to create mods](#how-to-create-mods)
+- 🧑‍🤝‍🧑 [Contributing](#Contributing)
+- 🧑‍💻 [Authors](#authors)
 
 ---
 
