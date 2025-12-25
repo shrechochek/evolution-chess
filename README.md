@@ -127,7 +127,7 @@ If you use custom images:
 ```
 
 > [!NOTE]
-> ### In this evolution tree pawn can evolve into star
+> In this evolution tree pawn can evolve into star
 
 ### Final `.json` structure
 ```json
