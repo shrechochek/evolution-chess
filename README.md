@@ -87,36 +87,20 @@ If you use custom images:
 - **`symbol`** — symbol defined in `SYMBOLS`
 - **`desc`** — description of the piece
 - **`role`** — special role:
-  <!--  - `king` — can castle, losing all kings means defeat
+  - `king` — can castle, losing all kings means defeat
   - `pawn` — can promote, en passant enabled
-  - `rook` — participates in castling -->
-  | `king` | Main piece. Losing all kings means defeat. Can castle |
-  |--------|-------------|
-  | `pawn` | Can promote. En passant is enabled |
-  | `rook` | Participates in castling |
+  - `rook` — participates in castling
 - **`tier`** — evolution tier
 - **`xpReq`** — XP required to evolve (`-1` = no evolution)
 - **`special`** - special ability
-  <!-- - `spear_attack` - attack square ahead
+  - `spear_attack` - attack square ahead
   - `revenge` - destroy the figure that ate it
   - `teleport` - teleport to every square without piece on it
   - `explode_n` - destroy everything within radius n, when this piece captured or capture
   - `detonate_n` - destroy everything within radius n, when this piece capture or captured, expect pawns and kings
   - `explode_all_n` - destroy everything within radius n, when this piece captured or capture
   - `range_capture` - capture without moving
-  - `swap_ally` - swap places with same color piece -->
-  | Special | Description |
-  |--------|-------------|
-  | `spear_attack` | Attacks the square directly in front |
-  | `revenge` | Destroys the piece that captured it |
-  | `teleport` | Can move to any empty square |
-  | `explode_n` | Destroys all pieces within radius **n** on capture or being captured |
-  | `detonate_n` | Same as explode, but **does not affect pawns and kings** |
-  | `explode_all_n` | Destroys everything within radius **n** |
-  | `range_capture` | Can capture without moving |
-  | `swap_ally` | Swaps position with a friendly piece |
-  | `ghost_n` | Can pass through **n** pieces |
-  | `immortal` | Cannot be captured |
+  - `swap_ally` - swap places with same color piece
 - **`ghost`** - can go through n pieces (you must set n)
 - **`immortal`** - cannot be captured
 
