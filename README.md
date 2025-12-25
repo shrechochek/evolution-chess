@@ -90,12 +90,12 @@ If you use custom images:
 <!--  - `king` — can castle, losing all kings means defeat
   - `pawn` — can promote, en passant enabled
   - `rook` — participates in castling -->
-  - | Role   | Description |
-  - |--------|-------------|
-  - | `king` | Main piece. Losing all kings means defeat. Can castle |
-  - | `pawn` | Can promote. En passant is enabled |
-  - | `rook` | Participates in castling |
-  - | `none` | No special chess role |
+  | Role   | Description |
+  |--------|-------------|
+  | `king` | Main piece. Losing all kings means defeat. Can castle |
+  | `pawn` | Can promote. En passant is enabled |
+  | `rook` | Participates in castling |
+  | `none` | No special chess role |
 - **`tier`** — evolution tier
 - **`xpReq`** — XP required to evolve (`-1` = no evolution)
 - **`special`** - special ability
