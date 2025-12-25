@@ -165,7 +165,7 @@ You can help by:
 - Suggesting ideas
 
 <!-- ## 🧑‍💻 Authors -->
-<h2 id="authors">🧑‍💻 Authors/h2>
+<h2 id="authors">🧑‍💻 Authors </h2>
   
 - 🧑‍💻 **Programmer**: [_shrechochek_](https://github.com/shrechochek)
 - 🎨 **Artist**: [_Serebr1k_](https://github.com/Serebr1k-code)
