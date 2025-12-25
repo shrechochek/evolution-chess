@@ -12,8 +12,7 @@ Chess where pieces evolve
 ---
 
 ## Contents
-<h2 id="how-to-play">🎮 How to Play</h2>
-<!-- - [How to play](#how-to-play) -->
+- [How to play](#how-to-play)
 - [Game example](#game-example)
 - [How pieces evolve](#how-pieces-evolve)
 - [How to create mods](#how-to-create-mods)
@@ -22,7 +21,8 @@ Chess where pieces evolve
 
 ---
 
-## 🎮 How to play
+<!-- ## 🎮 How to play -->
+<h2 id="how-to-play">🎮 How to Play</h2>
 You can play Evolution Chess in two ways:
 
 1. 🌐 [**Play online**](https://shrechochek.github.io/evolution-chess/)
