@@ -12,7 +12,8 @@ Chess where pieces evolve
 ---
 
 ## Contents
-- [How to play](#how-to-play)
+<h2 id="how-to-play">🎮 How to Play</h2>
+<!-- - [How to play](#how-to-play) -->
 - [Game example](#game-example)
 - [How pieces evolve](#how-pieces-evolve)
 - [How to create mods](#how-to-create-mods)
@@ -45,7 +46,7 @@ When a piece captures another piece, it gains experience and can evolve into a n
 
 ---
 
-## How to Create Mods
+## 🗂 How to Create Mods
 ### 1. Create a mod folder
 Create a folder with `.json` file
 
