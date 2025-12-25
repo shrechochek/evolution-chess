@@ -11,7 +11,7 @@ Chess where pieces evolve
 
 ---
 
-## contents
+## Contents
 - [How to play](#how-to-play)
 - [How pieces evolve](#how-pieces-evolve)
 - [How to create mods](#how-to-create-mods)
@@ -87,9 +87,15 @@ If you use custom images:
 - **`symbol`** — symbol defined in `SYMBOLS`
 - **`desc`** — description of the piece
 - **`role`** — special role:
-  - `king` — can castle, losing all kings means defeat
+<!--  - `king` — can castle, losing all kings means defeat
   - `pawn` — can promote, en passant enabled
-  - `rook` — participates in castling
+  - `rook` — participates in castling -->
+  - | Role   | Description |
+  - |--------|-------------|
+  - | `king` | Main piece. Losing all kings means defeat. Can castle |
+  - | `pawn` | Can promote. En passant is enabled |
+  - | `rook` | Participates in castling |
+  - | `none` | No special chess role |
 - **`tier`** — evolution tier
 - **`xpReq`** — XP required to evolve (`-1` = no evolution)
 - **`special`** - special ability
@@ -98,11 +104,11 @@ If you use custom images:
   - `teleport` - teleport to every square without piece on it
   - `explode_n` - destroy everything within radius n, when this piece captured or capture
   - `detonate_n` - destroy everything within radius n, when this piece capture or captured, expect pawns and kings
-  - `explde_all_n` - destroy everything within radius n, when this piece captured or capture
+  - `explode_all_n` - destroy everything within radius n, when this piece captured or capture
   - `range_capture` - capture without moving
   - `swap_ally` - swap places with same color piece
 - **`ghost`** - can go through n pieces (you must set n)
-- **`immortal`** - can not be captured
+- **`immortal`** - cannot be captured
 
 > [!WARNING]
 > You should rewrite all standart pieces logic
