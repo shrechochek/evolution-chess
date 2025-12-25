@@ -290,6 +290,38 @@
             transform: translateY(2px);
             border-bottom: none;
         }
+
+        /* Move Navigation Styles */
+        .nav-btn {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+            min-width: 40px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .move-counter {
+            color: #f1c40f;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -317,6 +349,16 @@
             </div>
 
             <button class="reset-btn" onclick="initGame()">New Game</button>
+
+            <!-- Move Navigation Controls -->
+            <div class="move-navigation" style="display: flex; gap: 5px; margin: 10px 0; justify-content: center;">
+                <button class="nav-btn" onclick="goToStart()" title="" disabled id="nav-start">⏮️</button>
+                <button class="nav-btn" onclick="goBack()" title="" disabled id="nav-back">⬅️</button>
+                <span class="move-counter" id="move-counter" style="font-size: 14px; align-self: center; min-width: 60px; text-align: center;">0/0</span>
+                <button class="nav-btn" onclick="goForward()" title="" disabled id="nav-forward">➡️</button>
+                <button class="nav-btn" onclick="goToEnd()" title="" disabled id="nav-end">⏭️</button>
+            </div>
+
             <div class="mod-upload-container">
                 <label for="mod-input" class="mod-upload-label">Load Mod</label>
                 <input type="file" id="mod-input" webkitdirectory directory multiple onchange="loadMod(this)">
@@ -465,7 +507,12 @@ const translations = {
         settings: "Settings",
         language: "Language",
         english: "English",
-        russian: "Русский"
+        russian: "Русский",
+        // Move navigation
+        go_to_start: "Go to start",
+        previous_move: "Previous move",
+        next_move: "Next move",
+        go_to_end: "Go to end"
     },
     ru: {
         title: "Шахматы c эволюцией",
@@ -578,7 +625,12 @@ const translations = {
         settings: "Настройки",
         language: "Язык",
         english: "English",
-        russian: "Русский"
+        russian: "Русский",
+        // Move navigation
+        go_to_start: "К началу",
+        previous_move: "Предыдущий ход",
+        next_move: "Следующий ход",
+        go_to_end: "К концу"
     }
 };
 
@@ -637,6 +689,9 @@ function updateUILanguage() {
     if (settingsModal && settingsModal.style.display !== 'none') {
         updateSettingsModal();
     }
+
+    // Update navigation button titles
+    updateNavigationButtons();
 }
 
 function showSettingsModal() {
@@ -801,7 +856,137 @@ let white_kings = 0;
 let black_kings = 0;
 let aiSide = null; // Глобальная переменная для стороны ИИ
 
+// History system for move navigation
+let gameHistory = [];
+let currentHistoryIndex = -1;
+let isViewingHistory = false;
+let aiBlockedAfterHistoryReturn = false; // Блокировка ИИ после возврата из режима просмотра истории
+let turnBeforeHistoryReturn = null; // Чей был ход перед возвратом из истории
+
 // --- FUNCTIONS ---
+
+// History management functions
+function saveGameState() {
+    const state = {
+        board: JSON.parse(JSON.stringify(board)), // Deep clone
+        currentTurn: currentTurn,
+        selectedCell: selectedCell,
+        possibleMoves: [...possibleMoves],
+        gameOver: gameOver,
+        enPassantTarget: enPassantTarget ? {...enPassantTarget} : null,
+        white_kings: white_kings,
+        black_kings: black_kings
+        // aiSide не сохраняется - это глобальная настройка
+    };
+
+    // If we're viewing history and making a new move, truncate history after current position
+    if (isViewingHistory && currentHistoryIndex < gameHistory.length - 1) {
+        gameHistory = gameHistory.slice(0, currentHistoryIndex + 1);
+    }
+
+    gameHistory.push(state);
+    currentHistoryIndex = gameHistory.length - 1;
+    isViewingHistory = false;
+}
+
+function goToMove(index) {
+    if (index < 0 || index >= gameHistory.length) return;
+
+    const state = gameHistory[index];
+    board = JSON.parse(JSON.stringify(state.board)); // Deep clone
+
+    // currentTurn восстанавливается только при просмотре прошлого,
+    // но не при возврате к текущему ходу
+    if (index < gameHistory.length - 1) {
+        currentTurn = state.currentTurn;
+    }
+
+    // selectedCell = state.selectedCell;
+    // possibleMoves = [...state.possibleMoves];
+    gameOver = state.gameOver;
+    // enPassantTarget = state.enPassantTarget ? {...state.enPassantTarget} : null;
+    white_kings = state.white_kings;
+    black_kings = state.black_kings;
+    // aiSide не восстанавливается из истории - это глобальная настройка игры
+
+    const wasViewingHistory = isViewingHistory;
+    currentHistoryIndex = index;
+    isViewingHistory = (index < gameHistory.length - 1);
+
+    // Если только что вернулись из режима просмотра истории к текущему ходу
+    if (wasViewingHistory && !isViewingHistory) {
+        aiBlockedAfterHistoryReturn = true;
+        turnBeforeHistoryReturn = currentTurn;
+    }
+
+    renderBoard();
+    updateInfo();
+    updateGameStatus(); // Update the turn display
+    updateNavigationButtons();
+}
+
+function canGoBack() {
+    return currentHistoryIndex > 0;
+}
+
+function canGoForward() {
+    return currentHistoryIndex < gameHistory.length - 1;
+}
+
+function goBack() {
+    if (canGoBack()) {
+        goToMove(currentHistoryIndex - 1);
+    }
+}
+
+function goForward() {
+    if (canGoForward()) {
+        goToMove(currentHistoryIndex + 1);
+    }
+}
+
+function goToStart() {
+    if (gameHistory.length > 0) {
+        goToMove(0);
+    }
+}
+
+function goToEnd() {
+    if (gameHistory.length > 0) {
+        goToMove(gameHistory.length - 1);
+    }
+}
+
+function updateNavigationButtons() {
+    const startBtn = document.getElementById('nav-start');
+    const backBtn = document.getElementById('nav-back');
+    const forwardBtn = document.getElementById('nav-forward');
+    const endBtn = document.getElementById('nav-end');
+    const counter = document.getElementById('move-counter');
+
+    if (startBtn) {
+        startBtn.disabled = !canGoBack() || currentHistoryIndex <= 0;
+        startBtn.title = t('go_to_start');
+    }
+    if (backBtn) {
+        backBtn.disabled = !canGoBack();
+        backBtn.title = t('previous_move');
+    }
+    if (forwardBtn) {
+        forwardBtn.disabled = !canGoForward();
+        forwardBtn.title = t('next_move');
+    }
+    if (endBtn) {
+        endBtn.disabled = !canGoForward() || currentHistoryIndex >= gameHistory.length - 2;
+        endBtn.title = t('go_to_end');
+    }
+
+    if (counter) {
+        const currentMove = Math.max(0, currentHistoryIndex);
+        const totalMoves = gameHistory.length - 1; // Subtract 1 because index 0 is initial position
+        counter.textContent = `${currentMove}/${totalMoves}`;
+    }
+}
 
 function initGame() {
     board = createBoard();
@@ -811,11 +996,23 @@ function initGame() {
     possibleMoves = [];
     enPassantTarget = null;
     aiSide = null; // Сбрасываем сторону ИИ при новой игре
+
+    // Reset history
+    gameHistory = [];
+    currentHistoryIndex = -1;
+    isViewingHistory = false;
+    aiBlockedAfterHistoryReturn = false;
+    turnBeforeHistoryReturn = null;
+
     document.getElementById('game-log').innerHTML = '';
 
     updateGameStatus();
     renderBoard();
     updateInfo();
+
+    // Save initial game state to history
+    saveGameState();
+    updateNavigationButtons();
 }
 
 function updateGameStatus() {
@@ -1042,7 +1239,7 @@ function isValidPos(x, y) {
 }
 
 function cellClick(x, y) {
-    if (gameOver) return;
+    if (gameOver || isViewingHistory) return;
 
     const clickedPiece = board[y][x];
     const move = possibleMoves.find(m => m.x === x && m.y === y);
@@ -1244,12 +1441,22 @@ function makeMove(fromX, fromY, move) {
 }
 
 function endTurn() {
+    // Save current game state to history before changing turn
+    saveGameState();
+
     selectedCell = null;
     possibleMoves = [];
     currentTurn = currentTurn === 'white' ? 'black' : 'white';
     renderBoard();
     const turnText = document.getElementById('turn-display');
     turnText.innerText = currentTurn === 'white' ? t('turn_white') : t('turn_black');
+    updateNavigationButtons();
+
+    // Снимаем блокировку ИИ после того, как игрок сделал ход и ход перешел к следующему игроку
+    if (aiBlockedAfterHistoryReturn && currentTurn !== turnBeforeHistoryReturn) {
+        aiBlockedAfterHistoryReturn = false;
+        turnBeforeHistoryReturn = null;
+    }
 }
 
 function explode(cx, cy, attackerColor, radius) {
@@ -2020,8 +2227,19 @@ function log(msg) {
         setInterval(() => {
             if (gameOver) return;
             if (!aiSide) return;
+            if (isViewingHistory) return; // Не делать ходы во время просмотра истории
+
+            // Блокировка ИИ после возврата из режима просмотра истории до тех пор,
+            // пока ход не сменится (игрок сделает ход)
+            if (aiBlockedAfterHistoryReturn && currentTurn === turnBeforeHistoryReturn) {
+                return;
+            }
+
             if (currentTurn === aiSide && !thinking) {
                 aiPlayOneMove();
+                // Снимаем блокировку после того, как ИИ сделал ход
+                aiBlockedAfterHistoryReturn = false;
+                turnBeforeHistoryReturn = null;
             }
         }, 300);
     }
