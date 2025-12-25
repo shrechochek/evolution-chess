@@ -15,13 +15,13 @@ Chess where pieces evolve
 - [How to play](#how-to-play)
 - [Game example](#game-example)
 - [How pieces evolve](#how-pieces-evolve)
-- [How to create mods](#🗂-how-to-create-mods)
-- [Contributing](#🧑‍🤝‍🧑-Contributing)
+- [How to create mods](#how-to-create-mods)
+- [Contributing](#Contributing)
 - [Authors](#authors)
 
 ---
 
-## How to play
+## 🎮 How to play
 You can play Evolution Chess in two ways:
 
 1. 🌐 [**Play online**](https://shrechochek.github.io/evolution-chess/)
