@@ -90,9 +90,8 @@ If you use custom images:
   <!--  - `king` — can castle, losing all kings means defeat
   - `pawn` — can promote, en passant enabled
   - `rook` — participates in castling -->
-  | &nbsp; | &nbsp; |
-  |--------|-------------|
   | `king` | Main piece. Losing all kings means defeat. Can castle |
+  |--------|-------------|
   | `pawn` | Can promote. En passant is enabled |
   | `rook` | Participates in castling |
 - **`tier`** — evolution tier
