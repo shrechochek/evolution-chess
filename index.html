@@ -389,6 +389,103 @@
             cursor: default;
             background-color: transparent;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 1024px) {
+            .game-container {
+                gap: 20px;
+            }
+
+            #board {
+                grid-template-columns: repeat(8, 70px);
+                grid-template-rows: repeat(8, 70px);
+            }
+
+            .cell {
+                width: 70px;
+                height: 70px;
+            }
+
+            .sidebar {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                gap: 20px;
+                align-items: center;
+            }
+
+            #board {
+                grid-template-columns: repeat(8, 60px);
+                grid-template-rows: repeat(8, 60px);
+                border-width: 6px;
+            }
+
+            .cell {
+                width: 60px;
+                height: 60px;
+            }
+
+            .sidebar {
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .modal-content {
+                max-width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            #board {
+                grid-template-columns: repeat(8, 45px);
+                grid-template-rows: repeat(8, 45px);
+                border-width: 4px;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            }
+
+            .cell {
+                width: 45px;
+                height: 45px;
+            }
+
+            .game-container {
+                gap: 15px;
+            }
+
+            .sidebar {
+                padding: 15px;
+            }
+
+            .settings-icon {
+                top: 10px;
+                right: 10px;
+                width: 28px;
+                height: 28px;
+            }
+
+            .settings-icon svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 2px;
+            }
+
+            .subtitle {
+                font-size: 0.85em;
+                margin-bottom: 15px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1932,6 +2029,16 @@ let dragStartY = 0;
 let draggedElement = null;
 let dragClone = null;
 
+// Get current cell size for responsive drag positioning
+function getCurrentCellSize() {
+    const cell = document.querySelector('.cell');
+    if (cell) {
+        const rect = cell.getBoundingClientRect();
+        return Math.min(rect.width, rect.height);
+    }
+    return 80; // fallback for desktop
+}
+
 // Mouse event handlers
 document.addEventListener('mousedown', function(e) {
     if (isViewingHistory) return;
@@ -1952,16 +2059,19 @@ document.addEventListener('mousedown', function(e) {
     dragStartY = e.clientY;
 
     // Create drag clone
+    const cellSize = getCurrentCellSize();
+    const offset = cellSize / 2; // Center the piece under cursor
+
     dragClone = pieceEl.cloneNode(true);
     dragClone.className = 'piece dragging';
     dragClone.style.position = 'fixed';
     dragClone.style.zIndex = '1000';
     dragClone.style.opacity = '0.8';
     dragClone.style.pointerEvents = 'none';
-    dragClone.style.width = '80px';
-    dragClone.style.height = '80px';
-    dragClone.style.left = (e.clientX - 40) + 'px';
-    dragClone.style.top = (e.clientY - 40) + 'px';
+    dragClone.style.width = cellSize + 'px';
+    dragClone.style.height = cellSize + 'px';
+    dragClone.style.left = (e.clientX - offset) + 'px';
+    dragClone.style.top = (e.clientY - offset) + 'px';
     dragClone.style.transform = 'none';
     dragClone.style.margin = '0';
     dragClone.style.padding = '0';
@@ -1995,8 +2105,10 @@ document.addEventListener('mousemove', function(e) {
 
     // Move the drag clone with the cursor
     if (isDragging && dragClone) {
-        dragClone.style.left = (e.clientX - 40) + 'px';
-        dragClone.style.top = (e.clientY - 40) + 'px';
+        const cellSize = getCurrentCellSize();
+        const offset = cellSize / 2; // Center the piece under cursor
+        dragClone.style.left = (e.clientX - offset) + 'px';
+        dragClone.style.top = (e.clientY - offset) + 'px';
     }
 
     // During dragging, we don't highlight cells - only show highlights when clicking on pieces
