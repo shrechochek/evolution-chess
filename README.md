@@ -33,20 +33,23 @@ You can play Evolution Chess in two ways:
 
 ---
 
-## Game Example
+<!-- ## 🏙 Game Example -->
+<h2 id="game-example">🏙 Game Example</h2>
 <img src="resources/game-images/game-example-1.png" width="700">
 
 📸 More screenshots: [here](resources/game-images)
 ---
 
-## How Pieces Evolve
+<!-- ## 🪄 How Pieces Evolve -->
+<h2 id="how-pieces-evolve">🪄 How Pieces Evolve</h2>
 When a piece captures another piece, it gains experience and can evolve into a new piece
 
 [**Evolution tree**](https://miro.com/app/board/uXjVI-ZUrws=/)
 
 ---
 
-## 🗂 How to Create Mods
+<!-- ## 🗂 How to Create Mods -->
+<h2 id="how-to-create-mods">🗂 How to Create Mods</h2>
 ### 1. Create a mod folder
 Create a folder with `.json` file
 
@@ -150,7 +153,8 @@ mod/
 
 ---
 
-## 🧑‍🤝‍🧑 Contributing
+<!-- ## 🧑‍🤝‍🧑 Contributing -->
+<h2 id="contributing">🧑‍🤝‍🧑 Contributing</h2>
 Pull requests are welcome!
 You can help by:
 - Creatingnew mods
@@ -158,6 +162,7 @@ You can help by:
 - Fixing bugs
 - Suggesting ideas
 
-## authors
-- 👨‍💻 **Programmer**: [_shrechochek_](https://github.com/shrechochek)
+<!-- ## 🧑‍💻 Authors -->
+<h2 id="authors">🧑‍💻 Authors/h2>
+- 🧑‍💻 **Programmer**: [_shrechochek_](https://github.com/shrechochek)
 - 🎨 **Artist**: [_Serebr1k_](https://github.com/Serebr1k-code)
