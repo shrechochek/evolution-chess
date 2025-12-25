@@ -5,7 +5,7 @@ Chess where pieces evolve
 
 > [!IMPORTANT]
 >  🌍 **Languages**  
->  [🇺🇸(en)](README.md)  |  [🇷🇺(ru)](docs/ru/README.md)
+>  [🇺🇸(en)](README.md)  |  [🇷🇺(ru)](resources/READMEs/ru/README.md)
 
 ---
 
@@ -30,9 +30,9 @@ You can play Evolution Chess in two ways:
 ---
 
 ## Game Example
-<img src="docs/game-example-photos/game-example-1.png" width="700">
+<img src="resources/game-images/game-example-1.png" width="700">
 
-📸 More screenshots: [here](docs/game-example-photos)
+📸 More screenshots: [here](resources/game-images)
 ---
 
 ## How Pieces Evolve
@@ -142,8 +142,8 @@ mod/
 
 > [!NOTE]
 > If you still don't understand how to create mods or want to see a specific example you can check <br>
-> */evolution-chess-2-alfa/mod_example* folder
-<!-- ##### **if you still don't understand how to create mods or want to see a specific example you can check /evolution-chess-2-alfa/mod_example folder** -->
+> [`example mod folder`](resources/mods/mod_example)
+<!-- > */evolution-chess-2-alfa/mod_example* folder -->
 
 ---
 
