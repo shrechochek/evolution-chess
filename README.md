@@ -142,8 +142,7 @@ mod/
 
 > [!NOTE]
 > If you still don't understand how to create mods or want to see a specific example you can check <br>
-> [`example mod folder`](resources/mods/mod_example)
-<!-- > */evolution-chess-2-alfa/mod_example* folder -->
+> [`mod example`](resources/mods/mod_example)
 
 ---
 
