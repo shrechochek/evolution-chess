@@ -47,7 +47,6 @@
             border: 8px solid #34495e;
             user-select: none;
             box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-            height: 100%;
         }
 
         .cell {
@@ -322,6 +321,74 @@
             color: #f1c40f;
             font-weight: bold;
         }
+
+        /* Drag and Drop Styles - removed drag-target highlighting */
+
+        .piece.draggable {
+            cursor: grab !important;
+            transition: none;
+        }
+
+        .piece.dragging {
+            opacity: 0.8;
+            z-index: 1000;
+            pointer-events: none;
+            position: fixed !important;
+            transition: none !important;
+            cursor: grabbing !important;
+            transform: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Move History Styles - Minimalist */
+        .move-history {
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .move-row {
+            display: flex;
+            align-items: center;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .move-number {
+            color: #888;
+            font-size: 12px;
+            min-width: 20px;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        .move-white, .move-black {
+            flex: 1;
+            padding: 3px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .move-white:hover, .move-black:hover {
+            background-color: rgba(52, 152, 219, 0.15);
+        }
+
+        .move-white.current, .move-black.current {
+            background-color: rgba(52, 152, 219, 0.3);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .move-empty {
+            cursor: default;
+            background-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -344,8 +411,8 @@
             </div>
 
             <div class="panel">
-                <h3 id="event-log-title">Event Log</h3>
-                <div class="log" id="game-log"></div>
+                <h3 id="move-history-title">Move History</h3>
+                <div class="move-history" id="move-history"></div>
             </div>
 
             <button class="reset-btn" onclick="initGame()">New Game</button>
@@ -512,7 +579,8 @@ const translations = {
         go_to_start: "Go to start",
         previous_move: "Previous move",
         next_move: "Next move",
-        go_to_end: "Go to end"
+        go_to_end: "Go to end",
+        move_history: "Move History"
     },
     ru: {
         title: "Шахматы c эволюцией",
@@ -630,7 +698,8 @@ const translations = {
         go_to_start: "К началу",
         previous_move: "Предыдущий ход",
         next_move: "Следующий ход",
-        go_to_end: "К концу"
+        go_to_end: "К концу",
+        move_history: "История ходов"
     }
 };
 
@@ -671,8 +740,8 @@ function updateUILanguage() {
         infoPanel.innerText = t('select_piece');
     }
 
-    // Update event log header
-    document.getElementById('event-log-title').textContent = t('event_log');
+    // Update move history header
+    document.getElementById('move-history-title').textContent = t('move_history');
 
     // Update buttons
     document.querySelector('.reset-btn').textContent = t('new_game');
@@ -863,6 +932,9 @@ let isViewingHistory = false;
 let aiBlockedAfterHistoryReturn = false; // Блокировка ИИ после возврата из режима просмотра истории
 let turnBeforeHistoryReturn = null; // Чей был ход перед возвратом из истории
 
+// Move notation history
+let moveNotationHistory = []; // Array of {notation, historyIndex, isWhite}
+
 // --- FUNCTIONS ---
 
 // History management functions
@@ -901,8 +973,9 @@ function goToMove(index) {
         currentTurn = state.currentTurn;
     }
 
-    // selectedCell = state.selectedCell;
-    // possibleMoves = [...state.possibleMoves];
+    // Очищаем выделение и возможные ходы при просмотре истории
+    selectedCell = null;
+    possibleMoves = [];
     gameOver = state.gameOver;
     // enPassantTarget = state.enPassantTarget ? {...state.enPassantTarget} : null;
     white_kings = state.white_kings;
@@ -915,14 +988,24 @@ function goToMove(index) {
 
     // Если только что вернулись из режима просмотра истории к текущему ходу
     if (wasViewingHistory && !isViewingHistory) {
-        aiBlockedAfterHistoryReturn = true;
-        turnBeforeHistoryReturn = currentTurn;
+        // Блокируем ИИ только если сейчас ход игрока
+        // Если сейчас ход ИИ, даем ему ходить сразу
+        if (currentTurn !== aiSide) {
+            aiBlockedAfterHistoryReturn = true;
+            turnBeforeHistoryReturn = currentTurn;
+        } else {
+            // Снимаем старую блокировку, если она была
+            aiBlockedAfterHistoryReturn = false;
+            turnBeforeHistoryReturn = null;
+        }
     }
 
     renderBoard();
     updateInfo();
     updateGameStatus(); // Update the turn display
     updateNavigationButtons();
+    updateMoveHistoryDisplay();
+    move_audio.play().catch(e=>{});
 }
 
 function canGoBack() {
@@ -954,6 +1037,144 @@ function goToStart() {
 function goToEnd() {
     if (gameHistory.length > 0) {
         goToMove(gameHistory.length - 1);
+    }
+}
+
+// Generate simple move notation
+function generateMoveNotation(piece, fromX, fromY, move) {
+    const toX = move.x;
+    const toY = move.y;
+
+    // Files and ranks
+    const fromFile = String.fromCharCode(97 + fromX); // a-h
+    const toFile = String.fromCharCode(97 + toX);
+    const toRank = 8 - toY; // 1-8
+
+    let notation = '';
+
+    // Castling
+    if (move.isCastling) {
+        notation = (toX === 6) ? 'O-O' : 'O-O-O';
+        return notation;
+    }
+
+    // Piece symbol (only for non-pawns)
+    if (PIECE_TYPES[piece.type].role !== 'pawn') {
+        notation = PIECE_TYPES[piece.type].symbol.toUpperCase();
+    }
+
+    // Capture
+    if (move.isCapture) {
+        if (PIECE_TYPES[piece.type].role === 'pawn') {
+            notation = fromFile + 'x';
+        } else {
+            notation += 'x';
+        }
+    }
+
+    // Destination
+    notation += toFile + toRank;
+
+    // Special moves
+    if (move.isEnPassant) {
+        notation += ' e.p.';
+    }
+
+    return notation;
+}
+
+// Add move to notation history
+function addMoveToNotationHistory(piece, fromX, fromY, move) {
+    const notation = generateMoveNotation(piece, fromX, fromY, move);
+    const isWhite = piece.color === 'white';
+
+    moveNotationHistory.push({
+        notation: notation,
+        historyIndex: gameHistory.length - 1,
+        isWhite: isWhite
+    });
+
+    updateMoveHistoryDisplay();
+}
+
+// Update move history display
+function updateDragHighlights() {
+    // Clear all existing highlights
+    document.querySelectorAll('.cell').forEach(cell => {
+        cell.classList.remove('possible-move', 'capture', 'selected');
+    });
+
+    // Apply new highlights
+    if (selectedCell) {
+        // Highlight selected cell
+        const selectedCellEl = document.querySelector(`.cell[data-cell-x="${selectedCell.x}"][data-cell-y="${selectedCell.y}"]`);
+        if (selectedCellEl) {
+            selectedCellEl.classList.add('selected');
+        }
+    }
+
+    // Highlight possible moves
+    possibleMoves.forEach(move => {
+        const cellEl = document.querySelector(`.cell[data-cell-x="${move.x}"][data-cell-y="${move.y}"]`);
+        if (cellEl) {
+            if (board[move.y][move.x] || move.isCapture) {
+                cellEl.classList.add('capture');
+            } else {
+                cellEl.classList.add('possible-move');
+            }
+        }
+    });
+}
+
+function updateMoveHistoryDisplay() {
+    const historyEl = document.getElementById('move-history');
+    historyEl.innerHTML = '';
+
+    if (moveNotationHistory.length === 0) {
+        historyEl.innerHTML = '<div style="color: #666; font-style: italic; text-align: center; padding: 15px; font-size: 12px;">No moves yet</div>';
+        return;
+    }
+
+    // Group moves in pairs (white-black)
+    for (let i = 0; i < moveNotationHistory.length; i += 2) {
+        const moveRow = document.createElement('div');
+        moveRow.className = 'move-row';
+
+        // Move number
+        const moveNumber = document.createElement('span');
+        moveNumber.className = 'move-number';
+        moveNumber.textContent = Math.floor(i / 2) + 1 + '.';
+        moveRow.appendChild(moveNumber);
+
+        // White move
+        const whiteMove = moveNotationHistory[i];
+        const whiteSpan = document.createElement('span');
+        whiteSpan.className = 'move-white' + (whiteMove.historyIndex === currentHistoryIndex ? ' current' : '');
+        whiteSpan.textContent = whiteMove.notation;
+        whiteSpan.onclick = () => goToMove(whiteMove.historyIndex);
+        moveRow.appendChild(whiteSpan);
+
+        // Black move (if exists)
+        const blackMove = moveNotationHistory[i + 1];
+        const blackSpan = document.createElement('span');
+        if (blackMove) {
+            blackSpan.className = 'move-black' + (blackMove.historyIndex === currentHistoryIndex ? ' current' : '');
+            blackSpan.textContent = blackMove.notation;
+            blackSpan.onclick = () => goToMove(blackMove.historyIndex);
+        } else {
+            blackSpan.className = 'move-black move-empty';
+            blackSpan.textContent = '';
+        }
+        moveRow.appendChild(blackSpan);
+
+        historyEl.appendChild(moveRow);
+    }
+
+    // Auto-scroll to bottom only when adding new moves, not when navigating
+    // (scroll only if we're at or near the bottom)
+    const isNearBottom = historyEl.scrollTop + historyEl.clientHeight >= historyEl.scrollHeight - 50;
+    if (isNearBottom) {
+        historyEl.scrollTop = historyEl.scrollHeight;
     }
 }
 
@@ -989,6 +1210,7 @@ function updateNavigationButtons() {
 }
 
 function initGame() {
+    console.log('initGame called');
     board = createBoard();
     currentTurn = 'white';
     selectedCell = null;
@@ -1003,8 +1225,9 @@ function initGame() {
     isViewingHistory = false;
     aiBlockedAfterHistoryReturn = false;
     turnBeforeHistoryReturn = null;
+    moveNotationHistory = [];
 
-    document.getElementById('game-log').innerHTML = '';
+    // Game log removed - now using move history
 
     updateGameStatus();
     renderBoard();
@@ -1013,6 +1236,8 @@ function initGame() {
     // Save initial game state to history
     saveGameState();
     updateNavigationButtons();
+    updateMoveHistoryDisplay();
+    console.log('initGame completed');
 }
 
 function updateGameStatus() {
@@ -1438,6 +1663,9 @@ function makeMove(fromX, fromY, move) {
     }
 
     endTurn();
+
+    // Add move to notation history after ending turn (when gameHistory is updated)
+    addMoveToNotationHistory(piece, fromX, fromY, move);
 }
 
 function endTurn() {
@@ -1596,6 +1824,10 @@ function showPromotionModal(piece) {
 
 function renderBoard() {
     const boardEl = document.getElementById('board');
+    if (!boardEl) {
+        console.error('Board element not found!');
+        return;
+    }
     boardEl.innerHTML = '';
 
     for (let y = 0; y < 8; y++) {
@@ -1603,6 +1835,10 @@ function renderBoard() {
             const cell = document.createElement('div');
             cell.className = `cell ${(x + y) % 2 === 0 ? 'light' : 'dark'}`;
             cell.onclick = () => cellClick(x, y);
+
+            // Store coordinates for drag and drop
+            cell.setAttribute('data-cell-x', x);
+            cell.setAttribute('data-cell-y', y);
 
             const move = possibleMoves.find(m => m.x === x && m.y === y);
             if (move) {
@@ -1626,45 +1862,202 @@ function renderBoard() {
                     pieceEl.innerText = "?";
                     cell.appendChild(pieceEl);
                     boardEl.appendChild(cell);
-                    continue; 
+                    continue;
                 }
 
                 pieceEl.className = `piece ${piece.color} tier-${def.tier}`;
                 if (def.immortal) pieceEl.classList.add('immortal');
 
+                // Add drag and drop functionality
+                if (!isViewingHistory && piece.color === currentTurn) {
+                    pieceEl.classList.add('draggable');
+                    pieceEl.setAttribute('data-x', x);
+                    pieceEl.setAttribute('data-y', y);
+
+                    // Add dragging class if this piece is being dragged
+                    if (isDragging && draggedFromX === x && draggedFromY === y) {
+                        pieceEl.classList.add('dragging');
+                    }
+                } else {
+                    pieceEl.classList.remove('draggable');
+                    pieceEl.classList.remove('dragging');
+                    pieceEl.removeAttribute('data-x');
+                    pieceEl.removeAttribute('data-y');
+                }
+
                 const img = document.createElement('img');
                 const imgName = `${piece.color}_${def.symbol}`;
-                
+
                 if (CUSTOM_ASSETS[imgName]) {
                     img.src = CUSTOM_ASSETS[imgName];
                 } else {
                     img.src = `images/${imgName}.svg`;
                 }
-                
+
                 img.onerror = function() {
                     this.style.display = 'none';
                     const textSpan = document.createElement('span');
                     textSpan.style.fontSize = '12px';
                     textSpan.style.fontWeight = 'bold';
-                    textSpan.innerText = def.name; 
+                    textSpan.innerText = def.name;
                     pieceEl.appendChild(textSpan);
                 };
 
                 pieceEl.appendChild(img);
-                
+
                 if (piece.xp > 0 && def.xpReq != -1) {
                     const badge = document.createElement('span');
                     badge.className = 'lvl-badge';
                     badge.innerText = `${piece.xp}/${def.xpReq}`;
                     pieceEl.appendChild(badge);
                 }
-                
+
                 cell.appendChild(pieceEl);
             }
             boardEl.appendChild(cell);
         }
     }
+
+    // Update highlights after rendering
+    updateDragHighlights();
 }
+
+// Custom Drag and Drop functionality using mouse events
+let draggedPiece = null;
+let draggedFromX = -1;
+let draggedFromY = -1;
+let isDragging = false;
+let dragStartX = 0;
+let dragStartY = 0;
+let draggedElement = null;
+let dragClone = null;
+
+// Mouse event handlers
+document.addEventListener('mousedown', function(e) {
+    if (isViewingHistory) return;
+
+    const pieceEl = e.target.closest('.piece.draggable');
+    if (!pieceEl) return;
+
+    e.preventDefault();
+
+    const x = parseInt(pieceEl.getAttribute('data-x'));
+    const y = parseInt(pieceEl.getAttribute('data-y'));
+
+    draggedPiece = board[y][x];
+    draggedFromX = x;
+    draggedFromY = y;
+    draggedElement = pieceEl;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+
+    // Create drag clone
+    dragClone = pieceEl.cloneNode(true);
+    dragClone.className = 'piece dragging';
+    dragClone.style.position = 'fixed';
+    dragClone.style.zIndex = '1000';
+    dragClone.style.opacity = '0.8';
+    dragClone.style.pointerEvents = 'none';
+    dragClone.style.width = '80px';
+    dragClone.style.height = '80px';
+    dragClone.style.left = (e.clientX - 40) + 'px';
+    dragClone.style.top = (e.clientY - 40) + 'px';
+    dragClone.style.transform = 'none';
+    dragClone.style.margin = '0';
+    dragClone.style.padding = '0';
+    document.body.appendChild(dragClone);
+
+    // Hide original piece
+    pieceEl.style.opacity = '0.3';
+
+    // Highlight possible moves for dragged piece (but don't show highlights during dragging)
+    selectedCell = {x, y};
+    possibleMoves = getValidMoves(draggedPiece, x, y);
+
+    // Don't update highlights during dragging - keep the board clean
+});
+
+document.addEventListener('mousemove', function(e) {
+    if (!draggedPiece || isViewingHistory) return;
+
+    // Start dragging only if mouse moved far enough from start position
+    if (!isDragging) {
+        const deltaX = Math.abs(e.clientX - dragStartX);
+        const deltaY = Math.abs(e.clientY - dragStartY);
+        const minDragDistance = 5; // pixels
+
+        if (deltaX > minDragDistance || deltaY > minDragDistance) {
+            isDragging = true;
+        } else {
+            return; // Not dragging yet, just hovering
+        }
+    }
+
+    // Move the drag clone with the cursor
+    if (isDragging && dragClone) {
+        dragClone.style.left = (e.clientX - 40) + 'px';
+        dragClone.style.top = (e.clientY - 40) + 'px';
+    }
+
+    // During dragging, we don't highlight cells - only show highlights when clicking on pieces
+});
+
+document.addEventListener('mouseup', function(e) {
+    if (!draggedPiece || isViewingHistory) return;
+
+    const wasDragging = isDragging;
+    isDragging = false;
+
+    // Clean up drag clone and restore original piece
+    if (dragClone) {
+        document.body.removeChild(dragClone);
+        dragClone = null;
+    }
+    if (draggedElement) {
+        draggedElement.style.opacity = '';
+    }
+
+    // Only process drop if we were actually dragging
+    if (wasDragging) {
+        // Find cell under cursor
+        const cell = document.elementFromPoint(e.clientX, e.clientY)?.closest('.cell');
+
+        let moveExecuted = false;
+        if (cell) {
+            const toX = parseInt(cell.getAttribute('data-cell-x'));
+            const toY = parseInt(cell.getAttribute('data-cell-y'));
+
+            // Check if this is a valid move
+            const move = possibleMoves.find(m => m.x === toX && m.y === toY);
+            if (move) {
+                // Execute the move
+                makeMove(draggedFromX, draggedFromY, move);
+                moveExecuted = true;
+            }
+        }
+
+        // Clear all highlights
+
+        // Reset drag state
+        draggedPiece = null;
+        draggedElement = null;
+        draggedFromX = -1;
+        draggedFromY = -1;
+        selectedCell = null;
+        possibleMoves = [];
+
+        // Only re-render if move wasn't executed (to avoid visual glitches)
+        if (!moveExecuted) {
+            updateDragHighlights();
+        }
+    } else {
+        // Just clicked, not dragged - reset state
+        draggedPiece = null;
+        draggedElement = null;
+        draggedFromX = -1;
+        draggedFromY = -1;
+    }
+});
 
 function updateInfo(piece) {
     const infoPanel = document.getElementById('piece-info');
@@ -1749,12 +2142,8 @@ function loadMod(input) {
 }
 
 function log(msg) {
-    const logEl = document.getElementById('game-log');
-    const entry = document.createElement('div');
-    entry.innerText = `> ${msg}`;
-    entry.style.padding = "2px 0";
-    entry.style.borderBottom = "1px solid rgba(255,255,255,0.05)";
-    logEl.prepend(entry); 
+    // Keep event logging for debugging only - move history is now displayed separately
+    console.log(`> ${msg}`);
 }
 // ================== AI ENGINE for "Шахматы с эволюцией" ==================
 // Интеграция с существующими переменными/функциями страницы:
@@ -2233,7 +2622,7 @@ function log(msg) {
             // пока ход не сменится (игрок сделает ход)
             if (aiBlockedAfterHistoryReturn && currentTurn === turnBeforeHistoryReturn) {
                 return;
-            }
+            }  
 
             if (currentTurn === aiSide && !thinking) {
                 aiPlayOneMove();
