@@ -148,6 +148,14 @@ mod/
 
 ---
 
+## 🧑‍🤝‍🧑 Contributing
+Pull requests are welcome!
+You can help by:
+- Creatingnew mods
+- Improving engine
+- Fixing bugs
+- Suggesting ideas
+
 ## authors
 - 👨‍💻 **Programmer**: [_shrechochek_](https://github.com/shrechochek)
 - 🎨 **Artist**: [_Serebr1k_](https://github.com/Serebr1k-code)
