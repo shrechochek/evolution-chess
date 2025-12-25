@@ -30,9 +30,9 @@
 ---
 
 ## Пример игры
-<img src="../../docs/game-example-photos/game-example-1.png" width="700">
+<img src="../../game-images/game-example-photos/game-example-1.png" width="700">
 
-📸 Больше скриншотов: [здесь](../game-example-photos)
+📸 Больше скриншотов: [здесь](../../game-images)
 
 ---
 
