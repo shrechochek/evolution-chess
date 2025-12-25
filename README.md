@@ -17,8 +17,9 @@ Chess where pieces evolve
 - 🪄 [How pieces evolve](#how-pieces-evolve)
 - 🗂 [How to create mods](#how-to-create-mods)
 - 🧑‍🤝‍🧑 [Contributing](#Contributing)
-- 🧑‍💻 [Authors](#authors)
 - 🧭 [Roadmap](#roadmap)
+- ⚠️ [Known Limitations](#known-limitations)
+- 🧑‍💻 [Authors](#authors)
 
 ---
 
@@ -170,8 +171,17 @@ You can help by:
 - [x] Mods support
 - [x] Adaptive engine
 - [x] Better UI for phones
+- [ ] Better control from phone
 - [ ] Better engine
 - [ ] Multiplayer website
+
+---
+
+<h2 id="known-limitations">⚠️ Known Limitations</h2>
+
+- The engine plays at a level of about 1000 elo
+- Visual bugs may appear
+- Control is not polished
 
 ---
 
