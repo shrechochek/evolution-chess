@@ -187,5 +187,5 @@ mod/
 
 <h2 id="authors">🧑‍💻 Автори </h2>
   
-- 🧑‍💻 **Програмісти**: [_shrechochek_](https://github.com/shrechochek) [_Serebr1k_](https://github.com/Serebr1k-code)
+- 🧑‍💻 **Програмісти**: [_shrechochek_](https://github.com/shrechochek), [_Serebr1k_](https://github.com/Serebr1k-code)
 - 🎨 **Виконавець**: [_Serebr1k_](https://github.com/Serebr1k-code)
