@@ -77,9 +77,9 @@ If you use custom images:
 ```json
 "PIECE_TYPES": {
   "pawn": { 
-    "name": "копейщик", 
+    "name": "spearman", 
     "symbol": "spearman", 
-    "desc": "пешка, которая бьет клетку перд собой",
+    "desc": "pawn that captures the pawn in front of it",
     "role": "pawn", 
     "tier": 1, 
     "xpReq": 1,
