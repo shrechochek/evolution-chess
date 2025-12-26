@@ -1590,6 +1590,7 @@ function makeMove(fromX, fromY, move) {
     const toY = move.y;
     const piece = board[fromY][fromX];
     let target = board[toY][toX];
+    let pawnPromoted = false; // Флаг для отслеживания превращения пешки
 
     if (move.isSwap) {
         board[fromY][fromX] = target;
@@ -1713,9 +1714,22 @@ function makeMove(fromX, fromY, move) {
         updateGameStatus(); // Проверяем состояние перед превращением
         if (!gameOver) {
             renderBoard();
-            showPromotionModal(piece);
+            // Для ИИ - автоматическое превращение в ферзя
+            if (piece.color !== aiSide) {
+                showPromotionModal(piece);
+                return;
+            } else {
+                // Автоматическая эволюция для ИИ - превращаем в ферзя
+                piece.type = 'queen';
+                piece.xp = 0;
+                pawnPromoted = true; // Устанавливаем флаг
+                log(`🤖 AI pawn promoted to ${getPieceDisplayName('queen')}`);
+                // Важно: завершаем ход после превращения
+                endTurn();
+                return;
+            }
         }
-        return; 
+        return;
     }
 
     // Взрывы атакующего (Ядерный король, Бомбер и т.д.)
@@ -1741,7 +1755,7 @@ function makeMove(fromX, fromY, move) {
         return;
     }
 
-    if (canEvolve(piece) && explosion === false) {
+    if (canEvolve(piece) && explosion === false && !pawnPromoted) {
         renderBoard();
         if (piece.color === aiSide) {
             // Автоматическая эволюция для ИИ - выбираем первую доступную опцию
