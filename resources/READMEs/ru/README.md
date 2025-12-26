@@ -5,7 +5,7 @@
 
 > [!IMPORTANT]
 >  🌍 **Языки**  
->  [🇺🇸(анг)](../../../README.md)  |  [🇷🇺(рус)](README.md)
+>  [🇺🇸(анг)](../../../README.md)  |  [🇷🇺(рус)](README.md)  |  [🇺🇦(ukr)](resources/READMEs/ru/README.md)
 
 ---
 
