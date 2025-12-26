@@ -1577,6 +1577,12 @@ function cellClick(x, y) {
         possibleMoves = getValidMoves(clickedPiece, x, y);
         renderBoard();
         updateInfo(clickedPiece);
+    } else if (clickedPiece && clickedPiece.color !== currentTurn) {
+        // Показываем информацию о фигуре противника
+        selectedCell = null;
+        possibleMoves = [];
+        renderBoard();
+        updateInfo(clickedPiece);
     } else {
         selectedCell = null;
         possibleMoves = [];
