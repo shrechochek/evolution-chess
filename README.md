@@ -27,7 +27,7 @@ Chess where pieces evolve
 You can play Evolution Chess in two ways:
 
 1. 🌐 [**Play online**](https://shrechochek.github.io/evolution-chess/)
-2. 💻 Download respository and run on your own PC
+2. 💻 Download repository and run on your own PC
 
 > [!NOTE]
 > ### You can play against your friends or AI
@@ -102,7 +102,7 @@ If you use custom images:
   - `revenge` - destroy the figure that ate it
   - `teleport` - teleport to every square without piece on it
   - `explode_n` - destroy everything within radius n, when this piece captured or capture
-  - `detonate_n` - destroy everything within radius n, when this piece capture or captured, expect pawns and kings
+  - `detonate_n` - destroy everything within radius n, when this piece capture or captured, except pawns and kings
   - `explode_all_n` - destroy everything within radius n, when this piece captured or capture
   - `range_capture` - capture without moving
   - `swap_ally` - swap places with same color piece
@@ -110,10 +110,10 @@ If you use custom images:
 - **`immortal`** - cannot be captured
 
 > [!WARNING]
-> You should rewrite all standart pieces logic
+> You should rewrite all standard pieces logic
 
 > [!TIP]
-> Standart pieces logic is already described in test mode you can use it
+> Standard pieces logic is already described in test mode you can use it
 
 ### 5. Write down evolution tree
 ```json
@@ -157,7 +157,7 @@ mod/
 
 Pull requests are welcome!
 You can help by:
-- Creatingnew mods
+- Creating new mods
 - Improving engine
 - Fixing bugs
 - Suggesting ideas
@@ -166,7 +166,7 @@ You can help by:
 
 <h2 id="roadmap">🧭 Roadmap</h2>
 
-- [x] Playable alfa
+- [x] Playable alpha
 - [x] 2 layers of evolution
 - [x] Mods support
 - [x] Adaptive engine
