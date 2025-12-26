@@ -30,7 +30,7 @@ You can play Evolution Chess in two ways:
 2. 💻 Download repository and run on your own PC
 
 > [!NOTE]
-> ### You can play against your friends or AI
+> You can play against your friends or AI
 
 ---
 
