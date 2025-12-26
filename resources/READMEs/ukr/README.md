@@ -35,7 +35,7 @@
 ---
 
 <h2 id="game-example">🏙 Приклад гри</h2>
-<img src="resources/game-images/game-example-1.png" width="700">
+<img src="../../game-images/game-example-1.png" width="700">
 
 📸 Більше скріншотів:: [here](resources/game-images)
 
