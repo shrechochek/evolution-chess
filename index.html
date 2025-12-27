@@ -63,7 +63,9 @@
         .cell.light { background-color: var(--board-light); }
         .cell.dark { background-color: var(--board-dark); }
         .cell.selected { background-color: var(--highlight) !important; }
-        
+        .cell.user-marked-light { background-color: rgba(245, 103, 84, 0.8) !important; }
+        .cell.user-marked-dark { background-color: rgba(216, 90, 73, 0.8) !important; }
+
         .cell.possible-move::after {
             content: '';
             width: 20px;
@@ -1017,6 +1019,7 @@ let board = [];
 let currentTurn = 'white';
 let selectedCell = null;
 let possibleMoves = [];
+let markedSquares = new Set(); // Track user-marked squares
 let gameOver = false;
 let enPassantTarget = null;
 let white_kings = 0;
@@ -1314,6 +1317,7 @@ function initGame() {
     selectedCell = null;
     gameOver = false;
     possibleMoves = [];
+    markedSquares.clear(); // Clear all square markings
     enPassantTarget = null;
     aiSide = null; // Сбрасываем сторону ИИ при новой игре
 
@@ -1563,6 +1567,9 @@ function isValidPos(x, y) {
 
 function cellClick(x, y) {
     if (gameOver || isViewingHistory) return;
+
+    // Clear all square markings when clicking any cell
+    markedSquares.clear();
 
     const clickedPiece = board[y][x];
     const move = possibleMoves.find(m => m.x === x && m.y === y);
@@ -1953,6 +1960,16 @@ function renderBoard() {
             const cell = document.createElement('div');
             cell.className = `cell ${(x + y) % 2 === 0 ? 'light' : 'dark'}`;
             cell.onclick = () => cellClick(x, y);
+            cell.oncontextmenu = (e) => {
+                e.preventDefault(); // Prevent default context menu
+                const squareKey = `${x},${y}`;
+                if (markedSquares.has(squareKey)) {
+                    markedSquares.delete(squareKey);
+                } else {
+                    markedSquares.add(squareKey);
+                }
+                renderBoard(); // Re-render to show/hide marking
+            };
 
             // Store coordinates for drag and drop
             cell.setAttribute('data-cell-x', x);
@@ -1970,6 +1987,15 @@ function renderBoard() {
             }
             if (selectedCell && selectedCell.x === x && selectedCell.y === y) {
                 cell.classList.add('selected');
+            }
+            if (markedSquares.has(`${x},${y}`)) {
+                // cell.classList.add('user-marked');
+                if((x+y)%2 == 0) {
+                    cell.classList.add('user-marked-light');
+                }
+                else {
+                    cell.classList.add('user-marked-dark');
+                }
             }
 
             const piece = board[y][x];
@@ -2062,7 +2088,7 @@ function getCurrentCellSize() {
 
 // Mouse event handlers
 document.addEventListener('mousedown', function(e) {
-    if (isViewingHistory) return;
+    if (isViewingHistory || e.button !== 0) return; // Only left mouse button for dragging
 
     const pieceEl = e.target.closest('.piece.draggable');
     if (!pieceEl) return;
@@ -2111,6 +2137,9 @@ document.addEventListener('mousedown', function(e) {
 document.addEventListener('mousemove', function(e) {
     if (!draggedPiece || isViewingHistory) return;
 
+    // Only process drag movement if left mouse button is pressed or we're already dragging
+    if (!isDragging && e.buttons !== 1) return; // 1 = left mouse button
+
     // Start dragging only if mouse moved far enough from start position
     if (!isDragging) {
         const deltaX = Math.abs(e.clientX - dragStartX);
@@ -2136,7 +2165,7 @@ document.addEventListener('mousemove', function(e) {
 });
 
 document.addEventListener('mouseup', function(e) {
-    if (!draggedPiece || isViewingHistory) return;
+    if (!draggedPiece || isViewingHistory || e.button !== 0) return; // Only left mouse button for dropping
 
     const wasDragging = isDragging;
     isDragging = false;
