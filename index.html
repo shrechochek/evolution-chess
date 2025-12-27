@@ -1963,13 +1963,6 @@ function renderBoard() {
             cell.onclick = () => cellClick(x, y);
             cell.oncontextmenu = (e) => {
                 e.preventDefault(); // Prevent default context menu
-                const squareKey = `${x},${y}`;
-                if (markedSquares.has(squareKey)) {
-                    markedSquares.delete(squareKey);
-                } else {
-                    markedSquares.add(squareKey);
-                }
-                renderBoard(); // Re-render to show/hide marking
             };
 
             // Store coordinates for drag and drop
@@ -2096,6 +2089,7 @@ let arrowStartY = -1;
 let isDrawingArrow = false;
 let arrowsSvg = null;
 let arrowElements = []; // Store arrow elements for clearing
+let arrowMovedToDifferentCell = false; // Track if mouse moved to a different cell
 
 // Get current cell size for responsive drag positioning
 function getCurrentCellSize() {
@@ -2255,28 +2249,58 @@ document.addEventListener('mousedown', function(e) {
             arrowStartX = x;
             arrowStartY = y;
             isDrawingArrow = true;
+            arrowMovedToDifferentCell = false; // Reset movement flag
+        }
+    }
+});
+
+// Track mouse movement during arrow drawing
+document.addEventListener('mousemove', function(e) {
+    if (isDrawingArrow && e.buttons === 2) { // Right mouse button is held
+        // Check if mouse moved to a different cell
+        const cell = document.elementFromPoint(e.clientX, e.clientY)?.closest('.cell');
+        if (cell) {
+            const currentX = parseInt(cell.getAttribute('data-cell-x'));
+            const currentY = parseInt(cell.getAttribute('data-cell-y'));
+
+            if (currentX !== arrowStartX || currentY !== arrowStartY) {
+                arrowMovedToDifferentCell = true;
+            }
         }
     }
 });
 
 document.addEventListener('mouseup', function(e) {
-    if (e.button === 2 && isDrawingArrow) { // Right mouse button
+    if (e.button === 2) { // Right mouse button
         e.preventDefault();
 
         const cell = e.target.closest('.cell');
-        if (cell) {
+        if (cell && isDrawingArrow) {
             const x = parseInt(cell.getAttribute('data-cell-x'));
             const y = parseInt(cell.getAttribute('data-cell-y'));
 
-            // Only draw arrows between different cells
-            if (arrowStartX !== x || arrowStartY !== y) {
-                drawArrow(arrowStartX, arrowStartY, x, y);
+            if (arrowMovedToDifferentCell) {
+                // Mouse moved to different cell - draw arrow
+                // Only draw arrows between different cells
+                if (arrowStartX !== x || arrowStartY !== y) {
+                    drawArrow(arrowStartX, arrowStartY, x, y);
+                }
+            } else {
+                // Mouse stayed in same cell - toggle square marking
+                const squareKey = `${x},${y}`;
+                if (markedSquares.has(squareKey)) {
+                    markedSquares.delete(squareKey);
+                } else {
+                    markedSquares.add(squareKey);
+                }
+                renderBoard(); // Re-render to show/hide marking
             }
         }
 
         isDrawingArrow = false;
         arrowStartX = -1;
         arrowStartY = -1;
+        arrowMovedToDifferentCell = false;
     }
 });
 
