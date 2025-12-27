@@ -1568,8 +1568,9 @@ function isValidPos(x, y) {
 function cellClick(x, y) {
     if (gameOver || isViewingHistory) return;
 
-    // Clear all square markings when clicking any cell
+    // Clear all square markings and arrows when clicking any cell
     markedSquares.clear();
+    clearArrows();
 
     const clickedPiece = board[y][x];
     const move = possibleMoves.find(m => m.x === x && m.y === y);
@@ -2062,6 +2063,19 @@ function renderBoard() {
         }
     }
 
+    // Add SVG overlay for arrows
+    const boardRect = boardEl.getBoundingClientRect();
+    arrowsSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    arrowsSvg.setAttribute('width', boardRect.width);
+    arrowsSvg.setAttribute('height', boardRect.height);
+    arrowsSvg.setAttribute('viewBox', `0 0 ${boardRect.width} ${boardRect.height}`);
+    arrowsSvg.style.position = 'fixed';
+    arrowsSvg.style.top = boardRect.top + 'px';
+    arrowsSvg.style.left = boardRect.left + 'px';
+    arrowsSvg.style.pointerEvents = 'none';
+    arrowsSvg.style.zIndex = '10';
+    document.body.appendChild(arrowsSvg);
+
     // Update highlights after rendering
     updateDragHighlights();
 }
@@ -2075,6 +2089,13 @@ let dragStartX = 0;
 let dragStartY = 0;
 let draggedElement = null;
 let dragClone = null;
+
+// Arrow drawing functionality
+let arrowStartX = -1;
+let arrowStartY = -1;
+let isDrawingArrow = false;
+let arrowsSvg = null;
+let arrowElements = []; // Store arrow elements for clearing
 
 // Get current cell size for responsive drag positioning
 function getCurrentCellSize() {
@@ -2218,6 +2239,44 @@ document.addEventListener('mouseup', function(e) {
         draggedElement = null;
         draggedFromX = -1;
         draggedFromY = -1;
+    }
+});
+
+// Arrow drawing with right mouse button
+document.addEventListener('mousedown', function(e) {
+    if (e.button === 2) { // Right mouse button
+        e.preventDefault();
+
+        const cell = e.target.closest('.cell');
+        if (cell) {
+            const x = parseInt(cell.getAttribute('data-cell-x'));
+            const y = parseInt(cell.getAttribute('data-cell-y'));
+
+            arrowStartX = x;
+            arrowStartY = y;
+            isDrawingArrow = true;
+        }
+    }
+});
+
+document.addEventListener('mouseup', function(e) {
+    if (e.button === 2 && isDrawingArrow) { // Right mouse button
+        e.preventDefault();
+
+        const cell = e.target.closest('.cell');
+        if (cell) {
+            const x = parseInt(cell.getAttribute('data-cell-x'));
+            const y = parseInt(cell.getAttribute('data-cell-y'));
+
+            // Only draw arrows between different cells
+            if (arrowStartX !== x || arrowStartY !== y) {
+                drawArrow(arrowStartX, arrowStartY, x, y);
+            }
+        }
+
+        isDrawingArrow = false;
+        arrowStartX = -1;
+        arrowStartY = -1;
     }
 });
 
@@ -2814,6 +2873,79 @@ if (savedLanguage && translations[savedLanguage]) {
     currentLanguage = savedLanguage;
 } else {
     currentLanguage = 'en'; // Default to English
+}
+
+// Arrow drawing functions
+function drawArrow(fromX, fromY, toX, toY) {
+    if (!arrowsSvg) return;
+
+    // Get the actual cell elements to calculate their center positions
+    const fromCell = document.querySelector(`.cell[data-cell-x="${fromX}"][data-cell-y="${fromY}"]`);
+    const toCell = document.querySelector(`.cell[data-cell-x="${toX}"][data-cell-y="${toY}"]`);
+
+    if (!fromCell || !toCell) return;
+
+    const boardEl = document.getElementById('board');
+    const boardRect = boardEl.getBoundingClientRect();
+    const fromRect = fromCell.getBoundingClientRect();
+    const toRect = toCell.getBoundingClientRect();
+
+    // Calculate center positions relative to SVG viewBox (subtract board position)
+    const startX = (fromRect.left + fromRect.width / 2) - boardRect.left;
+    const startY = (fromRect.top + fromRect.height / 2) - boardRect.top;
+    const endX = (toRect.left + toRect.width / 2) - boardRect.left;
+    const endY = (toRect.top + toRect.height / 2) - boardRect.top;
+
+    // Create arrow line
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', startX);
+    line.setAttribute('y1', startY);
+    line.setAttribute('x2', endX);
+    line.setAttribute('y2', endY);
+    line.setAttribute('stroke', '#ff4444');
+    line.setAttribute('stroke-width', '3');
+    line.setAttribute('marker-end', 'url(#arrowhead)');
+
+    // Create arrowhead marker
+    if (!document.getElementById('arrowhead')) {
+        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+        const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+        marker.setAttribute('id', 'arrowhead');
+        marker.setAttribute('markerWidth', '10');
+        marker.setAttribute('markerHeight', '7');
+        marker.setAttribute('refX', '9');
+        marker.setAttribute('refY', '3.5');
+        marker.setAttribute('orient', 'auto');
+
+        const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+        polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
+        polygon.setAttribute('fill', '#ff4444');
+
+        marker.appendChild(polygon);
+        defs.appendChild(marker);
+        arrowsSvg.appendChild(defs);
+    }
+
+    arrowsSvg.appendChild(line);
+    arrowElements.push(line);
+}
+
+function clearArrows() {
+    if (!arrowsSvg) return;
+
+    // Remove all arrow elements
+    arrowElements.forEach(element => {
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+        }
+    });
+    arrowElements = [];
+
+    // Also clear any existing defs
+    const defs = arrowsSvg.querySelector('defs');
+    if (defs) {
+        arrowsSvg.removeChild(defs);
+    }
 }
 
 // Update UI with current language
