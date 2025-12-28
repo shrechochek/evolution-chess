@@ -489,6 +489,34 @@
                 margin-bottom: 15px;
             }
         }
+
+        /* Coordinate labels */
+        .coordinate-label-dark {
+            position: absolute;
+            font-size: 12px;
+            font-weight: bold;
+            color: #808c8d;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .coordinate-label-light {
+            position: absolute;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ecf0f1;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .coordinate-letter {
+            bottom: 2px;
+            right: 2px;
+        }
+
+        .coordinate-number {
+            top: 2px;
+            left: 2px;
+        }
     </style>
 </head>
 <body>
@@ -2062,6 +2090,40 @@ function renderBoard() {
         }
     }
 
+    // Add coordinate labels
+    const letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+    // Add letters to bottom row (y=7)
+    for (let x = 0; x < 8; x++) {
+        const bottomCell = document.querySelector(`.cell[data-cell-x="${x}"][data-cell-y="7"]`);
+        if (bottomCell) {
+            const letterLabel = document.createElement('div');
+            if(x%2 === 0) {
+                letterLabel.className = 'coordinate-label-light coordinate-letter';
+            } else {
+                letterLabel.className = 'coordinate-label-dark coordinate-letter';
+            }
+            letterLabel.textContent = letters[x];
+            bottomCell.appendChild(letterLabel);
+        }
+    }
+
+    // Add numbers to left column (x=0), from 8 at top to 1 at bottom
+    for (let y = 0; y < 8; y++) {
+        const leftCell = document.querySelector(`.cell[data-cell-x="0"][data-cell-y="${y}"]`);
+        if (leftCell) {
+            const numberLabel = document.createElement('div');
+            // numberLabel.className = 'coordinate-label-dark coordinate-number';
+            if(y%2 !== 0) {
+                numberLabel.className = 'coordinate-label-light coordinate-number';
+            } else {
+                numberLabel.className = 'coordinate-label-dark coordinate-number';
+            }
+            numberLabel.textContent = (8 - y).toString(); // 8 at y=0, 7 at y=1, ..., 1 at y=7
+            leftCell.appendChild(numberLabel);
+        }
+    }
+
     // Add SVG overlay for arrows
     const boardRect = boardEl.getBoundingClientRect();
     arrowsSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -3019,6 +3081,36 @@ function testArrows() {
 
 // Uncomment the line below to test arrows on page load
 // testArrows();
+
+// Test function to verify coordinate labels are working
+function testCoordinateLabels() {
+    console.log('Testing coordinate labels...');
+
+    // Check if letter labels exist
+    for (let x = 0; x < 8; x++) {
+        const cell = document.querySelector(`.cell[data-cell-x="${x}"][data-cell-y="7"]`);
+        const label = cell ? cell.querySelector('.coordinate-letter') : null;
+        if (label) {
+            console.log(`Letter at x=${x}, y=7: ${label.textContent}`);
+        } else {
+            console.log(`Letter at x=${x}, y=7: NOT FOUND`);
+        }
+    }
+
+    // Check if number labels exist
+    for (let y = 0; y < 8; y++) {
+        const cell = document.querySelector(`.cell[data-cell-x="0"][data-cell-y="${y}"]`);
+        const label = cell ? cell.querySelector('.coordinate-number') : null;
+        if (label) {
+            console.log(`Number at x=0, y=${y}: ${label.textContent}`);
+        } else {
+            console.log(`Number at x=0, y=${y}: NOT FOUND`);
+        }
+    }
+}
+
+// Uncomment the line below to test coordinate labels on page load
+// setTimeout(testCoordinateLabels, 1000);
 
 initGame();
 </script>
