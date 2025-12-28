@@ -517,6 +517,12 @@
 
             <button class="reset-btn" onclick="initGame()">New Game</button>
 
+            <!-- Arrow Test Controls -->
+            <!-- <div style="margin: 10px 0; text-align: center;">
+                <button onclick="testArrows()" style="padding: 5px 10px; margin: 0 2px; font-size: 12px;">Test Arrows</button>
+                <button onclick="clearArrows()" style="padding: 5px 10px; margin: 0 2px; font-size: 12px;">Clear Arrows</button>
+            </div> -->
+
             <!-- Move Navigation Controls -->
             <div class="move-navigation" style="display: flex; gap: 5px; margin: 10px 0; justify-content: center;">
                 <button class="nav-btn" onclick="goToStart()" title="" disabled id="nav-start">⏮️</button>
@@ -2283,7 +2289,7 @@ document.addEventListener('mouseup', function(e) {
                 // Mouse moved to different cell - draw arrow
                 // Only draw arrows between different cells
                 if (arrowStartX !== x || arrowStartY !== y) {
-                    drawArrow(arrowStartX, arrowStartY, x, y);
+                    drawArrow(arrowStartX, arrowStartY, x, y, 15, 5);
                 }
             } else {
                 // Mouse stayed in same cell - toggle square marking
@@ -2900,7 +2906,7 @@ if (savedLanguage && translations[savedLanguage]) {
 }
 
 // Arrow drawing functions
-function drawArrow(fromX, fromY, toX, toY) {
+function drawArrow(fromX, fromY, toX, toY, lineWidth = 3, arrowHeadSize = 10) {
     if (!arrowsSvg) return;
 
     // Get the actual cell elements to calculate their center positions
@@ -2920,30 +2926,43 @@ function drawArrow(fromX, fromY, toX, toY) {
     const endX = (toRect.left + toRect.width / 2) - boardRect.left;
     const endY = (toRect.top + toRect.height / 2) - boardRect.top;
 
+    // Calculate the distance and direction vector
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Calculate the actual end point for the line (shorten it by arrowHeadSize)
+    const adjustedEndX = endX - (dx / distance) * arrowHeadSize;
+    const adjustedEndY = endY - (dy / distance) * arrowHeadSize;
+
     // Create arrow line
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     line.setAttribute('x1', startX);
     line.setAttribute('y1', startY);
-    line.setAttribute('x2', endX);
-    line.setAttribute('y2', endY);
-    line.setAttribute('stroke', '#ff4444');
-    line.setAttribute('stroke-width', '3');
-    line.setAttribute('marker-end', 'url(#arrowhead)');
+    line.setAttribute('x2', adjustedEndX);
+    line.setAttribute('y2', adjustedEndY);
+    line.setAttribute('stroke', '#ffaa00');
+    line.setAttribute('opacity', '0.8');
+    line.setAttribute('stroke-width', lineWidth);
+    line.setAttribute('marker-end', `url(#arrowhead-${arrowHeadSize})`);
 
     // Create arrowhead marker
-    if (!document.getElementById('arrowhead')) {
+    const markerId = `arrowhead-${arrowHeadSize}`;
+    if (!document.getElementById(markerId)) {
         const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
         const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
-        marker.setAttribute('id', 'arrowhead');
-        marker.setAttribute('markerWidth', '10');
-        marker.setAttribute('markerHeight', '7');
-        marker.setAttribute('refX', '9');
-        marker.setAttribute('refY', '3.5');
+        marker.setAttribute('id', markerId);
+        marker.setAttribute('markerWidth', arrowHeadSize);
+        marker.setAttribute('markerHeight', arrowHeadSize * 0.7);
+        // marker.setAttribute('refX', arrowHeadSize * 0.9);
+        marker.setAttribute('refX', arrowHeadSize * 0.7);
+        marker.setAttribute('refY', arrowHeadSize * 0.35);
         marker.setAttribute('orient', 'auto');
 
         const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
-        polygon.setAttribute('fill', '#ff4444');
+        polygon.setAttribute('points', `0 0, ${arrowHeadSize} ${arrowHeadSize * 0.35}, 0 ${arrowHeadSize * 0.7}`);
+        polygon.setAttribute('fill', '#ffaa00');
+        line.setAttribute('opacity', '0.8');
 
         marker.appendChild(polygon);
         defs.appendChild(marker);
@@ -2965,15 +2984,41 @@ function clearArrows() {
     });
     arrowElements = [];
 
-    // Also clear any existing defs
-    const defs = arrowsSvg.querySelector('defs');
-    if (defs) {
+    // Also clear any existing defs (including all arrowhead markers)
+    const allDefs = arrowsSvg.querySelectorAll('defs');
+    allDefs.forEach(defs => {
         arrowsSvg.removeChild(defs);
-    }
+    });
 }
 
 // Update UI with current language
 updateUILanguage();
+
+// Test function for arrows with different parameters
+function testArrows() {
+    clearArrows();
+
+    // Test different arrow configurations
+    // Arrow with thin line and small head
+    setTimeout(() => drawArrow(0, 0, 2, 2, 1, 5), 100);
+
+    // Arrow with medium line and medium head
+    setTimeout(() => drawArrow(1, 1, 4, 3, 3, 10), 200);
+
+    // Arrow with thick line and large head
+    setTimeout(() => drawArrow(2, 2, 5, 5, 5, 15), 300);
+
+    // Arrow with very thick line and small head
+    setTimeout(() => drawArrow(3, 3, 6, 6, 8, 8), 400);
+
+    // Arrow with thin line and large head
+    setTimeout(() => drawArrow(4, 4, 7, 7, 2, 20), 500);
+
+    console.log('Test arrows drawn with different line widths and head sizes');
+}
+
+// Uncomment the line below to test arrows on page load
+// testArrows();
 
 initGame();
 </script>
