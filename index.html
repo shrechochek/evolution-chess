@@ -1985,6 +1985,12 @@ function executeMoveLogic(fromX, fromY, move) {
         if (def.special && def.special.startsWith('explode_all')) {
             let radius_to_explode = parseInt(def.special[(def.special).length - 1], 10);
             explode_all(toX, toY, piece.color, (radius_to_explode-1) / 2);
+            // For nuclear kings (king_nuke), mark that both pieces should disappear
+            if (piece.type === 'king_nuke') {
+                explosion = true; // Mark that explosion occurred for movement logic
+            } else {
+                board[toY][toX] = null; // Clear the cell after nuclear explosion
+            }
         } else if (def.special && def.special.startsWith('explode')) {
             const radius = def.special === 'explode_5' ? 2 : 1;
             explode(toX, toY, piece.color, radius);
@@ -1993,22 +1999,43 @@ function executeMoveLogic(fromX, fromY, move) {
         }
     }
 
-    // Move the piece
-    if (def.special === 'teleport') {
-        board[fromY][fromX] = null;
-        board[toY][toX] = piece;
-    } else if (def.special === 'range_capture') {
-        if (!target) {
+    // Move the piece and handle special effects
+    if(target) {
+        if(def.special === 'range_capture') {
+            board[toY][toX] = null; // range_capture clears destination when capturing
+        } else if(explosion) {
+            // If explosion occurred during capture, check if attacker dies
+            if(piece.type === 'king_nuke') {
+                // Nuclear king disappears along with target
+                board[toY][toX] = null;
+                board[fromY][fromX] = null;
+            } else if(target && target.type === 'king_nuke') {
+                // Attacker disappears when capturing nuclear king
+                board[toY][toX] = null;
+                board[fromY][fromX] = null;
+            } else if(def.role !== 'king' && def.role !== 'pawn') {
+                board[toY][toX] = null; // Non-kings and non-pawns die from kamikaze explosion
+            } else {
+                board[toY][toX] = piece; // Kings and pawns occupy the space
+            }
+        } else {
             board[toY][toX] = piece;
-            board[fromY][fromX] = null;
         }
     } else {
-        board[toY][toX] = piece;
+        if (def.special === 'teleport') {
+            board[fromY][fromX] = null;
+            board[toY][toX] = piece;
+        } else if (def.special === 'range_capture') {
+            board[toY][toX] = piece;
+            board[fromY][fromX] = null;
+        } else {
+            board[toY][toX] = piece;
+        }
     }
 
-    if(def.special !== 'range_capture') {
+    if(def.special !== 'range_capture' && def.special !== 'teleport') {
         board[fromY][fromX] = null;
-    } else if(!target) {
+    } else if(def.special === 'range_capture' && !target) {
         board[fromY][fromX] = null;
     }
 
