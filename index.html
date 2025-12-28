@@ -517,6 +517,17 @@
             top: 2px;
             left: 2px;
         }
+
+        /* King in check highlighting */
+        .piece.king-in-check {
+            filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 0, 0, 0.6));
+            animation: king-check-pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes king-check-pulse {
+            0% { filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 0, 0, 0.6)); }
+            100% { filter: drop-shadow(0 0 12px rgba(255, 0, 0, 1.0)) drop-shadow(0 0 24px rgba(255, 0, 0, 0.8)); }
+        }
     </style>
 </head>
 <body>
@@ -1445,6 +1456,21 @@ function isSquareAttacked(tx, ty, attackerColor, checkBoard) {
     return false;
 }
 
+function isInCheck(color, checkBoard = board) {
+    // Найти короля указанного цвета
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            const piece = checkBoard[y][x];
+            if (piece && PIECE_TYPES[piece.type].role === 'king' && piece.color === color) {
+                // Проверить, атакуется ли позиция короля противником
+                const opponentColor = color === 'white' ? 'black' : 'white';
+                return isSquareAttacked(x, y, opponentColor, checkBoard);
+            }
+        }
+    }
+    return false; // Король не найден
+}
+
 function getValidMoves(piece, startX, startY, checkBoard = board, ignoreCastling = false) {
     const moves = [];
     const def = PIECE_TYPES[piece.type];
@@ -2040,6 +2066,14 @@ function renderBoard() {
                 pieceEl.className = `piece ${piece.color} tier-${def.tier}`;
                 if (def.immortal) pieceEl.classList.add('immortal');
 
+                // Highlight king if in check
+                if (def.role === 'king') {
+                    const opponentColor = piece.color === 'white' ? 'black' : 'white';
+                    if (isSquareAttacked(x, y, opponentColor, board)) {
+                        pieceEl.classList.add('king-in-check');
+                    }
+                }
+
                 // Add drag and drop functionality
                 if (!isViewingHistory && piece.color === currentTurn) {
                     pieceEl.classList.add('draggable');
@@ -2127,19 +2161,45 @@ function renderBoard() {
     // Add SVG overlay for arrows
     const boardRect = boardEl.getBoundingClientRect();
     arrowsSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    arrowsSvg.setAttribute('width', boardRect.width);
-    arrowsSvg.setAttribute('height', boardRect.height);
+    arrowsSvg.setAttribute('width', '100%');
+    arrowsSvg.setAttribute('height', '100%');
     arrowsSvg.setAttribute('viewBox', `0 0 ${boardRect.width} ${boardRect.height}`);
-    arrowsSvg.style.position = 'fixed';
-    arrowsSvg.style.top = boardRect.top + 'px';
-    arrowsSvg.style.left = boardRect.left + 'px';
+    arrowsSvg.style.position = 'absolute';
+    arrowsSvg.style.top = '0';
+    arrowsSvg.style.left = '0';
     arrowsSvg.style.pointerEvents = 'none';
     arrowsSvg.style.zIndex = '10';
-    document.body.appendChild(arrowsSvg);
+    arrowsSvg.style.width = '100%';
+    arrowsSvg.style.height = '100%';
+    boardEl.style.position = 'relative'; // Make board container relative for absolute positioning
+    boardEl.appendChild(arrowsSvg);
 
     // Update highlights after rendering
     updateDragHighlights();
 }
+
+// Update arrow overlay size and position when window changes
+function updateArrowOverlay() {
+    if (!arrowsSvg) return;
+
+    const boardEl = document.getElementById('board');
+    if (!boardEl) return;
+
+    const boardRect = boardEl.getBoundingClientRect();
+
+    // Update SVG viewBox to match current board size
+    arrowsSvg.setAttribute('viewBox', `0 0 ${boardRect.width} ${boardRect.height}`);
+
+    // Update all existing arrows to match new coordinates
+    arrowElements.forEach(arrow => {
+        // Arrows will automatically adjust since they use relative coordinates
+        // But we may need to update markers if arrow head sizes changed
+    });
+}
+
+// Handle window resize and scroll events to keep arrows positioned correctly
+window.addEventListener('resize', updateArrowOverlay);
+window.addEventListener('scroll', updateArrowOverlay);
 
 // Custom Drag and Drop functionality using mouse events
 let draggedPiece = null;
@@ -2982,7 +3042,7 @@ function drawArrow(fromX, fromY, toX, toY, lineWidth = 3, arrowHeadSize = 10) {
     const fromRect = fromCell.getBoundingClientRect();
     const toRect = toCell.getBoundingClientRect();
 
-    // Calculate center positions relative to SVG viewBox (subtract board position)
+    // Calculate center positions relative to board (since SVG now covers the entire board)
     const startX = (fromRect.left + fromRect.width / 2) - boardRect.left;
     const startY = (fromRect.top + fromRect.height / 2) - boardRect.top;
     const endX = (toRect.left + toRect.width / 2) - boardRect.left;
@@ -3111,6 +3171,38 @@ function testCoordinateLabels() {
 
 // Uncomment the line below to test coordinate labels on page load
 // setTimeout(testCoordinateLabels, 1000);
+
+// Test function to verify king check highlighting
+function testKingCheckHighlighting() {
+    console.log('Testing king check highlighting...');
+
+    // Check if any kings are highlighted as in check
+    const kingElements = document.querySelectorAll('.piece.king-in-check');
+    console.log(`Kings highlighted as in check: ${kingElements.length}`);
+
+    // Test check detection for current player
+    const currentColor = currentTurn;
+    const inCheck = isInCheck(currentColor);
+    console.log(`${currentColor} king in check: ${inCheck}`);
+
+    // Count kings by color
+    let whiteKings = 0, blackKings = 0;
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            const piece = board[y][x];
+            if (piece && PIECE_TYPES[piece.type].role === 'king') {
+                if (piece.color === 'white') whiteKings++;
+                else blackKings++;
+            }
+        }
+    }
+    console.log(`White kings: ${whiteKings}, Black kings: ${blackKings}`);
+
+    console.log('King check highlighting test completed');
+}
+
+// Uncomment the line below to test king check highlighting on page load
+// setTimeout(testKingCheckHighlighting, 2000);
 
 initGame();
 </script>
