@@ -531,7 +531,7 @@
 
         /* Piece movement animation */
         .piece.moving {
-            transition: transform 0.1s ease-out;
+            transition: transform 0.05s ease-out;
             z-index: 1000;
         }
 
@@ -1096,8 +1096,9 @@ let moveNotationHistory = []; // Array of {notation, historyIndex, isWhite}
 
 // History management functions
 function saveGameState() {
+    // Use more efficient cloning for better performance
     const state = {
-        board: JSON.parse(JSON.stringify(board)), // Deep clone
+        board: board.map(row => row.map(cell => cell ? {...cell} : null)), // Shallow clone of pieces
         currentTurn: currentTurn,
         selectedCell: selectedCell,
         possibleMoves: [...possibleMoves],
@@ -1647,6 +1648,15 @@ function cellClick(x, y) {
     const move = possibleMoves.find(m => m.x === x && m.y === y);
 
     if (move) {
+        // Check if there's already an animation in progress
+        const animatingPiece = document.querySelector('.piece.moving-to');
+        if (animatingPiece) {
+            // Queue the move to execute after current animation
+            setTimeout(() => {
+                animateMove(selectedCell.x, selectedCell.y, move);
+            }, 100);
+            return;
+        }
         animateMove(selectedCell.x, selectedCell.y, move);
         return;
     }
@@ -1654,18 +1664,27 @@ function cellClick(x, y) {
     if (clickedPiece && clickedPiece.color === currentTurn) {
         selectedCell = {x, y};
         possibleMoves = getValidMoves(clickedPiece, x, y);
-        renderBoard();
+        // Don't render board during animation to avoid breaking it
+        if (!document.querySelector('.piece.moving-to')) {
+            renderBoard();
+        }
         updateInfo(clickedPiece);
     } else if (clickedPiece && clickedPiece.color !== currentTurn) {
         // Показываем информацию о фигуре противника
         selectedCell = null;
         possibleMoves = [];
-        renderBoard();
+        // Don't render board during animation to avoid breaking it
+        if (!document.querySelector('.piece.moving-to')) {
+            renderBoard();
+        }
         updateInfo(clickedPiece);
     } else {
         selectedCell = null;
         possibleMoves = [];
-        renderBoard();
+        // Don't render board during animation to avoid breaking it
+        if (!document.querySelector('.piece.moving-to')) {
+            renderBoard();
+        }
         updateInfo(null);
     }
 }
@@ -2159,10 +2178,21 @@ function endTurn() {
     selectedCell = null;
     possibleMoves = [];
     currentTurn = currentTurn === 'white' ? 'black' : 'white';
-    renderBoard();
-    const turnText = document.getElementById('turn-display');
-    turnText.innerText = currentTurn === 'white' ? t('turn_white') : t('turn_black');
-    updateNavigationButtons();
+
+    // Use requestAnimationFrame for smoother rendering after animation
+    requestAnimationFrame(() => {
+        renderBoard();
+    });
+
+    // Update UI elements with a small delay to avoid blocking
+    setTimeout(() => {
+        const turnText = document.getElementById('turn-display');
+        turnText.innerText = currentTurn === 'white' ? t('turn_white') : t('turn_black');
+        // Only update navigation buttons when viewing history
+        if (isViewingHistory) {
+            updateNavigationButtons();
+        }
+    }, 10);
 
     // Снимаем блокировку ИИ после того, как игрок сделал ход и ход перешел к следующему игроку
     if (aiBlockedAfterHistoryReturn && currentTurn !== turnBeforeHistoryReturn) {
