@@ -531,7 +531,7 @@
 
         /* Piece movement animation */
         .piece.moving {
-            transition: transform 0.05s ease-out;
+            transition: transform 0.1s ease-out;
             z-index: 1000;
         }
 
@@ -1096,9 +1096,8 @@ let moveNotationHistory = []; // Array of {notation, historyIndex, isWhite}
 
 // History management functions
 function saveGameState() {
-    // Use more efficient cloning for better performance
     const state = {
-        board: board.map(row => row.map(cell => cell ? {...cell} : null)), // Shallow clone of pieces
+        board: JSON.parse(JSON.stringify(board)), // Deep clone
         currentTurn: currentTurn,
         selectedCell: selectedCell,
         possibleMoves: [...possibleMoves],
@@ -1648,15 +1647,6 @@ function cellClick(x, y) {
     const move = possibleMoves.find(m => m.x === x && m.y === y);
 
     if (move) {
-        // Check if there's already an animation in progress
-        const animatingPiece = document.querySelector('.piece.moving-to');
-        if (animatingPiece) {
-            // Queue the move to execute after current animation
-            setTimeout(() => {
-                animateMove(selectedCell.x, selectedCell.y, move);
-            }, 100);
-            return;
-        }
         animateMove(selectedCell.x, selectedCell.y, move);
         return;
     }
@@ -1664,27 +1654,18 @@ function cellClick(x, y) {
     if (clickedPiece && clickedPiece.color === currentTurn) {
         selectedCell = {x, y};
         possibleMoves = getValidMoves(clickedPiece, x, y);
-        // Don't render board during animation to avoid breaking it
-        if (!document.querySelector('.piece.moving-to')) {
-            renderBoard();
-        }
+        renderBoard();
         updateInfo(clickedPiece);
     } else if (clickedPiece && clickedPiece.color !== currentTurn) {
         // Показываем информацию о фигуре противника
         selectedCell = null;
         possibleMoves = [];
-        // Don't render board during animation to avoid breaking it
-        if (!document.querySelector('.piece.moving-to')) {
-            renderBoard();
-        }
+        renderBoard();
         updateInfo(clickedPiece);
     } else {
         selectedCell = null;
         possibleMoves = [];
-        // Don't render board during animation to avoid breaking it
-        if (!document.querySelector('.piece.moving-to')) {
-            renderBoard();
-        }
+        renderBoard();
         updateInfo(null);
     }
 }
@@ -2128,6 +2109,9 @@ function executeMoveLogic(fromX, fromY, move) {
     addMoveToNotationHistory(piece, fromX, fromY, move);
 }
 
+// Global flag to track if animation callback should execute
+let animationShouldComplete = true;
+
 // Wrapper function that animates piece movement before executing the move
 function animateMove(fromX, fromY, move) {
     const toX = move.x;
@@ -2147,6 +2131,9 @@ function animateMove(fromX, fromY, move) {
         return;
     }
 
+    // Reset animation completion flag
+    animationShouldComplete = true;
+
     // Determine what sound to play after animation
     const piece = board[fromY][fromX];
     const target = board[toY][toX];
@@ -2162,12 +2149,15 @@ function animateMove(fromX, fromY, move) {
 
     // Animate the piece movement
     animatePieceMove(fromX, fromY, toX, toY, () => {
-        // Play sound after animation completes
-        if (soundToPlay) {
-            soundToPlay.play().catch(e=>{});
+        // Only execute if animation should complete (no modal was shown)
+        if (animationShouldComplete) {
+            // Play sound after animation completes
+            if (soundToPlay) {
+                soundToPlay.play().catch(e=>{});
+            }
+            // After animation completes, execute the move logic
+            executeMoveLogic(fromX, fromY, move);
         }
-        // After animation completes, execute the move logic
-        executeMoveLogic(fromX, fromY, move);
     });
 }
 
@@ -2178,21 +2168,10 @@ function endTurn() {
     selectedCell = null;
     possibleMoves = [];
     currentTurn = currentTurn === 'white' ? 'black' : 'white';
-
-    // Use requestAnimationFrame for smoother rendering after animation
-    requestAnimationFrame(() => {
-        renderBoard();
-    });
-
-    // Update UI elements with a small delay to avoid blocking
-    setTimeout(() => {
-        const turnText = document.getElementById('turn-display');
-        turnText.innerText = currentTurn === 'white' ? t('turn_white') : t('turn_black');
-        // Only update navigation buttons when viewing history
-        if (isViewingHistory) {
-            updateNavigationButtons();
-        }
-    }, 10);
+    renderBoard();
+    const turnText = document.getElementById('turn-display');
+    turnText.innerText = currentTurn === 'white' ? t('turn_white') : t('turn_black');
+    updateNavigationButtons();
 
     // Снимаем блокировку ИИ после того, как игрок сделал ход и ход перешел к следующему игроку
     if (aiBlockedAfterHistoryReturn && currentTurn !== turnBeforeHistoryReturn) {
@@ -2311,6 +2290,9 @@ function canEvolve(piece) {
 }
 
 function showEvolutionModal(piece) {
+    // Animation should not continue when modal is shown
+    animationShouldComplete = false;
+
     const options = EVOLUTION_TREE[piece.type];
     showModal(t('evolution_title'), t('evolution_text'), options, (newType) => {
         piece.type = newType;
@@ -2323,6 +2305,9 @@ function showEvolutionModal(piece) {
 }
 
 function showPromotionModal(piece) {
+    // Animation should not continue when modal is shown
+    animationShouldComplete = false;
+
     const defaultOptions = ['queen', 'rook', 'bishop', 'knight'];
     const options = defaultOptions.filter(t => PIECE_TYPES[t] !== undefined);
 
