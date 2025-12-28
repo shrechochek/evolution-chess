@@ -528,17 +528,6 @@
             0% { filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 0, 0, 0.6)); }
             100% { filter: drop-shadow(0 0 12px rgba(255, 0, 0, 1.0)) drop-shadow(0 0 24px rgba(255, 0, 0, 0.8)); }
         }
-
-        /* Piece movement animation */
-        .piece.moving {
-            transition: transform 0.1s ease-out;
-            z-index: 1000;
-        }
-
-        .piece.moving-to {
-            position: absolute;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
@@ -1647,7 +1636,7 @@ function cellClick(x, y) {
     const move = possibleMoves.find(m => m.x === x && m.y === y);
 
     if (move) {
-        animateMove(selectedCell.x, selectedCell.y, move);
+        makeMove(selectedCell.x, selectedCell.y, move);
         return;
     }
 
@@ -1684,6 +1673,7 @@ function makeMove(fromX, fromY, move) {
         piece.hasMoved = true;
         
         log(`🔄 ${getPieceDisplayName(piece.type)} swapped with ${getPieceDisplayName(target.type)}`);
+        move_audio.play().catch(e=>{});
 
 
         const isAtEnd = (target.color === 'white' && fromY === 0) || (target.color === 'black' && fromY === 7);
@@ -1864,303 +1854,6 @@ function makeMove(fromX, fromY, move) {
     addMoveToNotationHistory(piece, fromX, fromY, move);
 }
 
-// Animate piece movement from one cell to another
-function animatePieceMove(fromX, fromY, toX, toY, callback) {
-    const fromCell = document.querySelector(`.cell[data-cell-x="${fromX}"][data-cell-y="${fromY}"]`);
-    const toCell = document.querySelector(`.cell[data-cell-x="${toX}"][data-cell-y="${toY}"]`);
-
-    if (!fromCell || !toCell) {
-        callback();
-        return;
-    }
-
-    const pieceEl = fromCell.querySelector('.piece');
-    if (!pieceEl) {
-        callback();
-        return;
-    }
-
-    const fromRect = fromCell.getBoundingClientRect();
-    const toRect = toCell.getBoundingClientRect();
-    const boardRect = document.getElementById('board').getBoundingClientRect();
-
-    // Calculate the movement delta
-    const deltaX = toRect.left - fromRect.left;
-    const deltaY = toRect.top - fromRect.top;
-
-    // Make the piece position absolute for animation
-    pieceEl.classList.add('moving', 'moving-to');
-
-    // Apply the transform to move the piece
-    pieceEl.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
-    // After animation completes, clean up and call callback
-    pieceEl.addEventListener('transitionend', function onTransitionEnd() {
-        pieceEl.removeEventListener('transitionend', onTransitionEnd);
-        pieceEl.classList.remove('moving', 'moving-to');
-        pieceEl.style.transform = '';
-        callback();
-    });
-
-    // Fallback for very fast animations (in case transitionend doesn't fire)
-    setTimeout(() => {
-        if (pieceEl.classList.contains('moving-to')) {
-            pieceEl.classList.remove('moving', 'moving-to');
-            pieceEl.style.transform = '';
-            callback();
-        }
-    }, 350);
-}
-
-// Execute move logic without rendering (for animation)
-function executeMoveLogic(fromX, fromY, move) {
-    const toX = move.x;
-    const toY = move.y;
-    const piece = board[fromY][fromX];
-    let target = board[toY][toX];
-    let pawnPromoted = false;
-
-    // Copy the logic from makeMove but without renderBoard calls
-    if (move.isSwap) {
-        board[fromY][fromX] = target;
-        board[toY][toX] = piece;
-
-        piece.hasMoved = true;
-
-        log(`🔄 ${getPieceDisplayName(piece.type)} swapped with ${getPieceDisplayName(target.type)}`);
-        move_audio.play().catch(e=>{});
-
-        const isAtEnd = (target.color === 'white' && fromY === 0) || (target.color === 'black' && fromY === 7);
-        if (PIECE_TYPES[target.type].role === 'pawn' && isAtEnd) {
-            updateGameStatus();
-            if (!gameOver) {
-                renderBoard();
-                showPromotionModal(target);
-            }
-            return;
-        }
-
-        endTurn();
-        return;
-    }
-
-    let captureHappened = false;
-    let enemyType = null;
-    let explosion = false;
-
-    if (move.isEnPassant) {
-        const dir = piece.color === 'white' ? 1 : -1;
-        const capturedPawnY = toY + dir;
-        target = board[capturedPawnY][toX];
-        board[capturedPawnY][toX] = null;
-        captureHappened = true;
-        log(t('en_passant'));
-    }
-
-    if (target) {
-        captureHappened = true;
-        enemyType = target.type;
-        piece.xp += 1;
-
-        if (['explode_3', 'detonate_3'].includes(PIECE_TYPES[target.type].special)) {
-            explode(toX, toY, board[toY][toX].color, 1);
-            explosion = true;
-        } else if (['explode_5', 'detonate_5'].includes(PIECE_TYPES[target.type].special)) {
-            explode(toX, toY, board[toY][toX].color, 2);
-            explosion = true;
-        } else if (['explode_all_5', 'explode_all_3', 'explode_all_7', 'explode_all_1', 'explode_all_9'].includes(PIECE_TYPES[target.type].special)) {
-            let radius_to_explode = parseInt(PIECE_TYPES[target.type].special[(PIECE_TYPES[target.type].special).length - 1], 10);
-            explode_all(toX, toY, board[toY][toX].color, (radius_to_explode-1) / 2);
-            explosion = true;
-        }
-    }
-
-    // Handle different move types and explosions
-    const def = PIECE_TYPES[piece.type];
-
-    // Nuclear explosions
-    if (captureHappened && enemyType) {
-        log(t('piece_capture', { piece: getPieceDisplayName(piece.type), target: getPieceDisplayName(enemyType) }));
-
-        if (def.special && def.special.startsWith('explode_all')) {
-            let radius_to_explode = parseInt(def.special[(def.special).length - 1], 10);
-            explode_all(toX, toY, piece.color, (radius_to_explode-1) / 2);
-            // For nuclear kings (king_nuke), mark that both pieces should disappear
-            if (piece.type === 'king_nuke') {
-                explosion = true; // Mark that explosion occurred for movement logic
-            } else {
-                board[toY][toX] = null; // Clear the cell after nuclear explosion
-            }
-        } else if (def.special && def.special.startsWith('explode')) {
-            const radius = def.special === 'explode_5' ? 2 : 1;
-            explode(toX, toY, piece.color, radius);
-            board[toY][toX] = null;
-            board[fromY][fromX] = null;
-        }
-    }
-
-    // Move the piece and handle special effects
-    if(target) {
-        if(def.special === 'range_capture') {
-            board[toY][toX] = null; // range_capture clears destination when capturing
-        } else if(explosion) {
-            // If explosion occurred during capture, check if attacker dies
-            if(piece.type === 'king_nuke') {
-                // Nuclear king disappears along with target
-                board[toY][toX] = null;
-                board[fromY][fromX] = null;
-            } else if(target && target.type === 'king_nuke') {
-                // Attacker disappears when capturing nuclear king
-                board[toY][toX] = null;
-                board[fromY][fromX] = null;
-            } else if(def.role !== 'king' && def.role !== 'pawn') {
-                board[toY][toX] = null; // Non-kings and non-pawns die from kamikaze explosion
-            } else {
-                board[toY][toX] = piece; // Kings and pawns occupy the space
-            }
-        } else {
-            board[toY][toX] = piece;
-        }
-    } else {
-        if (def.special === 'teleport') {
-            board[fromY][fromX] = null;
-            board[toY][toX] = piece;
-        } else if (def.special === 'range_capture') {
-            board[toY][toX] = piece;
-            board[fromY][fromX] = null;
-        } else {
-            board[toY][toX] = piece;
-        }
-    }
-
-    if(def.special !== 'range_capture' && def.special !== 'teleport') {
-        board[fromY][fromX] = null;
-    } else if(def.special === 'range_capture' && !target) {
-        board[fromY][fromX] = null;
-    }
-
-    piece.hasMoved = true;
-
-    // Castling
-    if (move.isCastling) {
-        const rook = board[toY][move.rookX];
-        board[toY][move.rookToX] = rook;
-        board[toY][move.rookX] = null;
-        rook.hasMoved = true;
-        log(t('castling'));
-    }
-
-    // En passant setup
-    if (move.isDoublePawnMove) {
-        const dir = piece.color === 'white' ? -1 : 1;
-        enPassantTarget = { x: toX, y: toY - dir };
-    } else {
-        enPassantTarget = null;
-    }
-
-    // Pawn promotion
-    const isAtEnd = (piece.color === 'white' && toY === 0) || (piece.color === 'black' && toY === 7);
-
-    if (def.role === 'pawn' && isAtEnd) {
-        updateGameStatus();
-        if (!gameOver) {
-            renderBoard();
-            if (piece.color !== aiSide) {
-                showPromotionModal(piece);
-                return;
-            } else {
-                piece.type = 'queen';
-                piece.xp = 0;
-                pawnPromoted = true;
-                log(`🤖 AI pawn promoted to ${getPieceDisplayName('queen')}`);
-                endTurn();
-                return;
-            }
-        }
-        return;
-    }
-
-    // Victory/defeat check
-    updateGameStatus();
-    if(gameOver) {
-        renderBoard();
-        return;
-    }
-
-    // Evolution
-    if (canEvolve(piece) && explosion === false && !pawnPromoted) {
-        renderBoard();
-        if (piece.color === aiSide) {
-            const options = EVOLUTION_TREE[piece.type];
-            if (options && options.length > 0) {
-                const newType = options[0];
-                piece.type = newType;
-                piece.xp = 0;
-                log(`🧬 AI evolution completed: ${getPieceDisplayName(newType)}`);
-                updateGameStatus();
-            }
-        } else {
-            showEvolutionModal(piece);
-            return;
-        }
-    }
-
-    endTurn();
-    addMoveToNotationHistory(piece, fromX, fromY, move);
-}
-
-// Global flag to track if animation callback should execute
-let animationShouldComplete = true;
-
-// Wrapper function that animates piece movement before executing the move
-function animateMove(fromX, fromY, move) {
-    const toX = move.x;
-    const toY = move.y;
-
-    // If it's the same cell (like evolution), skip animation
-    if (fromX === toX && fromY === toY) {
-        makeMove(fromX, fromY, move);
-        return;
-    }
-
-    // Check if this is a special move that shouldn't be animated
-    if (move.isSwap || move.isCastling || move.isEnPassant) {
-        // Play sound immediately for special moves
-        move_audio.play().catch(e=>{});
-        makeMove(fromX, fromY, move);
-        return;
-    }
-
-    // Reset animation completion flag
-    animationShouldComplete = true;
-
-    // Determine what sound to play after animation
-    const piece = board[fromY][fromX];
-    const target = board[toY][toX];
-    let soundToPlay = null;
-
-    if (target) {
-        // Capture sound
-        soundToPlay = capture_audio;
-    } else {
-        // Regular move sound
-        soundToPlay = move_audio;
-    }
-
-    // Animate the piece movement
-    animatePieceMove(fromX, fromY, toX, toY, () => {
-        // Only execute if animation should complete (no modal was shown)
-        if (animationShouldComplete) {
-            // Play sound after animation completes
-            if (soundToPlay) {
-                soundToPlay.play().catch(e=>{});
-            }
-            // After animation completes, execute the move logic
-            executeMoveLogic(fromX, fromY, move);
-        }
-    });
-}
-
 function endTurn() {
     // Save current game state to history before changing turn
     saveGameState();
@@ -2290,9 +1983,6 @@ function canEvolve(piece) {
 }
 
 function showEvolutionModal(piece) {
-    // Animation should not continue when modal is shown
-    animationShouldComplete = false;
-
     const options = EVOLUTION_TREE[piece.type];
     showModal(t('evolution_title'), t('evolution_text'), options, (newType) => {
         piece.type = newType;
@@ -2305,9 +1995,6 @@ function showEvolutionModal(piece) {
 }
 
 function showPromotionModal(piece) {
-    // Animation should not continue when modal is shown
-    animationShouldComplete = false;
-
     const defaultOptions = ['queen', 'rook', 'bishop', 'knight'];
     const options = defaultOptions.filter(t => PIECE_TYPES[t] !== undefined);
 
@@ -2649,7 +2336,7 @@ document.addEventListener('mouseup', function(e) {
             const move = possibleMoves.find(m => m.x === toX && m.y === toY);
             if (move) {
                 // Execute the move
-                animateMove(draggedFromX, draggedFromY, move);
+                makeMove(draggedFromX, draggedFromY, move);
                 moveExecuted = true;
             }
         }
@@ -2836,7 +2523,7 @@ function log(msg) {
 // - board (8x8 array of piece objects)
 // - PIECE_TYPES (definitions)
 // - getValidMoves(piece, x, y, checkBoard, ignoreCastling)
-// - animateMove(fromX, fromY, move)  <-- используется для применения хода в UI с анимацией
+// - makeMove(fromX, fromY, move)  <-- используется для применения хода в UI
 // - renderBoard(), updateInfo(), log(), initGame()
 // - глобальная enPassantTarget (движок временно перезаписывает её при симуляции)
 // =======================================================================
@@ -3235,7 +2922,7 @@ function log(msg) {
                     return;
                 }
                 // Выполнить ход на реальной доске через makeMove
-                animateMove(res.move.fromX, res.move.fromY, res.move.move);
+                makeMove(res.move.fromX, res.move.fromY, res.move.move);
             } catch (e) {
                 console.error("AI move failed", e);
             } finally {
