@@ -35,7 +35,7 @@ You can play Evolution Chess in two ways:
 ---
 
 <h2 id="game-example">🏙 Game Example</h2>
-<img src="resources/game-images/gameplay-gif-1.gif" width="700">
+<img src="resources/game-images/gameplay-gif-2.gif" width="700">
 
 📸 More screenshots: [here](resources/game-images)
 
