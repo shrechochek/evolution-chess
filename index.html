@@ -528,30 +528,6 @@
             0% { filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 0, 0, 0.6)); }
             100% { filter: drop-shadow(0 0 12px rgba(255, 0, 0, 1.0)) drop-shadow(0 0 24px rgba(255, 0, 0, 0.8)); }
         }
-
-        /* Mobile touch improvements */
-        .cell, .piece {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Improve touch targets for mobile */
-        @media (max-width: 768px) {
-            .cell {
-                min-width: 44px;
-                min-height: 44px;
-            }
-
-            .nav-btn, .reset-btn {
-                min-height: 44px;
-                min-width: 44px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -2243,12 +2219,6 @@ let arrowsSvg = null;
 let arrowElements = []; // Store arrow elements for clearing
 let arrowMovedToDifferentCell = false; // Track if mouse moved to a different cell
 
-// Long press variables for mobile arrow drawing
-let longPressTimer = null;
-let longPressDelay = 500; // ms
-let longPressTarget = null;
-let isLongPressActive = false;
-
 // Get current cell size for responsive drag positioning
 function getCurrentCellSize() {
     const cell = document.querySelector('.cell');
@@ -2259,20 +2229,7 @@ function getCurrentCellSize() {
     return 80; // fallback for desktop
 }
 
-// Helper functions for cross-platform event handling
-function getEventClientX(e) {
-    return e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
-}
-
-function getEventClientY(e) {
-    return e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-}
-
-function isTouchEvent(e) {
-    return e.type.startsWith('touch');
-}
-
-// Mouse and Touch event handlers
+// Mouse event handlers
 document.addEventListener('mousedown', function(e) {
     if (isViewingHistory || e.button !== 0) return; // Only left mouse button for dragging
 
@@ -2288,8 +2245,8 @@ document.addEventListener('mousedown', function(e) {
     draggedFromX = x;
     draggedFromY = y;
     draggedElement = pieceEl;
-    dragStartX = getEventClientX(e);
-    dragStartY = getEventClientY(e);
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
 
     // Create drag clone
     const cellSize = getCurrentCellSize();
@@ -2303,8 +2260,8 @@ document.addEventListener('mousedown', function(e) {
     dragClone.style.pointerEvents = 'none';
     dragClone.style.width = cellSize + 'px';
     dragClone.style.height = cellSize + 'px';
-    dragClone.style.left = (getEventClientX(e) - offset) + 'px';
-    dragClone.style.top = (getEventClientY(e) - offset) + 'px';
+    dragClone.style.left = (e.clientX - offset) + 'px';
+    dragClone.style.top = (e.clientY - offset) + 'px';
     dragClone.style.transform = 'none';
     dragClone.style.margin = '0';
     dragClone.style.padding = '0';
@@ -2324,14 +2281,12 @@ document.addEventListener('mousemove', function(e) {
     if (!draggedPiece || isViewingHistory) return;
 
     // Only process drag movement if left mouse button is pressed or we're already dragging
-    if (!isDragging && e.buttons !== 1 && !isTouchEvent(e)) return; // 1 = left mouse button
+    if (!isDragging && e.buttons !== 1) return; // 1 = left mouse button
 
     // Start dragging only if mouse moved far enough from start position
     if (!isDragging) {
-        const currentX = getEventClientX(e);
-        const currentY = getEventClientY(e);
-        const deltaX = Math.abs(currentX - dragStartX);
-        const deltaY = Math.abs(currentY - dragStartY);
+        const deltaX = Math.abs(e.clientX - dragStartX);
+        const deltaY = Math.abs(e.clientY - dragStartY);
         const minDragDistance = 5; // pixels
 
         if (deltaX > minDragDistance || deltaY > minDragDistance) {
@@ -2341,14 +2296,12 @@ document.addEventListener('mousemove', function(e) {
         }
     }
 
-    // Move the drag clone with the cursor/finger
+    // Move the drag clone with the cursor
     if (isDragging && dragClone) {
         const cellSize = getCurrentCellSize();
-        const offset = cellSize / 2; // Center the piece under cursor/finger
-        const currentX = getEventClientX(e);
-        const currentY = getEventClientY(e);
-        dragClone.style.left = (currentX - offset) + 'px';
-        dragClone.style.top = (currentY - offset) + 'px';
+        const offset = cellSize / 2; // Center the piece under cursor
+        dragClone.style.left = (e.clientX - offset) + 'px';
+        dragClone.style.top = (e.clientY - offset) + 'px';
     }
 
     // During dragging, we don't highlight cells - only show highlights when clicking on pieces
@@ -2371,10 +2324,8 @@ document.addEventListener('mouseup', function(e) {
 
     // Only process drop if we were actually dragging
     if (wasDragging) {
-        // Find cell under cursor/finger
-        const currentX = getEventClientX(e);
-        const currentY = getEventClientY(e);
-        const cell = document.elementFromPoint(currentX, currentY)?.closest('.cell');
+        // Find cell under cursor
+        const cell = document.elementFromPoint(e.clientX, e.clientY)?.closest('.cell');
 
         let moveExecuted = false;
         if (cell) {
@@ -2412,245 +2363,6 @@ document.addEventListener('mouseup', function(e) {
         draggedFromY = -1;
     }
 });
-
-// Touch event handlers for mobile devices
-document.addEventListener('touchstart', function(e) {
-    if (isViewingHistory) return;
-
-    const pieceEl = e.target.closest('.piece.draggable');
-    if (!pieceEl) return;
-
-    e.preventDefault();
-
-    const x = parseInt(pieceEl.getAttribute('data-x'));
-    const y = parseInt(pieceEl.getAttribute('data-y'));
-
-    draggedPiece = board[y][x];
-    draggedFromX = x;
-    draggedFromY = y;
-    draggedElement = pieceEl;
-    dragStartX = getEventClientX(e);
-    dragStartY = getEventClientY(e);
-
-    // Create drag clone
-    const cellSize = getCurrentCellSize();
-    const offset = cellSize / 2; // Center the piece under finger
-
-    dragClone = pieceEl.cloneNode(true);
-    dragClone.className = 'piece dragging';
-    dragClone.style.position = 'fixed';
-    dragClone.style.zIndex = '1000';
-    dragClone.style.opacity = '0.8';
-    dragClone.style.pointerEvents = 'none';
-    dragClone.style.width = cellSize + 'px';
-    dragClone.style.height = cellSize + 'px';
-    dragClone.style.left = (getEventClientX(e) - offset) + 'px';
-    dragClone.style.top = (getEventClientY(e) - offset) + 'px';
-    dragClone.style.transform = 'none';
-    dragClone.style.margin = '0';
-    dragClone.style.padding = '0';
-    document.body.appendChild(dragClone);
-
-    // Hide original piece
-    pieceEl.style.opacity = '0.3';
-
-    // Highlight possible moves for dragged piece
-    selectedCell = {x, y};
-    possibleMoves = getValidMoves(draggedPiece, x, y);
-});
-
-document.addEventListener('touchmove', function(e) {
-    if (!draggedPiece || isViewingHistory) return;
-
-    e.preventDefault();
-
-    // Start dragging only if finger moved far enough from start position
-    if (!isDragging) {
-        const currentX = getEventClientX(e);
-        const currentY = getEventClientY(e);
-        const deltaX = Math.abs(currentX - dragStartX);
-        const deltaY = Math.abs(currentY - dragStartY);
-        const minDragDistance = 10; // pixels (larger for touch)
-
-        if (deltaX > minDragDistance || deltaY > minDragDistance) {
-            isDragging = true;
-        } else {
-            return; // Not dragging yet, just touching
-        }
-    }
-
-    // Move the drag clone with the finger
-    if (isDragging && dragClone) {
-        const cellSize = getCurrentCellSize();
-        const offset = cellSize / 2; // Center the piece under finger
-        const currentX = getEventClientX(e);
-        const currentY = getEventClientY(e);
-        dragClone.style.left = (currentX - offset) + 'px';
-        dragClone.style.top = (currentY - offset) + 'px';
-    }
-});
-
-document.addEventListener('touchend', function(e) {
-    if (!draggedPiece || isViewingHistory) return;
-
-    const wasDragging = isDragging;
-    isDragging = false;
-
-    // Clean up drag clone and restore original piece
-    if (dragClone) {
-        document.body.removeChild(dragClone);
-        dragClone = null;
-    }
-    if (draggedElement) {
-        draggedElement.style.opacity = '';
-    }
-
-    let moveExecuted = false;
-
-    // Only process drop if we were actually dragging
-    if (wasDragging) {
-        // Find cell under finger
-        const currentX = getEventClientX(e);
-        const currentY = getEventClientY(e);
-        const cell = document.elementFromPoint(currentX, currentY)?.closest('.cell');
-
-        if (cell) {
-            const dropX = parseInt(cell.getAttribute('data-cell-x'));
-            const dropY = parseInt(cell.getAttribute('data-cell-y'));
-
-            // Check if this is a valid move
-            const move = possibleMoves.find(m => m.x === dropX && m.y === dropY);
-            if (move) {
-                // Execute the move
-                makeMove(draggedFromX, draggedFromY, move);
-                moveExecuted = true;
-            }
-        }
-
-        selectedCell = null;
-        possibleMoves = [];
-
-        // Only re-render if move wasn't executed (to avoid visual glitches)
-        if (!moveExecuted) {
-            updateDragHighlights();
-        }
-    } else {
-        // Just tapped, not dragged - reset state
-        draggedPiece = null;
-        draggedElement = null;
-        draggedFromX = -1;
-        draggedFromY = -1;
-    }
-});
-
-// Long press handlers for mobile arrow drawing
-document.addEventListener('touchstart', function(e) {
-    // Only start long press timer if touching a cell and not already dragging
-    const cell = e.target.closest('.cell');
-    if (cell && !draggedPiece && !isDrawingArrow) {
-        longPressTarget = cell;
-        longPressTimer = setTimeout(() => {
-            if (longPressTarget === cell) {
-                isLongPressActive = true;
-                e.preventDefault();
-
-                const x = parseInt(cell.getAttribute('data-cell-x'));
-                const y = parseInt(cell.getAttribute('data-cell-y'));
-
-                arrowStartX = x;
-                arrowStartY = y;
-                isDrawingArrow = true;
-                arrowMovedToDifferentCell = false;
-
-                // Visual feedback for long press
-                cell.style.backgroundColor = 'rgba(255, 255, 0, 0.3)';
-            }
-        }, longPressDelay);
-    }
-}, { passive: false });
-
-document.addEventListener('touchmove', function(e) {
-    // Cancel long press if finger moved too much
-    if (longPressTimer && !isLongPressActive) {
-        const currentX = getEventClientX(e);
-        const currentY = getEventClientY(e);
-        const deltaX = Math.abs(currentX - dragStartX);
-        const deltaY = Math.abs(currentY - dragStartY);
-
-        if (deltaX > 10 || deltaY > 10) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
-            longPressTarget = null;
-        }
-    }
-
-    // Handle arrow drawing during long press
-    if (isDrawingArrow && isLongPressActive) {
-        const cell = document.elementFromPoint(getEventClientX(e), getEventClientY(e))?.closest('.cell');
-        if (cell) {
-            const currentX = parseInt(cell.getAttribute('data-cell-x'));
-            const currentY = parseInt(cell.getAttribute('data-cell-y'));
-
-            if (currentX !== arrowStartX || currentY !== arrowStartY) {
-                arrowMovedToDifferentCell = true;
-            }
-        }
-    }
-});
-
-document.addEventListener('touchend', function(e) {
-    // Cancel long press timer
-    if (longPressTimer) {
-        clearTimeout(longPressTimer);
-        longPressTimer = null;
-    }
-
-    // Reset long press visual feedback
-    if (longPressTarget) {
-        longPressTarget.style.backgroundColor = '';
-        longPressTarget = null;
-    }
-
-    // Handle arrow completion on touch end
-    if (isDrawingArrow && isLongPressActive) {
-        isLongPressActive = false;
-
-        const currentX = getEventClientX(e);
-        const currentY = getEventClientY(e);
-        const cell = document.elementFromPoint(currentX, currentY)?.closest('.cell');
-
-        if (cell && arrowMovedToDifferentCell) {
-            const x = parseInt(cell.getAttribute('data-cell-x'));
-            const y = parseInt(cell.getAttribute('data-cell-y'));
-
-            // Only draw arrows between different cells
-            if (arrowStartX !== x || arrowStartY !== y) {
-                drawArrow(arrowStartX, arrowStartY, x, y);
-            }
-        }
-
-        isDrawingArrow = false;
-        arrowStartX = -1;
-        arrowStartY = -1;
-        arrowMovedToDifferentCell = false;
-    }
-});
-
-// Prevent default touch behaviors that might interfere
-document.addEventListener('touchstart', function(e) {
-    // Only prevent default if touching a draggable piece or cell
-    const target = e.target.closest('.piece.draggable, .cell');
-    if (target) {
-        e.preventDefault();
-    }
-}, { passive: false });
-
-document.addEventListener('touchmove', function(e) {
-    // Prevent scrolling when dragging pieces or drawing arrows
-    if (draggedPiece || isDrawingArrow) {
-        e.preventDefault();
-    }
-}, { passive: false });
 
 // Arrow drawing with right mouse button
 document.addEventListener('mousedown', function(e) {
