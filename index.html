@@ -4,531 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Шахматы с Эволюцией</title>
-    <style>
-        :root {
-            --bg-color: #2c3e50;
-            --board-dark: #7f8c8d;
-            --board-light: #ecf0f1;
-            --highlight: rgba(241, 196, 15, 0.6);
-            --capture: rgba(231, 76, 60, 0.6);
-            --special: rgba(52, 152, 219, 0.6);
-            --immortal: rgba(142, 68, 173, 0.8);
-            --white-piece: #fff;
-            --black-piece: #000;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h1 { margin-bottom: 5px; }
-        .subtitle { color: #bdc3c7; margin-bottom: 20px; font-size: 0.9em; }
-
-        .game-container {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        /* Chess Board */
-        #board {
-            display: grid;
-            grid-template-columns: repeat(8, 80px);
-            grid-template-rows: repeat(8, 80px);
-            border: 8px solid #34495e;
-            user-select: none;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
-            height: 100%;
-        }
-
-        .cell {
-            width: 80px;
-            height: 80px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .cell.light { background-color: var(--board-light); }
-        .cell.dark { background-color: var(--board-dark); }
-        .cell.selected { background-color: var(--highlight) !important; }
-        .cell.user-marked-light { background-color: rgba(245, 103, 84, 0.8) !important; }
-        .cell.user-marked-dark { background-color: rgba(216, 90, 73, 0.8) !important; }
-
-        .cell.possible-move::after {
-            content: '';
-            width: 20px;
-            height: 20px;
-            background: rgba(0,0,0,0.25);
-            border-radius: 50%;
-        }
-        .cell.capture { background-color: var(--capture) !important; }
-        .cell.special-move { background-color: var(--special) !important; }
-
-        /* Pieces */
-        .piece {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2;
-            cursor: grab;
-            transition: transform 0.2s;
-        }
-        
-        .piece img {
-            width: 90%;
-            height: 90%;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.4));
-        }
-
-        /* Бейджик уровня */
-        .lvl-badge {
-            position: absolute;
-            bottom: 4px;
-            right: 4px;
-            font-size: 12px;
-            background: rgba(0,0,0,0.85);
-            color: #f1c40f;
-            padding: 2px 6px;
-            border-radius: 6px;
-            pointer-events: none;
-            font-weight: bold;
-            z-index: 3;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 320px;
-            background: rgba(0,0,0,0.2);
-            padding: 20px;
-            border-radius: 8px;
-        }
-
-        .panel {
-            background: rgba(255,255,255,0.1);
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-        }
-
-        .turn-indicator {
-            font-size: 1.4em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .log {
-            height: 300px;
-            overflow-y: auto;
-            font-size: 0.9em;
-            font-family: monospace;
-            border-top: 1px solid rgba(255,255,255,0.2);
-            padding-top: 5px;
-            display: flex;
-            flex-direction: column-reverse;
-        }
-
-        /* Modal */
-        #modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-content {
-            background: #fff;
-            color: #333;
-            padding: 30px;
-            border-radius: 12px;
-            max-width: 700px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
-            border: 4px solid #f1c40f;
-        }
-
-        .modal-options {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .modal-card {
-            border: 2px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 150px;
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .modal-card:hover {
-            background: #fffdf0;
-            transform: translateY(-5px);
-            border-color: #f1c40f;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .modal-card img {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 10px;
-        }
-
-        .modal-name { font-weight: bold; display: block; margin-bottom: 5px; font-size: 1.1em;}
-        .modal-desc { font-size: 0.8em; color: #555; line-height: 1.2; }
-
-        button.reset-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        /* Settings icon */
-        .settings-icon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .settings-icon:hover {
-            background: rgba(255,255,255,0.2);
-        }
-
-        .settings-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
-        }
-
-        button.ai-btn-white {
-            background: #3ce79a;
-            color: white;
-            border: none;
-            padding: 12px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-
-        button.ai-btn-black {
-            background: #228659;
-            color: white;
-            border: none;
-            padding: 12px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        
-        /* Стили для загрузки модов */
-        .mod-upload-container {
-            margin-top: 10px;
-            text-align: left;
-        }
-        .mod-upload-container input[type="file"] {
-            display: none;
-        }
-        .mod-upload-label {
-            display: inline-block;
-            background: #3498db;
-            color: white;
-            padding: 10px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9em;
-            transition: background 0.2s;
-            border-bottom: 3px solid #2980b9;
-        }
-        .mod-upload-label:hover {
-            background: #2980b9;
-        }
-        .mod-upload-label:active {
-            transform: translateY(2px);
-            border-bottom: none;
-        }
-
-        /* Move Navigation Styles */
-        .nav-btn {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.2s;
-            min-width: 40px;
-        }
-
-        .nav-btn:hover:not(:disabled) {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-1px);
-        }
-
-        .nav-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .nav-btn:active:not(:disabled) {
-            transform: translateY(1px);
-        }
-
-        .move-counter {
-            color: #f1c40f;
-            font-weight: bold;
-        }
-
-        /* Drag and Drop Styles - removed drag-target highlighting */
-
-        .piece.draggable {
-            cursor: grab !important;
-            transition: none;
-        }
-
-        .piece.dragging {
-            opacity: 0.8;
-            z-index: 1000;
-            pointer-events: none;
-            position: fixed !important;
-            transition: none !important;
-            cursor: grabbing !important;
-            transform: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-
-        /* Move History Styles - Minimalist */
-        .move-history {
-            max-height: 250px;
-            overflow-y: auto;
-            font-size: 13px;
-            line-height: 1.4;
-        }
-
-        .move-row {
-            display: flex;
-            align-items: center;
-            padding: 2px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .move-number {
-            color: #888;
-            font-size: 12px;
-            min-width: 20px;
-            margin-right: 8px;
-            font-weight: bold;
-        }
-
-        .move-white, .move-black {
-            flex: 1;
-            padding: 3px 6px;
-            border-radius: 3px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-        }
-
-        .move-white:hover, .move-black:hover {
-            background-color: rgba(52, 152, 219, 0.15);
-        }
-
-        .move-white.current, .move-black.current {
-            background-color: rgba(52, 152, 219, 0.3);
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .move-empty {
-            cursor: default;
-            background-color: transparent;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 1024px) {
-            .game-container {
-                gap: 20px;
-            }
-
-            #board {
-                grid-template-columns: repeat(8, 70px);
-                grid-template-rows: repeat(8, 70px);
-            }
-
-            .cell {
-                width: 70px;
-                height: 70px;
-            }
-
-            .sidebar {
-                width: 280px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .game-container {
-                flex-direction: column;
-                gap: 20px;
-                align-items: center;
-            }
-
-            #board {
-                grid-template-columns: repeat(8, 60px);
-                grid-template-rows: repeat(8, 60px);
-                border-width: 6px;
-            }
-
-            .cell {
-                width: 60px;
-                height: 60px;
-            }
-
-            .sidebar {
-                width: 100%;
-                max-width: 400px;
-            }
-
-            .modal-content {
-                max-width: 90%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-
-            #board {
-                grid-template-columns: repeat(8, 45px);
-                grid-template-rows: repeat(8, 45px);
-                border-width: 4px;
-                box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-            }
-
-            .cell {
-                width: 45px;
-                height: 45px;
-            }
-
-            .game-container {
-                gap: 15px;
-            }
-
-            .sidebar {
-                padding: 15px;
-            }
-
-            .settings-icon {
-                top: 10px;
-                right: 10px;
-                width: 28px;
-                height: 28px;
-            }
-
-            .settings-icon svg {
-                width: 16px;
-                height: 16px;
-            }
-
-            h1 {
-                font-size: 1.5em;
-                margin-bottom: 2px;
-            }
-
-            .subtitle {
-                font-size: 0.85em;
-                margin-bottom: 15px;
-            }
-        }
-
-        /* Coordinate labels */
-        .coordinate-label-dark {
-            position: absolute;
-            font-size: 12px;
-            font-weight: bold;
-            color: #808c8d;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .coordinate-label-light {
-            position: absolute;
-            font-size: 12px;
-            font-weight: bold;
-            color: #ecf0f1;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .coordinate-letter {
-            bottom: 2px;
-            right: 2px;
-        }
-
-        .coordinate-number {
-            top: 2px;
-            left: 2px;
-        }
-
-        /* King in check highlighting */
-        .piece.king-in-check {
-            filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 0, 0, 0.6));
-            animation: king-check-pulse 1.5s ease-in-out infinite alternate;
-        }
-
-        @keyframes king-check-pulse {
-            0% { filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 16px rgba(255, 0, 0, 0.6)); }
-            100% { filter: drop-shadow(0 0 12px rgba(255, 0, 0, 1.0)) drop-shadow(0 0 24px rgba(255, 0, 0, 0.8)); }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -597,9 +73,75 @@
                         <option value="ru">Русский</option>
                     </select>
                 </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Game Tools:</label>
+                    <button onclick="openPositionEditor()" style="width: 100%; padding: 10px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 8px;">
+                        📝 <span id="position-editor-btn-text">Position Editor</span>
+                    </button>
+                    <small id="position-editor-desc" style="color: #888; font-size: 12px;">Create and edit custom chess positions</small>
+                </div>
+
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                     <button onclick="closeSettingsModal()" style="padding: 8px 16px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer;">Cancel</button>
                     <button onclick="saveSettings()" style="padding: 8px 16px; background: #f1c40f; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Position Editor Modal -->
+    <div id="position-editor-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 300; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+        <div class="modal-content" style="max-width: 1200px; width: 95%; max-height: 90vh; overflow-y: auto;">
+            <h2 style="margin-bottom: 20px;">Position Editor</h2>
+
+            <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                <!-- Piece Selection Panel -->
+                <div style="flex: 1; min-width: 250px;">
+                    <h3 style="margin-bottom: 15px; color: #f1c40f;" id="piece-selection-title">Piece Selection</h3>
+
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Color:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="select-white-pieces" style="flex: 1; padding: 8px; background: #f1c40f; color: #333; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">White</button>
+                            <button id="select-black-pieces" style="flex: 1; padding: 8px; background: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Black</button>
+                        </div>
+                    </div>
+
+                    <div id="piece-selection-panel" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 10px; background: rgba(255,255,255,0.05);">
+                        <!-- Pieces will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Board Preview -->
+                <div style="flex: 2;">
+                    <h3 style="margin-bottom: 15px; color: #f1c40f;" id="board-position-title">Board Position</h3>
+                    <div id="editor-board" style="display: grid; grid-template-columns: repeat(8, 40px); grid-template-rows: repeat(8, 40px); border: 4px solid #34495e; margin: 0 auto; width: fit-content; user-select: none; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                        <!-- Board cells will be populated by JavaScript -->
+                    </div>
+
+                    <div style="margin-top: 15px; text-align: center;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold;">Turn:</label>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button id="set-white-turn" style="padding: 8px 16px; background: #f1c40f; color: #333; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;" data-turn-text="white">White to move</button>
+                            <button id="set-black-turn" style="padding: 8px 16px; background: #34495e; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;" data-turn-text="black">Black to move</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 10px; justify-content: space-between; flex-wrap: wrap; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="clearEditorBoard()" style="padding: 10px 15px; background: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;" data-action="clear">🗑️ Clear Board</button>
+                    <button onclick="loadStandardPosition()" style="padding: 10px 15px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer;" data-action="standard">♟️ Standard Position</button>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="savePosition()" style="padding: 10px 15px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;" data-action="save">💾 Save Position</button>
+                    <button onclick="loadPosition()" style="padding: 10px 15px; background: #9b59b6; color: white; border: none; border-radius: 4px; cursor: pointer;" data-action="load">📂 Load Position</button>
+                    <button onclick="applyPosition()" style="padding: 10px 15px; background: #f39c12; color: #333; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;" data-action="apply">✓ Apply to Game</button>
+                    <button onclick="closePositionEditor()" style="padding: 10px 15px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer;" data-action="cancel">Cancel</button>
                 </div>
             </div>
         </div>
@@ -720,6 +262,21 @@ const translations = {
         language: "Language",
         english: "English",
         russian: "Русский",
+        position_editor: "Position Editor",
+        position_editor_desc: "Create and edit custom chess positions",
+        piece_selection: "Piece Selection",
+        board_position: "Board Position",
+        white_to_move: "White to move",
+        black_to_move: "Black to move",
+        clear_board: "Clear Board",
+        standard_position: "Standard Position",
+        save_position: "Save Position",
+        load_position: "Load Position",
+        apply_to_game: "Apply to Game",
+        position_saved: "Position saved successfully!",
+        position_loaded: "Position loaded successfully!",
+        no_saved_position: "No saved position found.",
+        position_applied: "Position applied to the game!",
         // Move navigation
         go_to_start: "Go to start",
         previous_move: "Previous move",
@@ -839,6 +396,21 @@ const translations = {
         language: "Язык",
         english: "English",
         russian: "Русский",
+        position_editor: "Редактор позиции",
+        position_editor_desc: "Создание и редактирование пользовательских шахматных позиций",
+        piece_selection: "Выбор фигур",
+        board_position: "Позиция на доске",
+        white_to_move: "Ход белых",
+        black_to_move: "Ход чёрных",
+        clear_board: "Очистить доску",
+        standard_position: "Стандартная позиция",
+        save_position: "Сохранить позицию",
+        load_position: "Загрузить позицию",
+        apply_to_game: "Применить к игре",
+        position_saved: "Позиция успешно сохранена!",
+        position_loaded: "Позиция успешно загружена!",
+        no_saved_position: "Сохранённая позиция не найдена.",
+        position_applied: "Позиция применена к игре!",
         // Move navigation
         go_to_start: "К началу",
         previous_move: "Предыдущий ход",
@@ -926,6 +498,365 @@ function saveSettings() {
     closeSettingsModal();
 }
 
+// Position Editor Functions
+function openPositionEditor() {
+    closeSettingsModal();
+    initializePositionEditor();
+    document.getElementById('position-editor-modal').style.display = 'flex';
+}
+
+function closePositionEditor() {
+    document.getElementById('position-editor-modal').style.display = 'none';
+}
+
+function initializePositionEditor() {
+    // Copy current board state to editor
+    editorBoard = JSON.parse(JSON.stringify(board));
+    editorTurn = currentTurn;
+
+    createEditorBoard();
+    createPieceSelectionPanel();
+    updateEditorTurnButtons();
+    updatePositionEditorTranslations();
+}
+
+function updatePositionEditorTranslations() {
+    // Update titles
+    const pieceSelectionTitle = document.getElementById('piece-selection-title');
+    const boardPositionTitle = document.getElementById('board-position-title');
+
+    if (pieceSelectionTitle) pieceSelectionTitle.textContent = t('piece_selection');
+    if (boardPositionTitle) boardPositionTitle.textContent = t('board_position');
+
+    // Update turn buttons
+    const whiteTurnBtn = document.getElementById('set-white-turn');
+    const blackTurnBtn = document.getElementById('set-black-turn');
+
+    if (whiteTurnBtn) whiteTurnBtn.textContent = t('white_to_move');
+    if (blackTurnBtn) blackTurnBtn.textContent = t('black_to_move');
+
+    // Update action buttons
+    const buttons = document.querySelectorAll('#position-editor-modal [data-action]');
+    buttons.forEach(btn => {
+        const action = btn.getAttribute('data-action');
+        switch (action) {
+            case 'clear':
+                btn.textContent = '🗑️ ' + t('clear_board');
+                break;
+            case 'standard':
+                btn.textContent = '♟️ ' + t('standard_position');
+                break;
+            case 'save':
+                btn.textContent = '💾 ' + t('save_position');
+                break;
+            case 'load':
+                btn.textContent = '📂 ' + t('load_position');
+                break;
+            case 'apply':
+                btn.textContent = '✓ ' + t('apply_to_game');
+                break;
+            case 'cancel':
+                btn.textContent = t('cancel', 'Cancel');
+                break;
+        }
+    });
+}
+
+function createEditorBoard() {
+    const editorBoardEl = document.getElementById('editor-board');
+    editorBoardEl.innerHTML = '';
+
+    for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+            const cell = document.createElement('div');
+            cell.className = `editor-cell ${(x + y) % 2 === 0 ? 'light' : 'dark'}`;
+            cell.setAttribute('data-x', x);
+            cell.setAttribute('data-y', y);
+            cell.onclick = () => handleEditorCellClick(x, y);
+
+            const piece = editorBoard[y][x];
+            if (piece) {
+                const pieceEl = document.createElement('div');
+                pieceEl.className = `editor-piece ${piece.color}`;
+                pieceEl.style.fontSize = '24px';
+                pieceEl.style.display = 'flex';
+                pieceEl.style.alignItems = 'center';
+                pieceEl.style.justifyContent = 'center';
+
+                const img = document.createElement('img');
+                // Get the correct symbol name from PIECE_TYPES
+                const pieceDef = PIECE_TYPES[piece.type];
+                const symbolName = pieceDef ? pieceDef.symbol || piece.type : piece.type;
+                const imgName = `${piece.color}_${symbolName}`;
+                if (CUSTOM_ASSETS[imgName]) {
+                    img.src = CUSTOM_ASSETS[imgName];
+                } else {
+                    img.src = `images/${imgName}.svg`;
+                }
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    pieceEl.textContent = getPieceSymbol(piece.type);
+                };
+
+                pieceEl.appendChild(img);
+                cell.appendChild(pieceEl);
+            }
+
+            editorBoardEl.appendChild(cell);
+        }
+    }
+}
+
+function createPieceSelectionPanel() {
+    const panel = document.getElementById('piece-selection-panel');
+    panel.innerHTML = '';
+
+    // Group pieces by tier
+    const piecesByTier = {};
+    const maxTier = 3;
+
+    // Initialize tiers
+    for (let tier = 1; tier <= maxTier; tier++) {
+        piecesByTier[tier] = [];
+    }
+
+    // Sort pieces into tiers
+    Object.keys(PIECE_TYPES).forEach(pieceType => {
+        const pieceDef = PIECE_TYPES[pieceType];
+        if (pieceDef.tier && pieceDef.tier >= 1 && pieceDef.tier <= maxTier) {
+            piecesByTier[pieceDef.tier].push(pieceType);
+        }
+    });
+
+    // Create tier sections
+    for (let tier = 1; tier <= maxTier; tier++) {
+        const tierPieces = piecesByTier[tier];
+        if (tierPieces.length === 0) continue;
+
+        // Add tier header
+        const tierHeader = document.createElement('div');
+        tierHeader.className = 'tier-header';
+        tierHeader.textContent = `Tier ${tier}`;
+        tierHeader.style.fontSize = '14px';
+        tierHeader.style.fontWeight = 'bold';
+        tierHeader.style.margin = '10px 0 5px 0';
+        tierHeader.style.color = '#f1c40f';
+        panel.appendChild(tierHeader);
+
+        // Add pieces for this tier
+        const tierContainer = document.createElement('div');
+        tierContainer.className = 'tier-pieces';
+        tierContainer.style.display = 'flex';
+        tierContainer.style.flexWrap = 'wrap';
+        tierContainer.style.gap = '2px';
+        tierContainer.style.marginBottom = '15px';
+
+        tierPieces.forEach(pieceType => {
+            const pieceButton = document.createElement('button');
+            pieceButton.className = 'piece-selection-btn';
+            pieceButton.setAttribute('data-piece-type', pieceType);
+            pieceButton.onclick = () => selectPiece(pieceType);
+
+            const img = document.createElement('img');
+            const imgName = `${selectedPieceColor}_${PIECE_TYPES[pieceType].symbol || pieceType}`;
+            if (CUSTOM_ASSETS[imgName]) {
+                img.src = CUSTOM_ASSETS[imgName];
+            } else {
+                img.src = `images/${imgName}.svg`;
+            }
+            img.style.width = '32px';
+            img.style.height = '32px';
+            img.onerror = function() {
+                this.style.display = 'none';
+                pieceButton.textContent = getPieceSymbol(pieceType);
+                pieceButton.style.fontSize = '20px';
+                pieceButton.style.padding = '8px';
+            };
+
+            pieceButton.appendChild(img);
+
+            // Add tooltip with piece name
+            const pieceDef = PIECE_TYPES[pieceType];
+            const pieceName = pieceDef.name || pieceType;
+            pieceButton.title = pieceName.charAt(0).toUpperCase() + pieceName.slice(1).replace(/_/g, ' ');
+
+            tierContainer.appendChild(pieceButton);
+        });
+
+        panel.appendChild(tierContainer);
+    }
+}
+
+function selectPiece(pieceType) {
+    selectedPieceType = pieceType;
+
+    // Update visual selection
+    document.querySelectorAll('.piece-selection-btn').forEach(btn => {
+        const isSelected = btn.getAttribute('data-piece-type') === pieceType;
+        btn.classList.toggle('selected', isSelected);
+    });
+}
+
+function handleEditorCellClick(x, y) {
+    if (selectedPieceType) {
+        // Place selected piece
+        editorBoard[y][x] = {
+            type: selectedPieceType,
+            color: selectedPieceColor,
+            xp: 0,
+            hasMoved: false,
+            id: Math.random().toString(36).substr(2, 9)
+        };
+    } else {
+        // Remove piece
+        editorBoard[y][x] = null;
+    }
+
+    createEditorBoard();
+}
+
+function getPieceSymbol(pieceType) {
+    // First try to get from PIECE_TYPES symbol mapping
+    if (PIECE_TYPES[pieceType] && PIECE_TYPES[pieceType].symbol) {
+        const symbolKey = PIECE_TYPES[pieceType].symbol;
+        if (SYMBOLS[symbolKey]) {
+            return SYMBOLS[symbolKey];
+        }
+    }
+
+    // Fallback to hardcoded symbols for basic pieces
+    const symbols = {
+        pawn: '♟', knight: '♞', bishop: '♗', rook: '♜', queen: '♛', king: '♚'
+    };
+    return symbols[pieceType] || '?';
+}
+
+// Color selection
+document.getElementById('select-white-pieces').onclick = () => {
+    selectedPieceColor = 'white';
+    document.getElementById('select-white-pieces').style.background = '#f1c40f';
+    document.getElementById('select-black-pieces').style.background = '#34495e';
+    createPieceSelectionPanel();
+};
+
+document.getElementById('select-black-pieces').onclick = () => {
+    selectedPieceColor = 'black';
+    document.getElementById('select-black-pieces').style.background = '#f1c40f';
+    document.getElementById('select-white-pieces').style.background = '#34495e';
+    createPieceSelectionPanel();
+};
+
+// Turn selection
+document.getElementById('set-white-turn').onclick = () => {
+    editorTurn = 'white';
+    updateEditorTurnButtons();
+};
+
+document.getElementById('set-black-turn').onclick = () => {
+    editorTurn = 'black';
+    updateEditorTurnButtons();
+};
+
+function updateEditorTurnButtons() {
+    const whiteBtn = document.getElementById('set-white-turn');
+    const blackBtn = document.getElementById('set-black-turn');
+
+    if (editorTurn === 'white') {
+        whiteBtn.style.background = '#f1c40f';
+        whiteBtn.style.color = '#333';
+        blackBtn.style.background = '#34495e';
+        blackBtn.style.color = 'white';
+    } else {
+        blackBtn.style.background = '#f1c40f';
+        blackBtn.style.color = '#333';
+        whiteBtn.style.background = '#34495e';
+        whiteBtn.style.color = 'white';
+    }
+}
+
+// Board operations
+function clearEditorBoard() {
+    editorBoard = Array(8).fill(null).map(() => Array(8).fill(null));
+    createEditorBoard();
+}
+
+function loadStandardPosition() {
+    // Create standard chess starting position
+    editorBoard = Array(8).fill(null).map(() => Array(8).fill(null));
+
+    // Place pawns
+    for (let x = 0; x < 8; x++) {
+        editorBoard[1][x] = createPiece('pawn', 'black');
+        editorBoard[6][x] = createPiece('pawn', 'white');
+    }
+
+    // Place other pieces
+    const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
+    backRow.forEach((type, x) => {
+        if (PIECE_TYPES[type]) {
+            editorBoard[0][x] = createPiece(type, 'black');
+            editorBoard[7][x] = createPiece(type, 'white');
+        }
+    });
+
+    editorTurn = 'white';
+    updateEditorTurnButtons();
+    createEditorBoard();
+}
+
+function savePosition() {
+    const positionData = {
+        board: editorBoard,
+        turn: editorTurn
+    };
+
+    localStorage.setItem('chessPositionEditor', JSON.stringify(positionData));
+    alert(t('position_saved'));
+}
+
+function loadPosition() {
+    const saved = localStorage.getItem('chessPositionEditor');
+    if (saved) {
+        const positionData = JSON.parse(saved);
+        editorBoard = positionData.board;
+        editorTurn = positionData.turn;
+        updateEditorTurnButtons();
+        createEditorBoard();
+        alert(t('position_loaded'));
+    } else {
+        alert(t('no_saved_position'));
+    }
+}
+
+function applyPosition() {
+    // Apply the edited position to the main game
+    board = JSON.parse(JSON.stringify(editorBoard));
+    currentTurn = editorTurn;
+
+    // Reset game state
+    possibleMoves = [];
+    selectedCell = null;
+    gameOver = false;
+    moveHistory = [];
+    historyIndex = -1;
+    enPassantTarget = null;
+    castlingRights = {
+        white: { kingSide: true, queenSide: true },
+        black: { kingSide: true, queenSide: true }
+    };
+
+    // Clear arrows and update UI
+    clearArrows();
+    renderBoard();
+    updateMoveHistory();
+    updateTurnIndicator();
+
+    closePositionEditor();
+    alert(t('position_applied'));
+}
+
 function updateSettingsModal() {
     // Update settings modal content if needed
     const modal = document.getElementById('settings-modal-overlay');
@@ -940,8 +871,20 @@ function updateSettingsModal() {
         modal.querySelectorAll('option')[1].textContent = t('russian');
         modal.querySelectorAll('button')[0].textContent = 'Cancel'; // Keep English for now
         modal.querySelectorAll('button')[1].textContent = 'Save'; // Keep English for now
+
+        // Update position editor translations
+        const positionEditorBtn = document.getElementById('position-editor-btn-text');
+        const positionEditorDesc = document.getElementById('position-editor-desc');
+        if (positionEditorBtn) positionEditorBtn.textContent = t('position_editor');
+        if (positionEditorDesc) positionEditorDesc.textContent = t('position_editor_desc');
     }
 }
+
+// Position Editor variables
+let selectedPieceType = null;
+let selectedPieceColor = 'white';
+let editorBoard = Array(8).fill(null).map(() => Array(8).fill(null));
+let editorTurn = 'white';
 
 const BOARD_SIZE = 8;
 
@@ -1005,9 +948,9 @@ let PIECE_TYPES = {
 
     'queen_camel': { name: 'ring', desc: 'ring_desc', symbol: SYMBOLS.ring, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_CAMEL)] },
     'queen_knight': { name: 'crown', desc: 'crown_desc', symbol: SYMBOLS.crown, tier: 2, xpReq: 4, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG), ...step(VEC_KNIGHT)] },
-    'queen_upgradeable': { name: 'queen_upgradeable', desc: 'queen_upgradeable_desc', symbol: SYMBOLS.queen_upgradeable, tier: 1, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
+    'queen_upgradeable': { name: 'queen_upgradeable', desc: 'queen_upgradeable_desc', symbol: SYMBOLS.queen_upgradeable, tier: 2, xpReq: 1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)] },
 
-    'king_nuke': { name: 'tnt', desc: 'tnt_desc', symbol: SYMBOLS.tnt, tier: 1, xpReq: -1, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_all_5', role: 'king'  },
+    'king_nuke': { name: 'tnt', desc: 'tnt_desc', symbol: SYMBOLS.tnt, tier: 3, xpReq: -1, moves: [...step(VEC_ORTHO), ...step(VEC_DIAG)], special: 'explode_all_5', role: 'king'  },
 
     // === TIER 3 ===
     'pawn_spartan': { name: 'spartan', desc: 'spartan_desc', symbol: SYMBOLS.spartan, tier: 3, xpReq: 1, role: 'pawn', extraMoves: [{dx:1,dy:1},{dx:-1,dy:1}], special: 'spear_attack' },
