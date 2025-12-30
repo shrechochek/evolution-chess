@@ -179,7 +179,7 @@ You can help by:
 
 <h2 id="known-limitations">⚠️ Known Limitations</h2>
 
-- The engine plays at a level of about 1000 elo
+- The engine plays at a level of about 1150 elo
 - Visual bugs may appear
 - Control is not polished
 
