@@ -2510,9 +2510,39 @@ function log(msg) {
             -40,-20,0,5,5,0,-20,-40,
             -50,-40,-30,-30,-30,-30,-40,-50
         ],
-        bishop: Array(64).fill(0),
-        rook: Array(64).fill(0),
-        queen: Array(64).fill(0),
+        // bishop: Array(64).fill(0),
+        bishop: [
+            -20,-10,-10,-10,-10,-10,-10,-20,
+            -10,0,0,0,0,0,0,-10,
+            -10,0,5,10,10,5,0,-10,
+            -10,5,5,10,10,5,5,-10,
+            -10,0,10,10,10,10,0,-10,
+            -10,10,10,10,10,10,10,-10,
+            -10,5,0,0,0,0,5,-10,
+            -20,-10,-10,-10,-10,-10,-10,-20
+        ],
+        // rook: Array(64).fill(0),
+        rook: [
+            0,0,0,0,0,0,0,0,
+            5,10,10,10,10,10,10,5,
+            -5,0,0,0,0,0,0,-5,
+            -5,0,0,0,0,0,0,-5,
+            -5,0,0,0,0,0,0,-5,
+            -5,0,0,0,0,0,0,-5,
+            -5,0,0,0,0,0,0,-5,
+            0,0,0,5,5,0,0,0
+        ],
+        // queen: Array(64).fill(0),
+        queen: [
+            -20,-10,-10,-5,-5,-10,-10,-20,
+            -10,0,0,0,0,0,0,-10,
+            -10,0,5,5,5,5,0,-10,
+            -5,0,5,5,5,5,0,-5,
+            0,0,5,5,5,5,0,-5,
+            -10,5,5,5,5,5,0,-10,
+            -10,0,5,0,0,0,0,-10,
+            -20,-10,-10,-5,-5,-10,-10,-20
+        ],
         king: Array(64).fill(0)
     };
 
@@ -2525,7 +2555,8 @@ function log(msg) {
                 if (!p) continue;
                 const type = p.type;
                 const color = p.color;
-                const v = (pieceValues[type] || 0);
+                const v = (pieceValues[type] || 400);
+                // const v = (pieceValues[type] || 0);
                 const sq = y*8 + x;
                 let pstVal = 0;
                 if (PST[type]) {
@@ -2565,8 +2596,10 @@ function log(msg) {
         moves.sort((a,b) => {
             const ta = boardState[a.move.y][a.move.x];
             const tb = boardState[b.move.y][b.move.x];
-            const va = ta ? (pieceValues[ta.type]||0) : 0;
-            const vb = tb ? (pieceValues[tb.type]||0) : 0;
+            // const va = ta ? (pieceValues[ta.type]||0) : 0;
+            // const vb = tb ? (pieceValues[tb.type]||0) : 0;
+            const va = ta ? (pieceValues[ta.type]||400) : 0;
+            const vb = tb ? (pieceValues[tb.type]||400) : 0;
             return vb - va;
         });
 
@@ -2614,8 +2647,10 @@ function log(msg) {
         moves.sort((a,b) => {
             const ta = boardState[a.move.y][a.move.x];
             const tb = boardState[b.move.y][b.move.x];
-            const va = ta ? (pieceValues[ta.type]||0) : 0;
-            const vb = tb ? (pieceValues[tb.type]||0) : 0;
+            // const va = ta ? (pieceValues[ta.type]||0) : 0;
+            // const vb = tb ? (pieceValues[tb.type]||0) : 0;
+            const va = ta ? (pieceValues[ta.type]||400) : 0;
+            const vb = tb ? (pieceValues[tb.type]||400) : 0;
             return (vb - va);
         });
 
