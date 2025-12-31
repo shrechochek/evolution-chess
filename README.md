@@ -188,11 +188,11 @@ You can help by:
 
 <h2 id="engine">⚙️ Engine</h2>
 
-Game is using self-written game engine.
+The game uses a custom-built engine
 
-Engine is adapted to work with cutsom pieces and evolutions 
+The engine is adapted to work with cutsom pieces and evolutions 
 
-Engine plays at approximately 1300 ELO
+The engine plays at approximately 1300 ELO
 
 <h2 id="authors">🧑‍💻 Authors </h2>
   
