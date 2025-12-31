@@ -190,7 +190,7 @@ You can help by:
 
 The game uses a custom-built engine
 
-The engine is adapted to work with cutsom pieces and evolutions 
+The engine is adapted to work with custom pieces and evolutions 
 
 The engine plays at approximately 1300 ELO
 
