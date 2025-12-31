@@ -202,8 +202,6 @@ The engine plays at approximately 1300 ELO
 
 - **Frontend:** HTML, CSS, JavaScript
 - **Game Engine:** Custom chess engine (JavaScript)
-- **AI:** Built-in engine (~1300 ELO)
-- **Rendering:** HTML5 Canvas
 - **Modding:** JSON-based mod system
 - **Deployment:** GitHub Pages
 
