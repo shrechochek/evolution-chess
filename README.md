@@ -1,6 +1,6 @@
 # Evolution Chess
 <!-- Chess where pieces evolve -->
-> Evolution Chess is a chess variant where pieces gain XP and evolve into new units after captures.
+> Evolution Chess is a chess variant where pieces gain XP and evolve into new units after captures
 
 <!-- ![Stars Counter](https://img.shields.io/github/stars/shrechochek/evolution-chess?style=for-the-badge&labelColor=%232e383c&color=%23dbbc7f) -->
 
