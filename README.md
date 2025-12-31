@@ -201,7 +201,8 @@ The engine plays at approximately 1300 ELO
 <h2 id="tech-stack">🛠 Tech Stack</h2>
 
 ![JavaScript](https://img.shields.io/badge/JavaScript-yellow)
-![Canvas](https://img.shields.io/badge/HTML-orange)
+![HTML](https://img.shields.io/badge/HTML-orange)
+![CSS](https://img.shields.io/badge/CSS-violet)
 
 - **Frontend:** HTML, CSS, JavaScript
 - **Game Engine:** Custom chess engine (JavaScript)
