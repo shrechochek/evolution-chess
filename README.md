@@ -79,7 +79,7 @@ If you use custom images:
   "pawn": { 
     "name": "spearman", 
     "symbol": "spearman", 
-    "desc": "pawn that captures the pawn in front of it",
+    "desc": "pawn that attacks the square directly ahead",
     "role": "pawn", 
     "tier": 1, 
     "xpReq": 1,
