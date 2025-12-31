@@ -20,6 +20,7 @@ Chess where pieces evolve
 - 🧭 [Roadmap](#roadmap)
 - ⚠️ [Known Limitations](#known-limitations)
 - 🧑‍💻 [Authors](#authors)
+- ⚙️ [Engine](#engine)
 
 ---
 
@@ -99,7 +100,7 @@ If you use custom images:
 - **`xpReq`** — XP required to evolve (`-1` = no evolution)
 - **`special`** - special ability
   - `spear_attack` - attack square ahead
-  - `revenge` - destroy the figure that ate it
+  - `revenge` - destroy the piece that captured it
   - `teleport` - teleport to every square without piece on it
   - `explode_n` - destroy everything within radius n, when this piece captured or capture
   - `detonate_n` - destroy everything within radius n, when this piece capture or captured, except pawns and kings
@@ -183,6 +184,15 @@ You can help by:
 - Control is not polished
 
 ---
+
+
+<h2 id="engine">⚙️ Engine</h2>
+
+Game is using self-written game engine.
+
+Engine is adapted to work with cutsom pieces and evolutions 
+
+Engine plays at approximately 1300 ELO
 
 <h2 id="authors">🧑‍💻 Authors </h2>
   
