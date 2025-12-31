@@ -193,6 +193,8 @@ The engine is designed to support custom pieces and evolution mechanics
 
 The engine plays at approximately 1300 ELO
 
+The engine is using minimax, alpha–beta pruning and moves sorting
+
 ---
 
 <h2 id="tech-stack">🛠 Tech Stack</h2>
