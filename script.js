@@ -823,19 +823,19 @@ let PIECE_TYPES = {
 };
 
 let EVOLUTION_TREE = {
-    'pawn': ['pawn_runner', 'pawn_spearman', 'pawn_torpedo'], 
-    'knight': ['knight_camel', 'knight_paladin', 'knight_knight'],
+    'pawn': ['pawn_spearman', 'pawn_runner', 'pawn_torpedo'], 
+    'knight': ['knight_paladin', ,'knight_camel' , 'knight_knight'],
     // 'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
     'bishop': ['bishop_ghost', 'two_color_bishop', 'bishop_swapper'],
-    'rook': ['rook_tank', 'rook_ghost', 'statue'],
-    'queen': ['queen_camel', 'queen_knight', 'queen_upgradeable'], 
+    'rook': ['rook_ghost', 'rook_tank', 'statue'],
+    'queen': ['queen_knight', 'queen_camel', 'queen_upgradeable'], 
 
-    'pawn_runner': ['pawn_superrunner', 'pawn_spartan'],
+    'pawn_runner': ['pawn_spartan', 'pawn_superrunner'],
     'pawn_spearman': ['pawn_spartan'],
     
     'knight_camel': ['knight_camel_hybrid', 'knight_endless'],
-    'knight_paladin': ['knight_king', 'rook'],
-    'knight_knight': ['knight_king', 'rook', 'bishop_ship'],
+    'knight_paladin': ['rook', 'knight_king'],
+    'knight_knight': ['rook', 'knight_king', 'bishop_ship'],
 
     'two_color_bishop': ['rook', 'bishop_ship'],
     'bishop_bomber': ['bishop_nuke'],
@@ -2486,7 +2486,10 @@ function log(msg) {
 
     // Оценочная функция — материал + piece-square + мобильность + король
     const pieceValues = {
-        pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 20000
+        pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 20000, 
+        queen_camel: 1200, queen_knight: 1200, rook_ghost: 600, rook_tank: 600, swap_bishop: 350, camel: 250, spearman: 150, runner: 150, torpedo: 130
+
+        // pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 20000
     };
     // простые piece-square tables (имеют смысл для классических фигур)
     const PST = {
