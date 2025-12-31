@@ -22,6 +22,7 @@
 - ⚠️ [Known Limitations](#known-limitations)
 - 🧑‍💻 [Authors](#authors)
 - ⚙️ [Engine](#engine)
+- 💻 [Tech stack](#tech-stack)
 
 ---
 
@@ -194,6 +195,13 @@ The game uses a custom-built engine
 The engine is adapted to work with custom pieces and evolutions 
 
 The engine plays at approximately 1300 ELO
+
+---
+
+<h2 id="tech-stack">💻 Tech stack</h2>
+- JS, HTML, CSS
+
+---
 
 <h2 id="authors">🧑‍💻 Authors </h2>
   
