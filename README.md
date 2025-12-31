@@ -171,15 +171,14 @@ You can help by:
 - [x] Mods support
 - [x] Adaptive engine
 - [x] Better UI for phones
+- [x] Better engine
 - [ ] Better control from phone
-- [ ] Better engine
 - [ ] Multiplayer website
 
 ---
 
 <h2 id="known-limitations">⚠️ Known Limitations</h2>
 
-- The engine plays at a level of about 1150 elo
 - Visual bugs may appear
 - Control is not polished
 
