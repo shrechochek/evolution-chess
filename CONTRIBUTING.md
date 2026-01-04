@@ -17,6 +17,6 @@
 3. make changes
 4. open pull request
 
-# 📜 Rules
+## 📜 Rules
 1. write understandable commits
 2. write only on vanilla JS

@@ -21,6 +21,6 @@
 3. 进行修改
 4. 提交 pull request
 
-# 📜 规则
+## 📜 规则
 1. 提交清晰、易懂的 commit 信息
 2. 只写 vanilla JS
