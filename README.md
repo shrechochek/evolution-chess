@@ -14,7 +14,6 @@
 - 🏙 [Game example](#game-example)
 - 🪄 [How pieces evolve](#how-pieces-evolve)
 - 🗂 [How to create mods](#how-to-create-mods)
-- 🧑‍🤝‍🧑 [Contributing](#Contributing)
 - 🧭 [Roadmap](#roadmap)
 - ⚠️ [Known Limitations](#known-limitations)
 - 🧑‍💻 [Authors](#authors)
@@ -150,17 +149,6 @@ mod/
 > [!NOTE]
 > If you still don't understand how to create mods or want to see a specific example you can check <br>
 > [`mod example`](resources/mods/mod_example)
-
----
-
-<h2 id="contributing">🧑‍🤝‍🧑 Contributing</h2>
-
-Pull requests are welcome!
-You can help by:
-- Creating new mods
-- Improving engine
-- Fixing bugs
-- Suggesting ideas
 
 ---
 
