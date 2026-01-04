@@ -39,9 +39,9 @@
 ---
 
 <h2 id="游戏示例">🏙 游戏示例</h2>
-<img src="../../game-images/game-example-gif-3.gif" width="700">
+<img src="../../images/game-images/game-example-gif-3.gif" width="700">
 
-📸 更多截图：[点击这里](../../game-images)
+📸 更多截图：[点击这里](../../images/game-images)
 
 ---
 

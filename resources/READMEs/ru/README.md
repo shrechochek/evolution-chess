@@ -38,9 +38,9 @@
 ---
 
 <h2 id="пример-игры">🏙 Пример игры</h2>
-<img src="resources/game-images/game-example-gif-3.gif" width="700">
+<img src="resources/images/game-images/game-example-gif-3.gif" width="700">
 
-📸 Больше скриншотов: [здесь](resources/game-images)
+📸 Больше скриншотов: [здесь](resources/images/game-images)
 
 ---
 
