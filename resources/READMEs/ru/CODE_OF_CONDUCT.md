@@ -1,5 +1,9 @@
 # Кодекс поведения (Code of Conduct)
 
+> [!IMPORTANT]
+>  🌍 **Languages**  
+>  [🇺🇸(en)](../../../CODE_OF_CONDUCT.md)  |  🇷🇺(ru) |  [🇺🇦(ua)](../ua/CODE_OF_CONDUCT.md)| [🇨🇳(zh)](../zh/CODE_OF_CONDUCT.md)
+
 ## Наше обязательство
 
 Мы, как участники, контрибьюторы и мейнтейнеры проекта, обязуемся сделать участие в проекте

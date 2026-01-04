@@ -1,5 +1,9 @@
 # Code of Conduct
 
+> [!IMPORTANT]
+>  🌍 **Languages**  
+>  🇺🇸(en)  |  [🇷🇺(ru)](resources/READMEs/ru/CODE_OF_CONDUCT.md)  |  [🇺🇦(ua)](resources/READMEs/ua/CODE_OF_CONDUCT.md)| [🇨🇳(zh)](resources/READMEs/zh/CODE_OF_CONDUCT.md)
+
 ## Our Pledge
 
 We as members, contributors, and maintainers pledge to make participation in this project a

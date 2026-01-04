@@ -1,5 +1,9 @@
 # Кодекс поведінки (Code of Conduct)
 
+> [!IMPORTANT]
+>  🌍 **Languages**  
+>  [🇺🇸(en)](../../../CODE_OF_CONDUCT.md)  |  [🇷🇺(ru)](../ru/CODE_OF_CONDUCT.md) |  🇺🇦(ua)| [🇨🇳(zh)](../zh/CODE_OF_CONDUCT.md)
+
 > [!NOTE]
 > ⚠️ **Машинний переклад**  
 > Цей README перекладено автоматично. Виправлення та покращення формулювань у вигляді pull request вітаються 🙌  

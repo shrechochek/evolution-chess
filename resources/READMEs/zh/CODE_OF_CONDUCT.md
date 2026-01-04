@@ -1,5 +1,9 @@
 # 行为准则 (Code of Conduct)
 
+> [!IMPORTANT]
+>  🌍 **Languages**  
+>  [🇺🇸(en)](../../../CODE_OF_CONDUCT.md)  |  [🇷🇺(ru)](../ru/CODE_OF_CONDUCT.md) |  [🇺🇦(ua)](../ua/CODE_OF_CONDUCT.md) | 🇨🇳(zh)
+
 > [!NOTE]
 > ⚠️ **机器翻译**  
 > 本 README 为自动翻译版本。欢迎通过 pull request 提交修正和改进 🙌  
