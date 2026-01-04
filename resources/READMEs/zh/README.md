@@ -5,7 +5,7 @@
 
 > [!IMPORTANT]
 > 🌍 **语言**  
-> 🇺🇸 (en) | 🇷🇺 (ru) | 🇺🇦 (ua) | 🇨🇳 (zh)
+> [🇺🇸(en)](../../../README.md) | [🇷🇺(ru)](../ru/README.md) | [🇺🇦(ua)](../ua/README.md) | 🇨🇳(zh)
 
 > [!NOTE]
 > ⚠️ **机器翻译**  
@@ -39,9 +39,9 @@
 ---
 
 <h2 id="游戏示例">🏙 游戏示例</h2>
-<img src="resources/game-images/game-example-gif-3.gif" width="700">
+<img src="../../game-images/game-example-gif-3.gif" width="700">
 
-📸 更多截图：[点击这里](resources/game-images)
+📸 更多截图：[点击这里](../../game-images)
 
 ---
 
