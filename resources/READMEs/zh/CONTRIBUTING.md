@@ -1,5 +1,9 @@
 # 🧑‍🤝‍🧑 Contributing
 
+> [!IMPORTANT]
+>  🌍 **Languages**  
+>  [🇺🇸(en)](../../../CONTRIBUTING.md)  |  [🇷🇺(ru)](../ru/CONTRIBUTING.md)  |  [🇺🇦(ua)](../ua/CONTRIBUTING.md)| 🇨🇳(zh)
+
 ## 🤝 你可以如何帮助项目？
 - 查找并修复 Bug
 - 创建模组

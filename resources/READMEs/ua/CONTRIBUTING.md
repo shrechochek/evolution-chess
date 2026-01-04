@@ -1,5 +1,9 @@
 # 🧑‍🤝‍🧑 Contributing
 
+> [!IMPORTANT]
+>  🌍 **Languages**  
+>  [🇺🇸(en)](../../../CONTRIBUTING.md)  |  [🇷🇺(ru)](../ru/CONTRIBUTING.md)  |  🇺🇦(ua)  |  [🇨🇳(zh)](../zh/CONTRIBUTING.md)
+
 ## 🤝 Як ви можете допомогти проєкту?
 - знаходити та виправляти баги
 - створювати моди
