@@ -10,7 +10,7 @@
 > [!NOTE]
 > ⚠️ **机器翻译**  
 > 本 README 为自动翻译版本。欢迎通过 pull request 的形式对翻译和措辞进行改进 🙌  
-> 详情请见 [这里](../../../CONTRIBUTING.md)
+> 详情请见 [这里](CONTRIBUTING.md)
 
 ---
 
