@@ -19,6 +19,7 @@
 - 🧑‍💻 [Authors](#authors)
 - ⚙️ [Engine](#engine)
 - 🛠 [Tech stack](#tech-stack)
+- ❓ [FAQ](FAQ.md)
 
 ---
 
