@@ -1419,7 +1419,7 @@ function isValidPos(x, y) {
 }
 
 function cellClick(x, y) {
-    if (gameOver || isViewingHistory) return;
+    if (isViewingHistory) return;
 
     // Clear all square markings and arrows when clicking any cell
     markedSquares.clear();
@@ -1969,7 +1969,25 @@ function renderBoard() {
 
     // Update highlights after rendering
     updateDragHighlights();
+
+    if(gameOver) {
+        selectedCell = null;
+        gameOver = false;
+        possibleMoves = [];
+        markedSquares.clear();
+        clearArrows();
+        renderBoard();
+    }
 }
+
+// function test_btn() {
+//     selectedCell = null;
+//     gameOver = false;
+//     possibleMoves = [];
+//     markedSquares.clear();
+//     clearArrows();
+//     renderBoard();
+// }
 
 // Update arrow overlay size and position when window changes
 function updateArrowOverlay() {
