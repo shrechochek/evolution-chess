@@ -1024,6 +1024,7 @@ function generateMoveNotation(piece, fromX, fromY, move) {
 
 // Add move to notation history
 function addMoveToNotationHistory(piece, fromX, fromY, move) {
+    // alert("=====TEST ALERT 2=====")
     const notation = generateMoveNotation(piece, fromX, fromY, move);
     const isWhite = piece.color === 'white';
 
@@ -1066,6 +1067,7 @@ function updateDragHighlights() {
 }
 
 function updateMoveHistoryDisplay() {
+    // alert("=====TEST ALERT=====")
     const historyEl = document.getElementById('move-history');
     historyEl.innerHTML = '';
 
@@ -1459,6 +1461,8 @@ function makeMove(fromX, fromY, move) {
     let target = board[toY][toX];
     let pawnPromoted = false; // Флаг для отслеживания превращения пешки
 
+    addMoveToNotationHistory(piece, fromX, fromY, move);
+
     if (move.isSwap) {
         board[fromY][fromX] = target;
         board[toY][toX] = piece;
@@ -1644,7 +1648,7 @@ function makeMove(fromX, fromY, move) {
     endTurn();
 
     // Add move to notation history after ending turn (when gameHistory is updated)
-    addMoveToNotationHistory(piece, fromX, fromY, move);
+    // addMoveToNotationHistory(piece, fromX, fromY, move);
 }
 
 function endTurn() {
