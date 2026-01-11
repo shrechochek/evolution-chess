@@ -12,7 +12,7 @@
 ## Contents
 - 🎮 [How to play](#how-to-play)
 - 🏙 [Game example](#game-example)
-- 🪄 [How pieces evolve](#how-pieces-evolve)
+- 🌈 [How pieces evolve](#how-pieces-evolve)
 - 🗂 [How to create mods](#how-to-create-mods)
 - 🧭 [Roadmap](#roadmap)
 - ⚠️ [Known Limitations](#known-limitations)
@@ -41,7 +41,7 @@ You can play Evolution Chess in two ways:
 
 ---
 
-<h2 id="how-pieces-evolve">🪄 How Pieces Evolve</h2>
+<h2 id="how-pieces-evolve">🌈 How Pieces Evolve</h2>
 When a piece captures another piece, it gains experience and can evolve into a new piece
 
 [**Evolution tree**](https://miro.com/app/board/uXjVI-ZUrws=/)
