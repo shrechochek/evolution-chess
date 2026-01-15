@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 >  🌍 **Languages**  
->  [🇺🇸(en)](../../../CONTRIBUTING.md)  |  [🇷🇺(ru)](../ru/CONTRIBUTING.md)  |  🇺🇦(ua)  |  [🇨🇳(zh)](../zh/CONTRIBUTING.md)
+>  [🇺🇸(en)](../../../.github/CONTRIBUTING.md)  |  [🇷🇺(ru)](../ru/CONTRIBUTING.md)  |  🇺🇦(ua)  |  [🇨🇳(zh)](../zh/CONTRIBUTING.md)
 
 > [!NOTE]
 > ⚠️ **Машинний переклад**  

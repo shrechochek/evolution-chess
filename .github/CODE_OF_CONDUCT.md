@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 >  🌍 **Languages**  
->  🇺🇸(en)  |  [🇷🇺(ru)](resources/READMEs/ru/CODE_OF_CONDUCT.md)  |  [🇺🇦(ua)](resources/READMEs/ua/CODE_OF_CONDUCT.md)| [🇨🇳(zh)](resources/READMEs/zh/CODE_OF_CONDUCT.md)
+>  🇺🇸(en)  |  [🇷🇺(ru)](../resources/READMEs/ru/CODE_OF_CONDUCT.md)  |  [🇺🇦(ua)](../resources/READMEs/ua/CODE_OF_CONDUCT.md)| [🇨🇳(zh)](../resources/READMEs/zh/CODE_OF_CONDUCT.md)
 
 ## Our Pledge
 
