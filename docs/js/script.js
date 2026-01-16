@@ -832,18 +832,22 @@ function updateNavigationButtons() {
     if (startBtn) {
         startBtn.disabled = !canGoBack() || currentHistoryIndex <= 0;
         startBtn.title = t('go_to_start');
+        startBtn.addEventListener("click", goToStart);
     }
     if (backBtn) {
         backBtn.disabled = !canGoBack();
         backBtn.title = t('previous_move');
+        backBtn.addEventListener("click", goBack);
     }
     if (forwardBtn) {
         forwardBtn.disabled = !canGoForward();
         forwardBtn.title = t('next_move');
+        forwardBtn.addEventListener("click", goForward);
     }
     if (endBtn) {
         endBtn.disabled = !canGoForward() || currentHistoryIndex >= gameHistory.length - 2;
         endBtn.title = t('go_to_end');
+        endBtn.addEventListener("click", goToEnd);
     }
 
     if (counter) {
@@ -851,6 +855,25 @@ function updateNavigationButtons() {
         const totalMoves = gameHistory.length - 1; // Subtract 1 because index 0 is initial position
         counter.textContent = `${currentMove}/${totalMoves}`;
     }
+}
+
+function addActionsToButtons() {
+    // Set actions for buttons
+    document.getElementById('save-position-btn').addEventListener("click", savePosition);
+    document.getElementById('load-position-btn').addEventListener("click", loadPosition);
+    document.getElementById('apply-position-btn').addEventListener("click", applyPosition);
+    
+    document.getElementById('open-position-editor-btn').addEventListener("click", openPositionEditor);
+    document.getElementById('close-position-editor-btn').addEventListener("click", closePositionEditor);
+    
+    document.getElementById('clear-editor-board-btn').addEventListener("click", clearEditorBoard);
+    document.getElementById('load-standart-position-btn').addEventListener("click", loadStandardPosition);
+    
+    document.querySelector('.settings-icon').addEventListener("click", showSettingsModal);
+    document.getElementById('save-settings-btn').addEventListener("click", saveSettings);
+    document.getElementById('close-settings-modal-btn').addEventListener("click", closeSettingsModal);
+
+    document.querySelector('.reset-btn').addEventListener("click", initGame);
 }
 
 function initGame() {
@@ -872,6 +895,9 @@ function initGame() {
     aiBlockedAfterHistoryReturn = false;
     turnBeforeHistoryReturn = null;
     moveNotationHistory = [];
+
+    //add actions to buttons
+    addActionsToButtons()
 
     // Game log removed - now using move history
 
@@ -2610,21 +2636,6 @@ function clearArrows() {
         arrowsSvg.removeChild(defs);
     });
 }
-
-window.showSettingsModal = showSettingsModal;
-window.initGame = initGame;
-window.goToStart = goToStart;
-window.goToEnd = goToEnd;
-window.goForward = goForward;
-window.goBack = goBack;
-window.openPositionEditor = openPositionEditor;
-window.closePositionEditor = closePositionEditor;
-window.closeSettingsModal = closeSettingsModal;
-window.saveSettings = saveSettings;
-window.clearEditorBoard = clearEditorBoard;
-window.savePosition = savePosition;
-window.loadPosition = loadPosition;
-window.applyPosition = applyPosition;
 
 // Update UI with current language
 updateUILanguage();
