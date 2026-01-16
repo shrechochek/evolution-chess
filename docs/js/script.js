@@ -173,7 +173,7 @@ function createEditorBoard() {
                 if (CUSTOM_ASSETS[imgName]) {
                     img.src = CUSTOM_ASSETS[imgName];
                 } else {
-                    img.src = `images/${imgName}.svg`;
+                    img.src = `assets/images/figures/${imgName}.svg`;
                 }
                 img.style.width = '100%';
                 img.style.height = '100%';
@@ -496,8 +496,8 @@ const VEC_DIAG = [{dx:1,dy:1},{dx:1,dy:-1},{dx:-1,dy:1},{dx:-1,dy:-1}];
 const VEC_KNIGHT = [{dx:2,dy:1},{dx:2,dy:-1},{dx:-2,dy:1},{dx:-2,dy:-1},{dx:1,dy:2},{dx:1,dy:-2},{dx:-1,dy:2},{dx:-1,dy:-2}];
 const VEC_CAMEL = [{dx:3,dy:1},{dx:3,dy:-1},{dx:-3,dy:1},{dx:-3,dy:-1},{dx:1,dy:3},{dx:1,dy:-3},{dx:-1,dy:3},{dx:-1,dy:-3}];
 
-const move_audio = new Audio('sounds/move.mp3');
-const capture_audio = new Audio('sounds/capture.mp3');
+const move_audio = new Audio('assets/sounds/effects/move.mp3');
+const capture_audio = new Audio('assets/sounds/effects/capture.mp3');
 
 function slide(vectors) { return vectors.map(v => ({...v, slide: true})); }
 function step(vectors) { return vectors.map(v => ({...v, slide: false})); }
