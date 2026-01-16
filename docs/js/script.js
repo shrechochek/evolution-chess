@@ -421,6 +421,7 @@ function applyPosition() {
     possibleMoves = [];
     selectedCell = null;
     gameOver = false;
+    alertGameOver = false;
     let moveHistory = [];
     let historyIndex = -1;
     enPassantTarget = null;
@@ -560,6 +561,7 @@ let selectedCell = null;
 let possibleMoves = [];
 let markedSquares = new Set(); // Track user-marked squares
 let gameOver = false;
+let alertGameOver = false;
 let enPassantTarget = null;
 let white_kings = 0;
 let black_kings = 0;
@@ -857,6 +859,7 @@ function initGame() {
     currentTurn = 'white';
     selectedCell = null;
     gameOver = false;
+    alertGameOver = false;
     possibleMoves = [];
     markedSquares.clear(); // Clear all square markings
     enPassantTarget = null;
@@ -885,7 +888,8 @@ function initGame() {
 
 function updateGameStatus() {
     // If the game is already over we should not re-run win/draw notifications.
-    if (gameOver) return;
+    if (alertGameOver) return;
+    // alert(gameOver)
     white_kings = 0;
     black_kings = 0;
     
@@ -901,15 +905,17 @@ function updateGameStatus() {
 
     // gameOver should be true when player wins then give alert because alert will pause the js execution
     if (white_kings === 0 && black_kings === 0) {
-        gameOver = true;
-        alert(t('draw_kings_destroyed'));
+        alert(t('draw kings destroyed!'));
+        alertGameOver = true;
     } else if (white_kings === 0) {
-        gameOver = true;
-        alert(t('black_wins'));
+        alert(t('black wins!'));
+        alertGameOver = true;
     } else if (black_kings === 0) {
-        gameOver = true;
-        alert(t('white_wins'));
+        alert(t('white wins!'));
+        alertGameOver = true;
     }
+
+    // alert("END!!!")
 }
 
 function createBoard() {
