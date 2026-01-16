@@ -35,9 +35,9 @@ You can play Evolution Chess in two ways:
 ---
 
 <h2 id="game-example">🏙 Game Example</h2>
-<img src="resources/images/game-images/game-example-gif-3.gif" width="700">
+<img src="../resources/images/game-images/game-example-gif-3.gif" width="700">
 
-📸 More screenshots: [here](resources/images/game-images)
+📸 More screenshots: [here](../resources/images/game-images)
 
 ---
 
@@ -149,7 +149,7 @@ mod/
 
 > [!NOTE]
 > If you still don't understand how to create mods or want to see a specific example you can check <br>
-> [`mod example`](resources/mods/mod_example)
+> [`mod example`](../resources/mods/mod_example)
 
 ---
 
