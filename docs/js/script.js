@@ -884,6 +884,8 @@ function initGame() {
 }
 
 function updateGameStatus() {
+    // If the game is already over we should not re-run win/draw notifications.
+    if (gameOver) return;
     white_kings = 0;
     black_kings = 0;
     
@@ -897,15 +899,16 @@ function updateGameStatus() {
         }
     }
 
+    // gameOver should be true when player wins then give alert because alert will pause the js execution
     if (white_kings === 0 && black_kings === 0) {
+        gameOver = true;
         alert(t('draw_kings_destroyed'));
-        gameOver = true;
     } else if (white_kings === 0) {
+        gameOver = true;
         alert(t('black_wins'));
-        gameOver = true;
     } else if (black_kings === 0) {
-        alert(t('white_wins'));
         gameOver = true;
+        alert(t('white_wins'));
     }
 }
 
