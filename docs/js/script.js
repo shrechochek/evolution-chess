@@ -421,10 +421,10 @@ function applyPosition() {
     possibleMoves = [];
     selectedCell = null;
     gameOver = false;
-    moveHistory = [];
-    historyIndex = -1;
+    let moveHistory = [];
+    let historyIndex = -1;
     enPassantTarget = null;
-    castlingRights = {
+    let castlingRights = {
         white: { kingSide: true, queenSide: true },
         black: { kingSide: true, queenSide: true }
     };
@@ -432,8 +432,8 @@ function applyPosition() {
     // Clear arrows and update UI
     clearArrows();
     renderBoard();
-    updateMoveHistory();
-    updateTurnIndicator();
+    // updateMoveHistory();
+    // updateTurnIndicator();
 
     closePositionEditor();
     alert(t('position_applied'));
@@ -2604,6 +2604,21 @@ function clearArrows() {
         arrowsSvg.removeChild(defs);
     });
 }
+
+window.showSettingsModal = showSettingsModal;
+window.initGame = initGame;
+window.goToStart = goToStart;
+window.goToEnd = goToEnd;
+window.goForward = goForward;
+window.goBack = goBack;
+window.openPositionEditor = openPositionEditor;
+window.closePositionEditor = closePositionEditor;
+window.closeSettingsModal = closeSettingsModal;
+window.saveSettings = saveSettings;
+window.clearEditorBoard = clearEditorBoard;
+window.savePosition = savePosition;
+window.loadPosition = loadPosition;
+window.applyPosition = applyPosition;
 
 // Update UI with current language
 updateUILanguage();
