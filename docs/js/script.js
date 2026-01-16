@@ -1,274 +1,6 @@
-// Translation system
-const translations = {
-    en: {
-        title: "Chess with Evolution",
-        subtitle: "made by shrechochek",
-        turn_white: "Turn: White",
-        turn_black: "Turn: Black",
-        select_piece: "Select a piece...",
-        event_log: "Event Log",
-        new_game: "New Game",
-        load_mod: "Load Mod",
-        evolution_title: "Evolution!",
-        evolution_text: "Your piece is mutating.",
-        promotion_title: "Promotion!",
-        promotion_text: "Pawn reached the end.",
-        max_level: "MAXIMUM LEVEL",
-        immortal: "Immortal",
-        tier: "Tier",
-        progress: "Progress",
-        next: "Next",
-        vs_ai_white: "Play vs AI (White)",
-        vs_ai_black: "Play vs AI (Black)",
-        ai_thinking: "🤖 AI ({side}) is thinking...",
-        ai_loaded: "✅ AI engine loaded. Use sidebar controls to start games.",
-        ai_no_move: "AI found no valid move (pass?)",
-        draw_kings_destroyed: "Draw! All kings destroyed.",
-        white_wins: "White wins!",
-        black_wins: "Black wins!",
-        castling: "🔄 Castling!",
-        en_passant: "⚔️ En passant!",
-        evolution_complete: "🧬 Evolution completed!",
-        promotion: "🎖 Promotion to {piece}!",
-        piece_capture: "{piece} takes {target} (+1 XP)",
-        revenge_explode: "💥 Revenge explosion!",
-        explosion: "💥 EXPLOSION (Radius {radius})!",
-        mod_loaded: "📂 MOD LOADED: {name}",
-        sprites_loaded: "🖼 Loaded sprites: {count}",
-        mod_error: "Mod loading error: PIECE_TYPES or EVOLUTION_TREE missing",
-        json_error: "Error reading JSON mod file!",
-        no_json_found: "No .json config file found in folder!",
-        // Piece names
-        pawn: "Pawn",
-        knight: "Knight",
-        bishop: "Bishop",
-        rook: "Rook",
-        queen: "Queen",
-        king: "King",
-        spearman: "Spearman",
-        runner: "Runner",
-        torpedo: "Torpedo",
-        camel: "Camel",
-        paladin: "Paladin",
-        knight_knight: "Knight-Knight",
-        bomber: "Bomber",
-        ghost: "Ghost",
-        two_color_bishop: "Two-Color Bishop",
-        swap_bishop: "Swap Bishop",
-        tank: "Tank",
-        car: "Ghost",
-        statue: "Statue",
-        ring: "Queen Camel",
-        crown: "Queen Knight",
-        queen_upgradeable: "Queen V2",
-        tnt: "Nuclear King",
-        spartan: "Spartan",
-        super_runner: "Super Runner",
-        camel_knight: "Camel-Knight",
-        endless_knight: "Endless Knight",
-        moose: "Moose",
-        nuke_bishop: "Nuclear Bishop",
-        sniper: "Sniper",
-        ship: "Ship",
-        helicopter: "Helicopter",
-        rocket: "Rocket",
-        unicorn: "Unicorn",
-        pin: "Ghost",
-        range: "Range queen",
-        // Piece descriptions
-        pawn_desc: "Basic pawn",
-        spearman_desc: "Strikes forward",
-        runner_desc: "Moves diagonally forward by 1",
-        torpedo_desc: "Moves forward by 2",
-        camel_desc: "Moves (3+1)",
-        paladin_desc: "Knight + orthogonal (1) and diagonal (1)",
-        knight_knight_desc: "Knight + diagonal (1)",
-        bomber_desc: "Explodes when captured",
-        ghost_desc: "Passes through 1 piece",
-        two_color_bishop_desc: "Bishop + King",
-        swap_bishop_desc: "Swaps with allied pieces",
-        tank_desc: "Rook + diagonal (1)",
-        car_desc: "Rook + passes through 1 piece",
-        statue_desc: "Teleports anywhere",
-        ring_desc: "Queen + Camel",
-        crown_desc: "Queen + Knight",
-        queen_upgradeable_desc: "Evolves further",
-        tnt_desc: "Explodes (5x5)",
-        spartan_desc: "Spearman + Runner",
-        super_runner_desc: "Moves like King",
-        camel_knight_desc: "Knight + Camel",
-        endless_knight_desc: "Slides as Knight (∞)",
-        moose_desc: "Knight + orthogonal (1) and diagonal (1)",
-        nuke_bishop_desc: "Explosion (3x3)",
-        sniper_desc: "Passes through 2 pieces",
-        ship_desc: "Knight + Bishop",
-        helicopter_desc: "Rook + Knight",
-        rocket_desc: "Rook + passes through 2 pieces",
-        unicorn_desc: "Queen + Knight + Camel",
-        pin_desc: "Queen + passes through 2 pieces",
-        range_desc: "Queen + ranged capture",
-        // Settings
-        settings: "Settings",
-        language: "Language",
-        english: "English",
-        russian: "Русский",
-        position_editor: "Position Editor",
-        position_editor_desc: "Create and edit custom chess positions",
-        piece_selection: "Piece Selection",
-        board_position: "Board Position",
-        white_to_move: "White to move",
-        black_to_move: "Black to move",
-        clear_board: "Clear Board",
-        standard_position: "Standard Position",
-        save_position: "Save Position",
-        load_position: "Load Position",
-        apply_to_game: "Apply to Game",
-        position_saved: "Position saved successfully!",
-        position_loaded: "Position loaded successfully!",
-        no_saved_position: "No saved position found.",
-        position_applied: "Position applied to the game!",
-        // Move navigation
-        go_to_start: "Go to start",
-        previous_move: "Previous move",
-        next_move: "Next move",
-        go_to_end: "Go to end",
-        move_history: "Move History"
-    },
-    ru: {
-        title: "Шахматы c эволюцией",
-        subtitle: "made by shrechochek",
-        turn_white: "Ход: Белые",
-        turn_black: "Ход: Черные",
-        select_piece: "Выберите фигуру...",
-        event_log: "Журнал событий",
-        new_game: "Новая игра",
-        load_mod: "Загрузить мод",
-        evolution_title: "Эволюция!",
-        evolution_text: "Ваша фигура мутирует.",
-        promotion_title: "Превращение!",
-        promotion_text: "Пешка дошла до края.",
-        max_level: "МАКСИМАЛЬНЫЙ УРОВЕНЬ",
-        immortal: "Бессмертный",
-        tier: "Уровень",
-        progress: "Прогресс",
-        next: "Далее",
-        vs_ai_white: "Играть против ИИ (За белых)",
-        vs_ai_black: "Играть против ИИ (За чёрных)",
-        ai_thinking: "🤖 ИИ ({side}) думает...",
-        ai_loaded: "✅ AI engine loaded. Use sidebar controls to start games.",
-        ai_no_move: "ИИ не нашёл допустимого хода (пасс?)",
-        draw_kings_destroyed: "Ничья! Все короли уничтожены.",
-        white_wins: "Победа белых!",
-        black_wins: "Победа черных!",
-        castling: "🔄 Рокировка!",
-        en_passant: "⚔️ Взятие на проходе!",
-        evolution_complete: "🧬 Эволюция завершена!",
-        promotion: "🎖 Превращение в {piece}!",
-        piece_capture: "{piece} рубит {target} (+1 XP)",
-        revenge_explode: "💥 Взрыв мести!",
-        explosion: "💥 ВЗРЫВ (Радиус {radius})!",
-        mod_loaded: "📂 ПАКЕТ ЗАГРУЖЕН: {name}",
-        sprites_loaded: "🖼 Загружено спрайтов: {count}",
-        mod_error: "Ошибка мода: отсутствуют PIECE_TYPES или EVOLUTION_TREE",
-        json_error: "Ошибка чтения JSON файла мода!",
-        no_json_found: "В папке не найден .json файл конфигурации!",
-        // Piece names
-        pawn: "Пешка",
-        knight: "Конь",
-        bishop: "Слон",
-        rook: "Ладья",
-        queen: "Ферзь",
-        king: "Король",
-        spearman: "Копейщик",
-        runner: "Бегун",
-        torpedo: "Торпеда",
-        camel: "Верблюд",
-        paladin: "Паладин",
-        knight_knight: "Рыцарь",
-        bomber: "Взрывной слон",
-        ghost: "Призрак",
-        two_color_bishop: "Двухцветный слон",
-        swap_bishop: "Свап слон",
-        tank: "Танк",
-        car: "Призрак",
-        statue: "Статуя",
-        ring: "Королева Верблюдов",
-        crown: "Королева Коней",
-        queen_upgradeable: "Ферзь V2",
-        tnt: "Царь Бомба",
-        spartan: "Спартанец",
-        super_runner: "Супер Бегун",
-        camel_knight: "Коне-Верблюд",
-        endless_knight: "Бесконечный конь",
-        moose: "Лось",
-        nuke_bishop: "Ядерный Слон",
-        sniper: "Снайпер",
-        ship: "Корабль",
-        helicopter: "Вертолет",
-        rocket: "Ракета",
-        unicorn: "Единорог",
-        pin: "Призрак",
-        range: "Королева дальнего боя",
-        // Piece descriptions
-        pawn_desc: "Обычная пешка",
-        spearman_desc: "Бьет клетку перед собой",
-        runner_desc: "ходит диагонально вперед на 1 клетку",
-        torpedo_desc: "ходит на 2 клетки вперед",
-        camel_desc: "ходит (3+1)",
-        paladin_desc: "конь + вертикаль (1) и горизонталь (1)",
-        knight_knight_desc: "конь + диагональ (1)",
-        bomber_desc: "взрывает фигуру, которая его съела",
-        ghost_desc: "проходит сквозь 1 фигуру",
-        two_color_bishop_desc: "слон + король",
-        swap_bishop_desc: "Меняется местами с фигурами своего цвета",
-        tank_desc: "ладья + король",
-        car_desc: "ладья + проходит сквозь 1 фигуру",
-        statue_desc: "ходит на любую свободную клетку доски, не может быть съедена",
-        ring_desc: "ферзь + верблюд",
-        crown_desc: "ферзь + конь",
-        queen_upgradeable_desc: "эволюционирует дальше",
-        tnt_desc: "взрывается (5x5)",
-        spartan_desc: "копейщик + бегун",
-        super_runner_desc: "ходит как король",
-        camel_knight_desc: "конь + верблюд",
-        endless_knight_desc: "слайд конем",
-        moose_desc: "конь + король",
-        nuke_bishop_desc: "взрыв (3x3)",
-        sniper_desc: "проходит сквозь 2 фигуры",
-        ship_desc: "конь + слон",
-        helicopter_desc: "ладья + конь",
-        rocket_desc: "проходит сквозь 2 фигуры",
-        unicorn_desc: "ферзь + конь + верблюд",
-        pin_desc: "проходит сквозь 2 фигуры",
-        range_desc: "дальняя атака",
-        // Settings
-        settings: "Настройки",
-        language: "Язык",
-        english: "English",
-        russian: "Русский",
-        position_editor: "Редактор позиции",
-        position_editor_desc: "Создание и редактирование пользовательских шахматных позиций",
-        piece_selection: "Выбор фигур",
-        board_position: "Позиция на доске",
-        white_to_move: "Ход белых",
-        black_to_move: "Ход чёрных",
-        clear_board: "Очистить доску",
-        standard_position: "Стандартная позиция",
-        save_position: "Сохранить позицию",
-        load_position: "Загрузить позицию",
-        apply_to_game: "Применить к игре",
-        position_saved: "Позиция успешно сохранена!",
-        position_loaded: "Позиция успешно загружена!",
-        no_saved_position: "Сохранённая позиция не найдена.",
-        position_applied: "Позиция применена к игре!",
-        // Move navigation
-        go_to_start: "К началу",
-        previous_move: "Предыдущий ход",
-        next_move: "Следующий ход",
-        go_to_end: "К концу",
-        move_history: "История ходов"
-    }
-};
+import { translations } from './translations.js';
+import { EVOLUTION_TREE } from './evolution-tree.js';
+import {pieceValues, PST} from './engine-pieces.js'
 
 let currentLanguage = 'en'; // Default to English
 
@@ -822,37 +554,6 @@ let PIECE_TYPES = {
     'queen_range': { name: 'range', desc: 'range_desc', symbol: SYMBOLS.range, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
 
-let EVOLUTION_TREE = {
-    'pawn': ['pawn_spearman', 'pawn_runner', 'pawn_torpedo'], 
-    'knight': ['knight_paladin', ,'knight_camel' , 'knight_knight'],
-    // 'bishop': ['bishop_bomber', 'bishop_ghost', 'two_color_bishop'],
-    'bishop': ['bishop_ghost', 'two_color_bishop', 'bishop_swapper'],
-    'rook': ['rook_ghost', 'rook_tank', 'statue'],
-    'queen': ['queen_knight', 'queen_camel', 'queen_upgradeable'], 
-
-    'pawn_runner': ['pawn_spartan', 'pawn_superrunner'],
-    'pawn_spearman': ['pawn_spartan'],
-    
-    'knight_camel': ['knight_camel_hybrid', 'knight_endless'],
-    'knight_paladin': ['rook', 'knight_king'],
-    'knight_knight': ['rook', 'knight_king', 'bishop_ship'],
-
-    'two_color_bishop': ['rook', 'bishop_ship'],
-    'bishop_bomber': ['bishop_nuke'],
-    'bishop_ghost': ['bishop_sniper'],
-    'swap_bishop': ['rook'],
-
-    'rook_tank': ['rook_helicopter', 'queen'],
-    'rook_ghost': ['rook_sniper'],
-
-    'queen_camel': ['queen_knight_camel'],
-    'queen_knight': ['queen_knight_camel'],
-    'queen_upgradeable': ['king_nuke', 'queen_ghost', 'queen_range', 'king'],
-
-    'pawn_superrunner': ['knight'],
-    'pawn_spartan': ['bishop']
-};
-
 let board = [];
 let currentTurn = 'white';
 let selectedCell = null;
@@ -1183,6 +884,8 @@ function initGame() {
 }
 
 function updateGameStatus() {
+    // If the game is already over we should not re-run win/draw notifications.
+    if (gameOver) return;
     white_kings = 0;
     black_kings = 0;
     
@@ -1196,15 +899,16 @@ function updateGameStatus() {
         }
     }
 
+    // gameOver should be true when player wins then give alert because alert will pause the js execution
     if (white_kings === 0 && black_kings === 0) {
+        gameOver = true;
         alert(t('draw_kings_destroyed'));
-        gameOver = true;
     } else if (white_kings === 0) {
+        gameOver = true;
         alert(t('black_wins'));
-        gameOver = true;
     } else if (black_kings === 0) {
-        alert(t('white_wins'));
         gameOver = true;
+        alert(t('white_wins'));
     }
 }
 
@@ -2505,71 +2209,6 @@ function log(msg) {
         }
         return epTarget;
     }
-
-    // Оценочная функция — материал + piece-square + мобильность + король
-    const pieceValues = {
-        pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 20000, 
-        queen_camel: 1200, queen_knight: 1200, rook_ghost: 600, rook_tank: 600, swap_bishop: 350, camel: 250, spearman: 150, runner: 150, torpedo: 130
-
-        // pawn: 100, knight: 320, bishop: 330, rook: 500, queen: 900, king: 20000
-    };
-    // простые piece-square tables (имеют смысл для классических фигур)
-    const PST = {
-        pawn: [
-            0,0,0,0,0,0,0,0,
-            50,50,50,50,50,50,50,50,
-            10,10,20,30,30,20,10,10,
-            5,5,10,25,25,10,5,5,
-            0,0,0,20,20,0,0,0,
-            5,-5,-10,0,0,-10,-5,5,
-            5,10,10,-20,-20,10,10,5,
-            0,0,0,0,0,0,0,0
-        ],
-        knight: [
-            -50,-40,-30,-30,-30,-30,-40,-50,
-            -40,-20,0,0,0,0,-20,-40,
-            -30,0,10,15,15,10,0,-30,
-            -30,5,15,20,20,15,5,-30,
-            -30,0,15,20,20,15,0,-30,
-            -30,5,10,15,15,10,5,-30,
-            -40,-20,0,5,5,0,-20,-40,
-            -50,-40,-30,-30,-30,-30,-40,-50
-        ],
-        // bishop: Array(64).fill(0),
-        bishop: [
-            -20,-10,-10,-10,-10,-10,-10,-20,
-            -10,0,0,0,0,0,0,-10,
-            -10,0,5,10,10,5,0,-10,
-            -10,5,5,10,10,5,5,-10,
-            -10,0,10,10,10,10,0,-10,
-            -10,10,10,10,10,10,10,-10,
-            -10,5,0,0,0,0,5,-10,
-            -20,-10,-10,-10,-10,-10,-10,-20
-        ],
-        // rook: Array(64).fill(0),
-        rook: [
-            0,0,0,0,0,0,0,0,
-            5,10,10,10,10,10,10,5,
-            -5,0,0,0,0,0,0,-5,
-            -5,0,0,0,0,0,0,-5,
-            -5,0,0,0,0,0,0,-5,
-            -5,0,0,0,0,0,0,-5,
-            -5,0,0,0,0,0,0,-5,
-            0,0,0,5,5,0,0,0
-        ],
-        // queen: Array(64).fill(0),
-        queen: [
-            -20,-10,-10,-5,-5,-10,-10,-20,
-            -10,0,0,0,0,0,0,-10,
-            -10,0,5,5,5,5,0,-10,
-            -5,0,5,5,5,5,0,-5,
-            0,0,5,5,5,5,0,-5,
-            -10,5,5,5,5,5,0,-10,
-            -10,0,5,0,0,0,0,-10,
-            -20,-10,-10,-5,-5,-10,-10,-20
-        ],
-        king: Array(64).fill(0)
-    };
 
     function evaluateBoard(boardState, sideToMove) {
         let score = 0;
