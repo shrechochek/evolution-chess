@@ -1,6 +1,10 @@
 import { translations } from './translations.js';
 import { EVOLUTION_TREE } from './evolution-tree.js';
 import {pieceValues, PST} from './engine-pieces.js'
+import { SYMBOLS, VEC_ORTHO, VEC_DIAG, VEC_KNIGHT, VEC_CAMEL, move_audio, capture_audio, slide, step, BOARD_SIZE } from './modules/constants.js';
+import { createAI } from './modules/ai.js';
+import { createPositionEditor } from './modules/position-editor.js';
+import { createGame } from './modules/game.js';
 
 let currentLanguage = 'en'; // Default to English
 
@@ -80,365 +84,7 @@ function saveSettings() {
     closeSettingsModal();
 }
 
-// Position Editor Functions
-function openPositionEditor() {
-    closeSettingsModal();
-    initializePositionEditor();
-    document.getElementById('position-editor-modal').style.display = 'flex';
-}
-
-function closePositionEditor() {
-    document.getElementById('position-editor-modal').style.display = 'none';
-}
-
-function initializePositionEditor() {
-    // Copy current board state to editor
-    editorBoard = JSON.parse(JSON.stringify(board));
-    editorTurn = currentTurn;
-
-    createEditorBoard();
-    createPieceSelectionPanel();
-    updateEditorTurnButtons();
-    updatePositionEditorTranslations();
-}
-
-function updatePositionEditorTranslations() {
-    // Update titles
-    const pieceSelectionTitle = document.getElementById('piece-selection-title');
-    const boardPositionTitle = document.getElementById('board-position-title');
-
-    if (pieceSelectionTitle) pieceSelectionTitle.textContent = t('piece_selection');
-    if (boardPositionTitle) boardPositionTitle.textContent = t('board_position');
-
-    // Update turn buttons
-    const whiteTurnBtn = document.getElementById('set-white-turn');
-    const blackTurnBtn = document.getElementById('set-black-turn');
-
-    if (whiteTurnBtn) whiteTurnBtn.textContent = t('white_to_move');
-    if (blackTurnBtn) blackTurnBtn.textContent = t('black_to_move');
-
-    // Update action buttons
-    const buttons = document.querySelectorAll('#position-editor-modal [data-action]');
-    buttons.forEach(btn => {
-        const action = btn.getAttribute('data-action');
-        switch (action) {
-            case 'clear':
-                btn.textContent = '🗑️ ' + t('clear_board');
-                break;
-            case 'standard':
-                btn.textContent = '♟️ ' + t('standard_position');
-                break;
-            case 'save':
-                btn.textContent = '💾 ' + t('save_position');
-                break;
-            case 'load':
-                btn.textContent = '📂 ' + t('load_position');
-                break;
-            case 'apply':
-                btn.textContent = '✓ ' + t('apply_to_game');
-                break;
-            case 'cancel':
-                btn.textContent = t('cancel', 'Cancel');
-                break;
-        }
-    });
-}
-
-function createEditorBoard() {
-    const editorBoardEl = document.getElementById('editor-board');
-    editorBoardEl.innerHTML = '';
-
-    for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-            const cell = document.createElement('div');
-            cell.className = `editor-cell ${(x + y) % 2 === 0 ? 'light' : 'dark'}`;
-            cell.setAttribute('data-x', x);
-            cell.setAttribute('data-y', y);
-            cell.onclick = () => handleEditorCellClick(x, y);
-
-            const piece = editorBoard[y][x];
-            if (piece) {
-                const pieceEl = document.createElement('div');
-                pieceEl.className = `editor-piece ${piece.color}`;
-                pieceEl.style.fontSize = '24px';
-                pieceEl.style.display = 'flex';
-                pieceEl.style.alignItems = 'center';
-                pieceEl.style.justifyContent = 'center';
-
-                const img = document.createElement('img');
-                // Get the correct symbol name from PIECE_TYPES
-                const pieceDef = PIECE_TYPES[piece.type];
-                const symbolName = pieceDef ? pieceDef.symbol || piece.type : piece.type;
-                const imgName = `${piece.color}_${symbolName}`;
-                if (CUSTOM_ASSETS[imgName]) {
-                    img.src = CUSTOM_ASSETS[imgName];
-                } else {
-                    img.src = `assets/images/figures/${imgName}.svg`;
-                }
-                img.style.width = '100%';
-                img.style.height = '100%';
-                img.onerror = function() {
-                    this.style.display = 'none';
-                    pieceEl.textContent = getPieceSymbol(piece.type);
-                };
-
-                pieceEl.appendChild(img);
-                cell.appendChild(pieceEl);
-            }
-
-            editorBoardEl.appendChild(cell);
-        }
-    }
-}
-
-function createPieceSelectionPanel() {
-    const panel = document.getElementById('piece-selection-panel');
-    panel.innerHTML = '';
-
-    // Group pieces by tier
-    const piecesByTier = {};
-    const maxTier = 3;
-
-    // Initialize tiers
-    for (let tier = 1; tier <= maxTier; tier++) {
-        piecesByTier[tier] = [];
-    }
-
-    // Sort pieces into tiers
-    Object.keys(PIECE_TYPES).forEach(pieceType => {
-        const pieceDef = PIECE_TYPES[pieceType];
-        if (pieceDef.tier && pieceDef.tier >= 1 && pieceDef.tier <= maxTier) {
-            piecesByTier[pieceDef.tier].push(pieceType);
-        }
-    });
-
-    // Create tier sections
-    for (let tier = 1; tier <= maxTier; tier++) {
-        const tierPieces = piecesByTier[tier];
-        if (tierPieces.length === 0) continue;
-
-        // Add tier header
-        const tierHeader = document.createElement('div');
-        tierHeader.className = 'tier-header';
-        tierHeader.textContent = `Tier ${tier}`;
-        tierHeader.style.fontSize = '14px';
-        tierHeader.style.fontWeight = 'bold';
-        tierHeader.style.margin = '10px 0 5px 0';
-        tierHeader.style.color = '#f1c40f';
-        panel.appendChild(tierHeader);
-
-        // Add pieces for this tier
-        const tierContainer = document.createElement('div');
-        tierContainer.className = 'tier-pieces';
-        tierContainer.style.display = 'flex';
-        tierContainer.style.flexWrap = 'wrap';
-        tierContainer.style.gap = '2px';
-        tierContainer.style.marginBottom = '15px';
-
-        tierPieces.forEach(pieceType => {
-            const pieceButton = document.createElement('button');
-            pieceButton.className = 'piece-selection-btn';
-            pieceButton.setAttribute('data-piece-type', pieceType);
-            pieceButton.onclick = () => selectPiece(pieceType);
-
-            const img = document.createElement('img');
-            const imgName = `${selectedPieceColor}_${PIECE_TYPES[pieceType].symbol || pieceType}`;
-            if (CUSTOM_ASSETS[imgName]) {
-                img.src = CUSTOM_ASSETS[imgName];
-            } else {
-                img.src = `images/${imgName}.svg`;
-            }
-            img.style.width = '32px';
-            img.style.height = '32px';
-            img.onerror = function() {
-                this.style.display = 'none';
-                pieceButton.textContent = getPieceSymbol(pieceType);
-                pieceButton.style.fontSize = '20px';
-                pieceButton.style.padding = '8px';
-            };
-
-            pieceButton.appendChild(img);
-
-            // Add tooltip with piece name
-            const pieceDef = PIECE_TYPES[pieceType];
-            const pieceName = pieceDef.name || pieceType;
-            pieceButton.title = pieceName.charAt(0).toUpperCase() + pieceName.slice(1).replace(/_/g, ' ');
-
-            tierContainer.appendChild(pieceButton);
-        });
-
-        panel.appendChild(tierContainer);
-    }
-}
-
-function selectPiece(pieceType) {
-    selectedPieceType = pieceType;
-
-    // Update visual selection
-    document.querySelectorAll('.piece-selection-btn').forEach(btn => {
-        const isSelected = btn.getAttribute('data-piece-type') === pieceType;
-        btn.classList.toggle('selected', isSelected);
-    });
-}
-
-function handleEditorCellClick(x, y) {
-    if (selectedPieceType) {
-        // Place selected piece
-        editorBoard[y][x] = {
-            type: selectedPieceType,
-            color: selectedPieceColor,
-            xp: 0,
-            hasMoved: false,
-            id: Math.random().toString(36).substr(2, 9)
-        };
-    } else {
-        // Remove piece
-        editorBoard[y][x] = null;
-    }
-
-    createEditorBoard();
-}
-
-function getPieceSymbol(pieceType) {
-    // First try to get from PIECE_TYPES symbol mapping
-    if (PIECE_TYPES[pieceType] && PIECE_TYPES[pieceType].symbol) {
-        const symbolKey = PIECE_TYPES[pieceType].symbol;
-        if (SYMBOLS[symbolKey]) {
-            return SYMBOLS[symbolKey];
-        }
-    }
-
-    // Fallback to hardcoded symbols for basic pieces
-    const symbols = {
-        pawn: '♟', knight: '♞', bishop: '♗', rook: '♜', queen: '♛', king: '♚'
-    };
-    return symbols[pieceType] || '?';
-}
-
-// Color selection
-document.getElementById('select-white-pieces').onclick = () => {
-    selectedPieceColor = 'white';
-    document.getElementById('select-white-pieces').style.background = '#f1c40f';
-    document.getElementById('select-black-pieces').style.background = '#34495e';
-    createPieceSelectionPanel();
-};
-
-document.getElementById('select-black-pieces').onclick = () => {
-    selectedPieceColor = 'black';
-    document.getElementById('select-black-pieces').style.background = '#f1c40f';
-    document.getElementById('select-white-pieces').style.background = '#34495e';
-    createPieceSelectionPanel();
-};
-
-// Turn selection
-document.getElementById('set-white-turn').onclick = () => {
-    editorTurn = 'white';
-    updateEditorTurnButtons();
-};
-
-document.getElementById('set-black-turn').onclick = () => {
-    editorTurn = 'black';
-    updateEditorTurnButtons();
-};
-
-function updateEditorTurnButtons() {
-    const whiteBtn = document.getElementById('set-white-turn');
-    const blackBtn = document.getElementById('set-black-turn');
-
-    if (editorTurn === 'white') {
-        whiteBtn.style.background = '#f1c40f';
-        whiteBtn.style.color = '#333';
-        blackBtn.style.background = '#34495e';
-        blackBtn.style.color = 'white';
-    } else {
-        blackBtn.style.background = '#f1c40f';
-        blackBtn.style.color = '#333';
-        whiteBtn.style.background = '#34495e';
-        whiteBtn.style.color = 'white';
-    }
-}
-
-// Board operations
-function clearEditorBoard() {
-    editorBoard = Array(8).fill(null).map(() => Array(8).fill(null));
-    createEditorBoard();
-}
-
-function loadStandardPosition() {
-    // Create standard chess starting position
-    editorBoard = Array(8).fill(null).map(() => Array(8).fill(null));
-
-    // Place pawns
-    for (let x = 0; x < 8; x++) {
-        editorBoard[1][x] = createPiece('pawn', 'black');
-        editorBoard[6][x] = createPiece('pawn', 'white');
-    }
-
-    // Place other pieces
-    const backRow = ['rook', 'knight', 'bishop', 'queen', 'king', 'bishop', 'knight', 'rook'];
-    backRow.forEach((type, x) => {
-        if (PIECE_TYPES[type]) {
-            editorBoard[0][x] = createPiece(type, 'black');
-            editorBoard[7][x] = createPiece(type, 'white');
-        }
-    });
-
-    editorTurn = 'white';
-    updateEditorTurnButtons();
-    createEditorBoard();
-}
-
-function savePosition() {
-    const positionData = {
-        board: editorBoard,
-        turn: editorTurn
-    };
-
-    localStorage.setItem('chessPositionEditor', JSON.stringify(positionData));
-    alert(t('position_saved'));
-}
-
-function loadPosition() {
-    const saved = localStorage.getItem('chessPositionEditor');
-    if (saved) {
-        const positionData = JSON.parse(saved);
-        editorBoard = positionData.board;
-        editorTurn = positionData.turn;
-        updateEditorTurnButtons();
-        createEditorBoard();
-        alert(t('position_loaded'));
-    } else {
-        alert(t('no_saved_position'));
-    }
-}
-
-function applyPosition() {
-    // Apply the edited position to the main game
-    board = JSON.parse(JSON.stringify(editorBoard));
-    currentTurn = editorTurn;
-
-    // Reset game state
-    possibleMoves = [];
-    selectedCell = null;
-    gameOver = false;
-    alertGameOver = false;
-    let moveHistory = [];
-    let historyIndex = -1;
-    enPassantTarget = null;
-    let castlingRights = {
-        white: { kingSide: true, queenSide: true },
-        black: { kingSide: true, queenSide: true }
-    };
-
-    // Clear arrows and update UI
-    clearArrows();
-    renderBoard();
-    // updateMoveHistory();
-    // updateTurnIndicator();
-
-    closePositionEditor();
-    alert(t('position_applied'));
-}
+// Position editor was moved to modules/position-editor.js; use the factory to create an instance
 
 function updateSettingsModal() {
     // Update settings modal content if needed
@@ -463,44 +109,8 @@ function updateSettingsModal() {
     }
 }
 
-// Position Editor variables
-let selectedPieceType = null;
-let selectedPieceColor = 'white';
-let editorBoard = Array(8).fill(null).map(() => Array(8).fill(null));
-let editorTurn = 'white';
-
-const BOARD_SIZE = 8;
-
+// Position Editor support (state lives inside the position-editor module)
 let CUSTOM_ASSETS = {}; 
-
-let SYMBOLS = {
-    // Basic
-    pawn: 'pawn', knight: 'knight', bishop: 'bishop', rook: 'rook', queen: 'queen', king: 'king',
-    // Tier 2
-    spearman: 'spearman', runner: 'runner', torpedo: 'torpedo',
-    camel: 'camel', paladin: 'paladin', knight_knight: 'knight_knight',
-    bomber: 'bomber', ghost: 'ghost', two_color_bishop: 'two_color_bishop', swap_bishop: 'swap_bishop',
-    tank: 'tank', car: 'car', statue: 'statue',
-    ring: 'ring', crown: 'crown', queen_upgradeable: 'queen_upgradeable',
-    tnt: 'tnt', dead_end: 'dead_end',
-    // Tier 3
-    spartan: 'spartan', super_runner: 'super_runner',
-    camel_knight: 'camel_knight', endless_knight: 'endless_knight', moose: 'moose',
-    nuke_bishop: 'nuke_bishop', sniper: 'sniper', ship: 'ship',
-    helicopter: 'helicopter', rocket: 'rocket',
-    unicorn: 'unicorn', pin: 'pin', range: 'range',
-};
-
-const VEC_ORTHO = [{dx:1,dy:0},{dx:-1,dy:0},{dx:0,dy:1},{dx:0,dy:-1}];
-const VEC_DIAG = [{dx:1,dy:1},{dx:1,dy:-1},{dx:-1,dy:1},{dx:-1,dy:-1}];
-const VEC_KNIGHT = [{dx:2,dy:1},{dx:2,dy:-1},{dx:-2,dy:1},{dx:-2,dy:-1},{dx:1,dy:2},{dx:1,dy:-2},{dx:-1,dy:2},{dx:-1,dy:-2}];
-const VEC_CAMEL = [{dx:3,dy:1},{dx:3,dy:-1},{dx:-3,dy:1},{dx:-3,dy:-1},{dx:1,dy:3},{dx:1,dy:-3},{dx:-1,dy:3},{dx:-1,dy:-3}];
-
-const move_audio = new Audio('assets/sounds/effects/move.mp3');
-const capture_audio = new Audio('assets/sounds/effects/capture.mp3');
-
-function slide(vectors) { return vectors.map(v => ({...v, slide: true})); }
-function step(vectors) { return vectors.map(v => ({...v, slide: false})); }
 
 let PIECE_TYPES = {
     // === TIER 1 ===
@@ -554,6 +164,9 @@ let PIECE_TYPES = {
     'queen_ghost': { name: 'pin', desc: 'pin_desc', symbol: SYMBOLS.pin, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], ghost : 2 },
     'queen_range': { name: 'range', desc: 'range_desc', symbol: SYMBOLS.range, tier: 3, xpReq: -1, moves: [...slide(VEC_ORTHO), ...slide(VEC_DIAG)], special: 'range_capture'}
 };
+
+// Create game core instance (delegates move generation, attack checks, explosions, evolution rules)
+const GAME = createGame({ getPieceTypes: () => PIECE_TYPES, getEvolutionTree: () => EVOLUTION_TREE });
 
 let board = [];
 let currentTurn = 'white';
@@ -859,15 +472,16 @@ function updateNavigationButtons() {
 
 function addActionsToButtons() {
     // Set actions for buttons
-    document.getElementById('save-position-btn').addEventListener("click", savePosition);
-    document.getElementById('load-position-btn').addEventListener("click", loadPosition);
-    document.getElementById('apply-position-btn').addEventListener("click", applyPosition);
-    
-    document.getElementById('open-position-editor-btn').addEventListener("click", openPositionEditor);
-    document.getElementById('close-position-editor-btn').addEventListener("click", closePositionEditor);
-    
-    document.getElementById('clear-editor-board-btn').addEventListener("click", clearEditorBoard);
-    document.getElementById('load-standart-position-btn').addEventListener("click", loadStandardPosition);
+    // Position editor actions will be delegated to the position-editor module instance
+    const saveBtn = document.getElementById('save-position-btn'); if (saveBtn) saveBtn.addEventListener('click', () => POSITION_EDITOR && POSITION_EDITOR.savePosition());
+    const loadBtn = document.getElementById('load-position-btn'); if (loadBtn) loadBtn.addEventListener('click', () => POSITION_EDITOR && POSITION_EDITOR.loadPosition());
+    const applyBtn = document.getElementById('apply-position-btn'); if (applyBtn) applyBtn.addEventListener('click', () => POSITION_EDITOR && POSITION_EDITOR.applyPosition());
+
+    const openBtn = document.getElementById('open-position-editor-btn'); if (openBtn) openBtn.addEventListener('click', () => POSITION_EDITOR && POSITION_EDITOR.openPositionEditor());
+    const closeBtn = document.getElementById('close-position-editor-btn'); if (closeBtn) closeBtn.addEventListener('click', () => POSITION_EDITOR && POSITION_EDITOR.closePositionEditor());
+
+    const clearBtn = document.getElementById('clear-editor-board-btn'); if (clearBtn) clearBtn.addEventListener('click', () => POSITION_EDITOR && POSITION_EDITOR.clearEditorBoard());
+    const stdBtn = document.getElementById('load-standart-position-btn'); if (stdBtn) stdBtn.addEventListener('click', () => POSITION_EDITOR && POSITION_EDITOR.loadStandardPosition());
     
     document.querySelector('.settings-icon').addEventListener("click", showSettingsModal);
     document.getElementById('save-settings-btn').addEventListener("click", saveSettings);
@@ -972,19 +586,11 @@ function createPiece(type, color) {
     };
 }
 
+// Initialize the position editor module (depends on createPiece & PIECE_TYPES)
+const POSITION_EDITOR = createPositionEditor({ PIECE_TYPES, CUSTOM_ASSETS, createPiece, t, SYMBOLS, BOARD_SIZE });
+
 function isSquareAttacked(tx, ty, attackerColor, checkBoard) {
-    for (let y = 0; y < 8; y++) {
-        for (let x = 0; x < 8; x++) {
-            const piece = checkBoard[y][x];
-            if (piece && piece.color === attackerColor) {
-                const moves = getValidMoves(piece, x, y, checkBoard, true);
-                if (moves.some(m => m.x === tx && m.y === ty)) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
+    return GAME.isSquareAttacked(tx, ty, attackerColor, checkBoard, enPassantTarget);
 }
 
 function isInCheck(color, checkBoard = board) {
@@ -995,7 +601,7 @@ function isInCheck(color, checkBoard = board) {
             if (piece && PIECE_TYPES[piece.type].role === 'king' && piece.color === color) {
                 // Проверить, атакуется ли позиция короля противником
                 const opponentColor = color === 'white' ? 'black' : 'white';
-                return isSquareAttacked(x, y, opponentColor, checkBoard);
+                return GAME.isInCheck(color, checkBoard, enPassantTarget);
             }
         }
     }
@@ -1003,157 +609,11 @@ function isInCheck(color, checkBoard = board) {
 }
 
 function getValidMoves(piece, startX, startY, checkBoard = board, ignoreCastling = false) {
-    const moves = [];
-    const def = PIECE_TYPES[piece.type];
-    const isWhite = piece.color === 'white';
-    const direction = isWhite ? -1 : 1;
-
-    if (def.special === 'teleport') {
-        for(let y=0; y<8; y++) {
-            for(let x=0; x<8; x++) {
-                if (!checkBoard[y][x]) {
-                    moves.push({x, y});
-                }
-            }
-        }
-        return moves; 
-    }
-
-    if (def.role === 'pawn') {
-        let dy = direction;
-        if (isValidPos(startX, startY + dy) && !checkBoard[startY + dy][startX]) {
-            moves.push({x: startX, y: startY + dy});
-            if (!piece.hasMoved && isValidPos(startX, startY + dy * 2) && !checkBoard[startY + dy * 2][startX]) {
-                moves.push({x: startX, y: startY + dy * 2, isDoublePawnMove: true});
-            }
-        }
-        [[-1, dy], [1, dy]].forEach(att => {
-            const tx = startX + att[0];
-            const ty = startY + att[1];
-            if (isValidPos(tx, ty)) {
-                const target = checkBoard[ty][tx];
-                if (target && target.color !== piece.color) {
-                    if (!PIECE_TYPES[target.type].immortal) {
-                         moves.push({x: tx, y: ty, isCapture: true});
-                    }
-                }
-                else if (!target && enPassantTarget && enPassantTarget.x === tx && enPassantTarget.y === ty) {
-                     moves.push({x: tx, y: ty, isCapture: true, isEnPassant: true});
-                }
-            }
-        });
-        if (def.special === 'spear_attack') {
-            const forwardY = startY + direction;
-            if (isValidPos(startX, forwardY)) {
-                const target = checkBoard[forwardY][startX];
-                if (target && target.color !== piece.color) {
-                     if (!PIECE_TYPES[target.type].immortal) {
-                         moves.push({x: startX, y: forwardY, isCapture: true});
-                     }
-                }
-            }
-        }
-        if (def.extraMoves) {
-            def.extraMoves.forEach(m => {
-                const actualDy = m.dy * direction; 
-                const tx = startX + m.dx;
-                const ty = startY + actualDy;
-                if (isValidPos(tx, ty) && !checkBoard[ty][tx]) {
-                    moves.push({x: tx, y: ty});
-                }
-            });
-        }
-    }
-
-    if (def.moves) {
-        def.moves.forEach(vec => {
-            const dx = vec.dx;
-            const dy = vec.dy;
-            
-            if (vec.slide) {
-                let obstaclesPassed = 0;
-                const ghostLimit = (def.ghost === true) ? Infinity : (def.ghost || 0);
-
-                for (let i = 1; i < 8; i++) {
-                    const tx = startX + (dx * i);
-                    const ty = startY + (dy * i);
-                    if (!isValidPos(tx, ty)) break;
-                    
-                    const target = checkBoard[ty][tx];
-                    if (!target) {
-                        moves.push({x: tx, y: ty});
-                    } else {
-                        // 1. Проверка на ВРАГА (Обычное взятие)
-                        if (target.color !== piece.color) {
-                            if (!PIECE_TYPES[target.type].immortal) {
-                                moves.push({x: tx, y: ty, isCapture: true});
-                            }
-                        } 
-                        // 2. Проверка на СОЮЗНИКА И СПЕЦ. СПОСОБНОСТЬ (Обмен)
-                        else if (def.special === 'swap_ally' && target.color === piece.color) {
-                            // Если фигура - Слон-рокировщик и цель - союзник:
-                            moves.push({x: tx, y: ty, isSwap: true});
-                            // Обмен является конечным ходом в этом направлении, дальше не скользим
-                            break; 
-                        }
-
-                        // Продолжение обработки препятствий (для "Призрака" и т.п.)
-                        obstaclesPassed++;
-                        if (obstaclesPassed > ghostLimit) break;
-                    }
-                }
-            } else {
-                const tx = startX + dx;
-                const ty = startY + dy;
-                if (isValidPos(tx, ty)) {
-                    const target = checkBoard[ty][tx];
-                    if (!target) {
-                        moves.push({x: tx, y: ty});
-                    } else if (target.color !== piece.color) {
-                        if (!PIECE_TYPES[target.type].immortal) {
-                            moves.push({x: tx, y: ty, isCapture: true});
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    if (def.role === 'king' && !piece.hasMoved && !ignoreCastling) {
-        const row = isWhite ? 7 : 0;
-        const oppColor = isWhite ? 'black' : 'white';
-        
-        const kRook = checkBoard[row][7];
-        if (kRook && PIECE_TYPES[kRook.type].role === 'rook' && !kRook.hasMoved) {
-            if (!checkBoard[row][5] && !checkBoard[row][6]) {
-                if (
-                    !isSquareAttacked(4, row, oppColor, checkBoard) &&
-                    !isSquareAttacked(5, row, oppColor, checkBoard) &&
-                    !isSquareAttacked(6, row, oppColor, checkBoard)
-                ) {
-                    moves.push({x: 6, y: row, isCastling: true, rookX: 7, rookToX: 5});
-                }
-            }
-        }
-        
-        const qRook = checkBoard[row][0];
-        if (qRook && PIECE_TYPES[qRook.type].role === 'rook' && !qRook.hasMoved) {
-            if (!checkBoard[row][1] && !checkBoard[row][2] && !checkBoard[row][3]) {
-                if (
-                    !isSquareAttacked(4, row, oppColor, checkBoard) &&
-                    !isSquareAttacked(3, row, oppColor, checkBoard) &&
-                    !isSquareAttacked(2, row, oppColor, checkBoard)
-                ) {
-                    moves.push({x: 2, y: row, isCastling: true, rookX: 0, rookToX: 3});
-                }
-            }
-        }
-    }
-    return moves;
+    return GAME.getValidMoves(piece, startX, startY, checkBoard, enPassantTarget, ignoreCastling);
 }
 
 function isValidPos(x, y) {
-    return x >= 0 && x < 8 && y >= 0 && y < 8;
+    return GAME.isValidPos(x, y);
 }
 
 function cellClick(x, y) {
@@ -1191,200 +651,88 @@ function cellClick(x, y) {
 }
 
 function makeMove(fromX, fromY, move) {
-    const toX = move.x;
-    const toY = move.y;
     const piece = board[fromY][fromX];
-    let target = board[toY][toX];
-    let pawnPromoted = false; // Флаг для отслеживания превращения пешки
+    if (!piece) return;
 
     addMoveToNotationHistory(piece, fromX, fromY, move);
 
-    if (move.isSwap) {
-        board[fromY][fromX] = target;
-        board[toY][toX] = piece;
-        
-        piece.hasMoved = true;
-        
-        log(`🔄 ${getPieceDisplayName(piece.type)} swapped with ${getPieceDisplayName(target.type)}`);
-        move_audio.play().catch(e=>{});
+    // Delegate actual mutation to GAME.applyMove which returns events and new enPassantTarget
+    const res = GAME.applyMove(board, fromX, fromY, move, { enPassantTarget });
+    enPassantTarget = res.enPassantTarget;
 
+    // Decide audio: any capture events => capture_audio, swap considered as move
+    const hasCapture = res.events.some(e => e.type === 'capture');
+    const hasSwap = res.events.some(e => e.type === 'swap');
+    if (hasCapture) capture_audio.play().catch(() => {}); else if (hasSwap) move_audio.play().catch(() => {}); else move_audio.play().catch(() => {});
 
-        const isAtEnd = (target.color === 'white' && fromY === 0) || (target.color === 'black' && fromY === 7);
-        log("hi");
-        log(isAtEnd)
-        if (PIECE_TYPES[target.type].role === 'pawn' && isAtEnd) {
-            updateGameStatus(); // Проверяем состояние перед превращением
-            if (!gameOver) {
-                renderBoard();
-                showPromotionModal(target);
-            }
-            return; 
+    // Log en-passant
+    res.events.forEach(e => {
+        if (e.type === 'capture' && e.enPassant) {
+            log(t('en_passant'));
         }
-        
-        endTurn();
-        return;
-    }
-    
-    let captureHappened = false;
-    let enemyType = null;
-    let explosion = false;
+    });
 
-    if (move.isEnPassant) {
-        const dir = piece.color === 'white' ? 1 : -1; 
-        const capturedPawnY = toY + dir;
-        target = board[capturedPawnY][toX]; 
-        board[capturedPawnY][toX] = null; 
-        captureHappened = true;
-        log(t('en_passant'));
-    }
-
-    if (target) {
-        capture_audio.play().catch(e=>{});
-        captureHappened = true;
-        enemyType = target.type;
-        piece.xp += 1;
-        
-        if (['explode_3', 'detonate_3'].includes(PIECE_TYPES[target.type].special)) {
-            explode(toX, toY, board[toY][toX].color, 1);
-            explosion = true;
-        } else if (['explode_5', 'detonate_5'].includes(PIECE_TYPES[target.type].special)) {
-            explode(toX, toY, board[toY][toX].color, 2);
-            explosion = true;
-        } else if (['explode_all_5', 'explode_all_3', 'explode_all_7', 'explode_all_1', 'explode_all_9'].includes(PIECE_TYPES[target.type].special)) {
-            let radius_to_explode = parseInt(PIECE_TYPES[target.type].special[(PIECE_TYPES[target.type].special).length - 1], 10);
-            explode_all(toX, toY, board[toY][toX].color, (radius_to_explode-1) / 2);
-            explosion = true;
+    // Log swaps
+    res.events.forEach(e => {
+        if (e.type === 'swap') {
+            if (e.swappedWith) log(`🔄 ${getPieceDisplayName(e.piece.type)} swapped with ${getPieceDisplayName(e.swappedWith.type)}`);
         }
-    } else {
-        move_audio.play().catch(e=>{});
-    }
+    });
 
-    // Перемещение и обработка особых эффектов при перемещении
-    if(target) {
-        if(PIECE_TYPES[piece.type].special === 'range_capture') {
-            board[toY][toX] = null;
-        } else if(explosion) {
-            // Если произошел взрыв при взятии, проверяем, умирает ли атакующий
-            if(PIECE_TYPES[piece.type].role !== 'king' && PIECE_TYPES[piece.type].role !== 'pawn') {
-                board[toY][toX] = null; // Не король и не пешка умирают от взрыва камикадзе
-            } else {
-                board[toY][toX] = piece; // Короли и пешки занимают место
-            }
-        } else if(PIECE_TYPES[target.type].special === 'revenge') {
-            explosion = true;
-            // // Логика "мести": если атакующий не король, он умирает
-            // if(PIECE_TYPES[piece.type].role === 'king') {
-            //      // Король выживает при мести (упрощение, или можно добавить урон)
-            //      board[toY][toX] = piece;
-            // } else {
-            //     board[toY][toX] = null;
-            // }
-            explode_all(toX, toY, board[toY][toX].color, 1);
-            board[toY][toX] = null;
-        } else {
-            board[toY][toX] = piece;
+    // Log captures
+    res.events.forEach(e => {
+        if (e.type === 'capture' && e.target) {
+            log(t('piece_capture', { piece: getPieceDisplayName(e.piece.type), target: getPieceDisplayName(e.target.type) }));
         }
-    } else {
-        board[toY][toX] = piece;
-    }
+    });
 
-    // Очистка старой клетки (если это не дальняя атака)
-    if(PIECE_TYPES[piece.type].special !== 'range_capture') {
-        board[fromY][fromX] = null;
-    } else if(!target) {
-        board[fromY][fromX] = null; // Если range_capture но никого не съел - просто ход
-    }
-    
-    piece.hasMoved = true;
-
-    // Рокировка
-    if (move.isCastling) {
-        const rook = board[toY][move.rookX];
-        board[toY][move.rookToX] = rook;
-        board[toY][move.rookX] = null;
-        rook.hasMoved = true;
-        log(t('castling'));
-    }
-
-    // Взятие на проходе (метка)
-    if (move.isDoublePawnMove) {
-        const dir = piece.color === 'white' ? -1 : 1;
-        enPassantTarget = { x: toX, y: toY - dir }; 
-    } else {
-        enPassantTarget = null;
-    }
-
-    const def = PIECE_TYPES[piece.type];
-    const isAtEnd = (piece.color === 'white' && toY === 0) || (piece.color === 'black' && toY === 7);
-    
-    if (def.role === 'pawn' && isAtEnd) {
-        updateGameStatus(); // Проверяем состояние перед превращением
-        if (!gameOver) {
-            renderBoard();
-            // Для ИИ - автоматическое превращение в ферзя
-            if (piece.color !== aiSide) {
-                showPromotionModal(piece);
-                return;
-            } else {
-                // Автоматическая эволюция для ИИ - превращаем в ферзя
-                piece.type = 'queen';
-                piece.xp = 0;
-                pawnPromoted = true; // Устанавливаем флаг
-                log(`🤖 AI pawn promoted to ${getPieceDisplayName('queen')}`);
-                // Важно: завершаем ход после превращения
-                endTurn();
-                return;
-            }
-        }
-        return;
-    }
-
-    // Взрывы атакующего (Ядерный король, Бомбер и т.д.)
-    if (captureHappened && enemyType) {
-        log(t('piece_capture', { piece: getPieceDisplayName(piece.type), target: getPieceDisplayName(enemyType) }));
-        
-        if (def.special && def.special.startsWith('explode_all')) {
-            // Убрана ошибочная логика ручного декремента королей здесь!
-            let radius_to_explode = parseInt(def.special[(def.special).length - 1], 10);
-            explode_all(toX, toY, piece.color, (radius_to_explode-1) / 2);
-        } else if (def.special && def.special.startsWith('explode')) {
-            const radius = def.special === 'explode_5' ? 2 : 1; 
-            explode(toX, toY, piece.color, radius);
-            board[toX][toY] = null;
-            board[fromX][fromY] = null;
-        }
-    }
-
-    // Проверка на победу/поражение ПОСЛЕ всех взрывов и перемещений
+    // After mutation, check game status
     updateGameStatus();
-    if(gameOver) {
+    if (gameOver) {
         renderBoard();
         return;
     }
 
-    if (canEvolve(piece) && explosion === false && !pawnPromoted) {
-        renderBoard();
-        if (piece.color === aiSide) {
-            // Автоматическая эволюция для ИИ - выбираем первую доступную опцию
-            const options = EVOLUTION_TREE[piece.type];
-            if (options && options.length > 0) {
-                const newType = options[0]; // Выбираем первую доступную эволюцию
-                piece.type = newType;
-                piece.xp = 0;
-                log(`🧬 AI evolution completed: ${getPieceDisplayName(newType)}`);
-                updateGameStatus();
-            }
+    // Handle promotion events
+    const promo = res.events.find(e => e.type === 'promotion_needed');
+    if (promo) {
+        // promo.piece is the piece object on board at that square
+        if (promo.piece.color !== aiSide) {
+            renderBoard();
+            showPromotionModal(promo.piece);
+            return; // wait for user to pick
         } else {
-            // Показываем модальное окно для игрока
-            showEvolutionModal(piece);
+            // AI auto-promotes to queen
+            promo.piece.type = 'queen';
+            promo.piece.xp = 0;
+            log(`🤖 AI pawn promoted to ${getPieceDisplayName('queen')}`);
+            endTurn();
             return;
         }
     }
 
-    endTurn();
+    // Handle evolution availability
+    const evo = res.events.find(e => e.type === 'evolution_available');
+    if (evo) {
+        // If AI -> auto-evolve to first option
+        if (evo.piece.color === aiSide) {
+            const options = EVOLUTION_TREE[evo.piece.type];
+            if (options && options.length > 0) {
+                const newType = options[0];
+                evo.piece.type = newType;
+                evo.piece.xp = 0;
+                log(`🧬 AI evolution completed: ${getPieceDisplayName(newType)}`);
+                updateGameStatus();
+            }
+        } else {
+            renderBoard();
+            showEvolutionModal(evo.piece);
+            return;
+        }
+    }
 
-    // Add move to notation history after ending turn (when gameHistory is updated)
-    // addMoveToNotationHistory(piece, fromX, fromY, move);
+    // No UI-blocking events: finish the turn
+    endTurn();
 }
 
 function endTurn() {
@@ -1407,45 +755,14 @@ function endTurn() {
 }
 
 function explode(cx, cy, attackerColor, radius) {
+    // keep UX log here, delegate the actual destruction logic to GAME
     log(t('explosion', { radius }));
-    for (let dy = -radius; dy <= radius; dy++) {
-        for (let dx = -radius; dx <= radius; dx++) {
-            // if (dx===0 && dy===0) log("delete");
-            const tx = cx + dx;
-            const ty = cy + dy;
-            if (isValidPos(tx, ty)) {
-                const victim = board[ty][tx];
-                if (victim && PIECE_TYPES[victim.type].role !== 'pawn' && !PIECE_TYPES[victim.type].immortal) { 
-                    const isNuke = radius > 1;
-                    // if (isNuke || victim.color !== attackerColor) {
-                    board[ty][tx] = null;
-                        // Счетчики королей здесь не трогаем, они обновятся в updateGameStatus
-                    // }
-                }
-            }
-        }
-    }
+    GAME.explode(board, cx, cy, attackerColor, radius);
 }
 
 function explode_all(cx, cy, attackerColor, radius) {
     log(t('explosion', { radius }));
-    for (let dy = -radius; dy <= radius; dy++) {
-        for (let dx = -radius; dx <= radius; dx++) {
-            // if (dx===0 && dy===0) continue; // Центр взрыва (сам атакующий) не уничтожается
-            const tx = cx + dx;
-            const ty = cy + dy;
-            if (isValidPos(tx, ty)) {
-                const victim = board[ty][tx];
-                if (victim && !PIECE_TYPES[victim.type].immortal) { 
-                    const isNuke = radius > 1;
-                    if (isNuke) {
-                        board[ty][tx] = null;
-                        // Счетчики королей здесь не трогаем
-                    }
-                }
-            }
-        }
-    }
+    GAME.explode_all(board, cx, cy, attackerColor, radius);
 }
 
 // --- MODALS & RENDER ---
@@ -1509,10 +826,7 @@ function showModal(title, text, items, callback) {
 }
 
 function canEvolve(piece) {
-    const evolutions = EVOLUTION_TREE[piece.type];
-    if (!evolutions || evolutions.length === 0) return false;
-    const def = PIECE_TYPES[piece.type];
-    return piece.xp >= def.xpReq;
+    return GAME.canEvolve(piece);
 }
 
 function showEvolutionModal(piece) {
@@ -2069,479 +1383,8 @@ function log(msg) {
     // Keep event logging for debugging only - move history is now displayed separately
     console.log(`> ${msg}`);
 }
-// ================== AI ENGINE for "Шахматы с эволюцией" ==================
-// Интеграция с существующими переменными/функциями страницы:
-// - board (8x8 array of piece objects)
-// - PIECE_TYPES (definitions)
-// - getValidMoves(piece, x, y, checkBoard, ignoreCastling)
-// - makeMove(fromX, fromY, move)  <-- используется для применения хода в UI
-// - renderBoard(), updateInfo(), log(), initGame()
-// - глобальная enPassantTarget (движок временно перезаписывает её при симуляции)
-// =======================================================================
-
-(function(){
-    // Параметры ИИ — настраиваемые
-    const AI_CONFIG = {
-        timePerMoveMs: 1500,   // лимит времени на ход (ms) — меняйте для "сложности"
-        maxDepthHardCap: 4,    // абсолютный максимум глубины итеративного углубления
-        mode: 'full',       // 'classic' | 'full'  -- classic: только обычные шахматные фигуры
-        useQuiescence: true
-    };
-
-    // Классификация классических фигур
-    const CLASSIC_SET = new Set(['pawn','knight','bishop','rook','queen','king']);
-
-    // Zobrist hashing
-    const Zobrist = {
-        table: {},   // pieceType_color_squareIndex -> BigInt
-        sideToMove: 0n,
-        initialized: false,
-        init() {
-            if (this.initialized) return;
-            this.sideToMove = rand64();
-            const pieceTypes = Object.keys(PIECE_TYPES);
-            for (const p of pieceTypes) {
-                this.table[p] = { white: Array(64).fill(0n), black: Array(64).fill(0n) };
-                for (let sq=0; sq<64; sq++){
-                    this.table[p].white[sq] = rand64();
-                    this.table[p].black[sq] = rand64();
-                }
-            }
-            this.initialized = true;
-        },
-        hashBoard(board, epTarget, side) {
-            // board[y][x] -> piece or null
-            let h = 0n;
-            for (let y=0; y<8; y++){
-                for (let x=0; x<8; x++){
-                    const p = board[y][x];
-                    if (p) {
-                        const idx = y*8 + x;
-                        const color = p.color;
-                        const type = p.type;
-                        if (this.table[type] && this.table[type][color]) {
-                            h ^= this.table[type][color][idx];
-                        }
-                    }
-                }
-            }
-            if (side === 'black') h ^= this.sideToMove;
-            if (epTarget) {
-                // fold en-passant x coordinate (0..7) into hash
-                h ^= BigInt(epTarget.x + 1) * 0x9e3779b97f4a7c15n; // magic
-            }
-            return h.toString(); // string key for Map
-        }
-    };
-
-    function rand64(){
-        // формируем 64-битное случайное BigInt
-        const hi = Math.floor(Math.random() * 0x100000000);
-        const lo = Math.floor(Math.random() * 0x100000000);
-        return (BigInt(hi) << 32n) ^ BigInt(lo);
-    }
-
-    // Клонирование доски и фигур — используется для симуляции ходов
-    function cloneBoard(srcBoard) {
-        const b = Array(8).fill(null).map(()=>Array(8).fill(null));
-        for (let y=0;y<8;y++){
-            for (let x=0;x<8;x++){
-                const p = srcBoard[y][x];
-                if (p) {
-                    b[y][x] = {
-                        type: p.type,
-                        color: p.color,
-                        xp: p.xp || 0,
-                        hasMoved: p.hasMoved || false,
-                        id: p.id || null
-                    };
-                }
-            }
-        }
-        return b;
-    }
-
-    // Утилиты: получить все ходы для стороны на данном board
-    function generateAllMoves(boardState, side, epTarget) {
-        // getValidMoves использует глобальную enPassantTarget — временно подменим
-        const oldEP = enPassantTarget;
-        enPassantTarget = epTarget;
-        const moves = []; // {fromX,fromY, move}
-        for (let y=0;y<8;y++){
-            for (let x=0;x<8;x++){
-                const p = boardState[y][x];
-                if (!p || p.color !== side) continue;
-                // Режим classic: пропустить нетипичные фигуры (если включено)
-                if (AI_CONFIG.mode === 'classic' && !CLASSIC_SET.has(p.type)) continue;
-                try {
-                    const mlist = getValidMoves(p, x, y, boardState, true) || [];
-                    for (const m of mlist) {
-                        moves.push({fromX:x, fromY:y, move:m});
-                    }
-                } catch (e) {
-                    // на всякий случай — если getValidMoves падает для модиф. фигур
-                    // пропускаем эти фигуры (в классическом режиме это ожидаемо)
-                    //console.warn("getValidMoves error:", e);
-                }
-            }
-        }
-        enPassantTarget = oldEP;
-        return moves;
-    }
-
-    // Применение хода на симулированной доске — возвращает новый epTarget
-    function applyPseudoMove(boardState, fromX, fromY, move) {
-        // работает с cloned board
-        const toX = move.x, toY = move.y;
-        const piece = boardState[fromY][fromX];
-        let epTarget = null;
-
-        // handle en passant capture
-        if (move.isEnPassant) {
-            const dir = piece.color === 'white' ? 1 : -1;
-            const capturedY = toY + dir;
-            boardState[capturedY][toX] = null;
-        }
-
-        // handle capture (we simply overwrite)
-        const target = boardState[toY][toX];
-        if (target) {
-            // increment xp on attacker in search world
-            piece.xp = (piece.xp || 0) + 1;
-        }
-
-        // move piece
-        boardState[toY][toX] = Object.assign({}, piece);
-        boardState[fromY][fromX] = null;
-        boardState[toY][toX].hasMoved = true;
-
-        // castling
-        if (move.isCastling) {
-            const rook = boardState[toY][move.rookX];
-            boardState[toY][move.rookToX] = rook;
-            boardState[toY][move.rookX] = null;
-            if (boardState[toY][move.rookToX]) boardState[toY][move.rookToX].hasMoved = true;
-        }
-
-        // double pawn move -> set enPassant target
-        if (move.isDoublePawnMove) {
-            const dir = piece.color === 'white' ? -1 : 1;
-            epTarget = { x: toX, y: toY - dir };
-        } else {
-            epTarget = null;
-        }
-
-        // promotion handling (простое): если пешка дошла до конца, превращаем в ферзя (если есть)
-        const def = PIECE_TYPES[boardState[toY][toX].type];
-        if (def && def.role === 'pawn') {
-            const isWhite = boardState[toY][toX].color === 'white';
-            if ((isWhite && toY === 0) || (!isWhite && toY === 7)) {
-                if (PIECE_TYPES['queen']) boardState[toY][toX].type = 'queen';
-            }
-        }
-        return epTarget;
-    }
-
-    function evaluateBoard(boardState, sideToMove) {
-        let score = 0;
-        let whiteMob = 0, blackMob = 0;
-        for (let y=0;y<8;y++){
-            for (let x=0;x<8;x++){
-                const p = boardState[y][x];
-                if (!p) continue;
-                const type = p.type;
-                const color = p.color;
-                const v = (pieceValues[type] || 400);
-                // const v = (pieceValues[type] || 0);
-                const sq = y*8 + x;
-                let pstVal = 0;
-                if (PST[type]) {
-                    pstVal = (color === 'white' ? PST[type][sq] : PST[type][63 - sq]);
-                }
-                const val = v + pstVal;
-                score += (color === 'white') ? val : -val;
-
-                // mobility approx (cheap): count moves
-                try {
-                    const oldEP = enPassantTarget;
-                    enPassantTarget = null; // quick approx
-                    const mvs = getValidMoves(p, x, y, boardState, true) || [];
-                    enPassantTarget = oldEP;
-                    if (color === 'white') whiteMob += mvs.length;
-                    else blackMob += mvs.length;
-                } catch(e){}
-            }
-        }
-        score += 2 * (whiteMob - blackMob);
-        return (sideToMove === 'white') ? score : -score;
-    }
-
-    // Quiescence search (разрешаем только взятия)
-    function quiescence(alpha, beta, boardState, side, epTarget, tt, depthLimit) {
-        const stand_pat = evaluateBoard(boardState, side);
-        if (stand_pat >= beta) return beta;
-        if (alpha < stand_pat) alpha = stand_pat;
-
-        // generate captures only
-        const moves = generateAllMoves(boardState, side, epTarget).filter(it => {
-            const tgt = boardState[it.move.y][it.move.x];
-            return tgt !== null || it.move.isEnPassant;
-        });
-
-        // order captures by simple MVV-LVA (capture value) using target value
-        moves.sort((a,b) => {
-            const ta = boardState[a.move.y][a.move.x];
-            const tb = boardState[b.move.y][b.move.x];
-            // const va = ta ? (pieceValues[ta.type]||0) : 0;
-            // const vb = tb ? (pieceValues[tb.type]||0) : 0;
-            const va = ta ? (pieceValues[ta.type]||400) : 0;
-            const vb = tb ? (pieceValues[tb.type]||400) : 0;
-            return vb - va;
-        });
-
-        for (const m of moves) {
-            const newBoard = cloneBoard(boardState);
-            const newEP = applyPseudoMove(newBoard, m.fromX, m.fromY, m.move);
-            const oldGlobalEP = enPassantTarget;
-            enPassantTarget = newEP;
-            const score = -quiescence(-beta, -alpha, newBoard, side === 'white' ? 'black' : 'white', newEP, tt, depthLimit-1);
-            enPassantTarget = oldGlobalEP;
-            if (score >= beta) return beta;
-            if (score > alpha) alpha = score;
-        }
-        return alpha;
-    }
-
-    // Альфа-бета с итеративным углублением и ТТ
-    function alphaBeta(boardState, depth, alpha, beta, side, epTarget, tt, ply) {
-        const hash = Zobrist.hashBoard(boardState, epTarget, side);
-        if (tt.has(hash)) {
-            const entry = tt.get(hash);
-            if (entry.depth >= depth) {
-                if (entry.flag === 'EXACT') return entry.value;
-                if (entry.flag === 'LOWER' && entry.value > alpha) alpha = entry.value;
-                if (entry.flag === 'UPPER' && entry.value < beta) beta = entry.value;
-                if (alpha >= beta) return entry.value;
-            }
-        }
-
-        if (depth === 0) {
-            if (AI_CONFIG.useQuiescence) {
-                return quiescence(alpha, beta, boardState, side, epTarget, tt, 6);
-            } else {
-                return evaluateBoard(boardState, side);
-            }
-        }
-
-        let bestValue = -Infinity;
-        let bestMove = null;
-
-        // generate moves
-        let moves = generateAllMoves(boardState, side, epTarget);
-
-        // move ordering heuristics: prefer captures
-        moves.sort((a,b) => {
-            const ta = boardState[a.move.y][a.move.x];
-            const tb = boardState[b.move.y][b.move.x];
-            // const va = ta ? (pieceValues[ta.type]||0) : 0;
-            // const vb = tb ? (pieceValues[tb.type]||0) : 0;
-            const va = ta ? (pieceValues[ta.type]||400) : 0;
-            const vb = tb ? (pieceValues[tb.type]||400) : 0;
-            return (vb - va);
-        });
-
-        if (moves.length === 0) {
-            // no moves -> evaluate (checkmate/stalemate handling not detailed)
-            return evaluateBoard(boardState, side);
-        }
-
-        for (const m of moves) {
-            const newBoard = cloneBoard(boardState);
-            const newEP = applyPseudoMove(newBoard, m.fromX, m.fromY, m.move);
-
-            const oldGlobalEP = enPassantTarget;
-            enPassantTarget = newEP;
-            const score = -alphaBeta(newBoard, depth-1, -beta, -alpha, side === 'white' ? 'black' : 'white', newEP, tt, ply+1);
-            enPassantTarget = oldGlobalEP;
-
-            if (score > bestValue) {
-                bestValue = score;
-                bestMove = m;
-            }
-            if (bestValue > alpha) alpha = bestValue;
-            if (alpha >= beta) break;
-        }
-
-        // store in TT
-        let flag = 'EXACT';
-        if (bestValue <= alpha) flag = 'UPPER';
-        else if (bestValue >= beta) flag = 'LOWER';
-        tt.set(hash, { value: bestValue, depth: depth, flag: flag, bestMove: bestMove });
-
-        return bestValue;
-    }
-
-    // Основная функция итеративного углубления, возвращает лучший ход {fromX,fromY,move}
-    function findBestMove(rootBoard, side, timeLimitMs) {
-        Zobrist.init();
-        const start = performance.now();
-        const tt = new Map();
-        let best = null;
-        let bestScore = -Infinity;
-        let depth = 1;
-        const maxDepth = AI_CONFIG.maxDepthHardCap;
-
-        let epTargetRoot = enPassantTarget; // текущее глобальное
-
-        while (true) {
-            if (depth > maxDepth) break;
-            const now = performance.now();
-            if (now - start > timeLimitMs) break;
-
-            // iterative deepening
-            try {
-                const clonedBoard = cloneBoard(rootBoard);
-                const score = alphaBeta(clonedBoard, depth, -Infinity, Infinity, side, epTargetRoot, tt, 0);
-                // extract best move from TT if available
-                const rootHash = Zobrist.hashBoard(rootBoard, epTargetRoot, side);
-                let bestFromTT = null;
-                if (tt.has(rootHash) && tt.get(rootHash).bestMove) {
-                    bestFromTT = tt.get(rootHash).bestMove;
-                    best = bestFromTT;
-                    bestScore = tt.get(rootHash).value;
-                }
-            } catch(e) {
-                console.error("search error", e);
-            }
-
-            depth++;
-            if (performance.now() - start > timeLimitMs) break;
-        }
-
-        return { move: best, score: bestScore };
-    }
-
-    // AI loop & UI integration
-    // aiSide теперь глобальная переменная
-    let autoPlay = false;
-    let thinking = false;
-
-    function aiPlayOneMove() {
-        if (gameOver) return;
-        if (!aiSide) return;
-        if (currentTurn !== aiSide) return;
-        if (thinking) return;
-        thinking = true;
-        log(t('ai_thinking', { side: aiSide }));
-        // snapshot board
-        const rootBoard = cloneBoard(board);
-        const timeLimit = AI_CONFIG.timePerMoveMs;
-
-        setTimeout(() => {
-            try {
-                const res = findBestMove(rootBoard, aiSide, timeLimit);
-                if (!res.move) {
-                    log(t('ai_no_move'));
-                    thinking = false;
-                    return;
-                }
-                // Выполнить ход на реальной доске через makeMove
-                makeMove(res.move.fromX, res.move.fromY, res.move.move);
-            } catch (e) {
-                console.error("AI move failed", e);
-            } finally {
-                thinking = false;
-                if (autoPlay && !gameOver) {
-                    // если после хода ход переходит к ИИ сопернику, то запустить следующий
-                    setTimeout(aiPlayOneMove, 200);
-                }
-            }
-        }, 30); // небольшая задержка для UI
-    }
-
-    // UI: добавить контролы в сайдбар (если есть)
-    function setupUIControls() {
-        const sideBar = document.querySelector('.sidebar');
-        if (!sideBar) return;
-        const panel = document.createElement('div');
-        panel.className = 'panel';
-        // panel.style.display = 'flex';
-        panel.style.flexDirection = 'column';
-        panel.style.gap = '8px';
-
-        // buttons
-        const btnWhite = document.createElement('button');
-        btnWhite.className = 'ai-btn-white';
-        btnWhite.textContent = t('vs_ai_white');
-        btnWhite.onclick = () => { aiSide = 'black'; autoPlay = false; log("Player plays white. AI — black."); setTimeout(aiPlayOneMove, 10); };
-        const btnBlack = document.createElement('button');
-        btnBlack.className = 'ai-btn-black';
-        btnBlack.textContent = t('vs_ai_black');
-        btnBlack.onclick = () => { aiSide = 'white'; autoPlay = false; log("Player plays black. AI — white."); setTimeout(aiPlayOneMove, 10); };
-        const btnAuto = document.createElement('button');
-        btnAuto.textContent = 'ИИ vs ИИ (Auto)';
-        btnAuto.onclick = () => { autoPlay = !autoPlay; aiSide = 'black'; log("AI vs AI: " + (autoPlay ? "enabled" : "disabled")); if (autoPlay) setTimeout(aiPlayOneMove, 50); };
-        const selMode = document.createElement('select');
-        const optClassic = document.createElement('option'); optClassic.value='classic'; optClassic.textContent='Classic subset (fast)';
-        const optFull = document.createElement('option'); optFull.value='full'; optFull.textContent='Full (slow, all pieces)';
-        selMode.appendChild(optClassic); selMode.appendChild(optFull);
-        selMode.value = AI_CONFIG.mode;
-        selMode.onchange = () => { AI_CONFIG.mode = selMode.value; log(`AI mode: ${AI_CONFIG.mode}`); };
-
-        const inputTime = document.createElement('input');
-        inputTime.type = 'number';
-        inputTime.value = AI_CONFIG.timePerMoveMs;
-        inputTime.min = 100;
-        inputTime.step = 100;
-        inputTime.title = "ms per move";
-        inputTime.onchange = () => { AI_CONFIG.timePerMoveMs = Math.max(100, Number(inputTime.value)); log(`AI time per move: ${AI_CONFIG.timePerMoveMs}ms`); };
-
-        sideBar.appendChild(btnWhite);
-        sideBar.appendChild(btnBlack);
-        // panel.appendChild(btnAuto);
-        // panel.appendChild(document.createTextNode('Режим поиска:'));
-        // panel.appendChild(selMode);
-        // panel.appendChild(document.createTextNode('Время на ход (ms):'));
-        // panel.appendChild(inputTime);
-
-        // sideBar.appendChild(panel);
-    }
-
-    // Hook: запуск ИИ когда приходит его ход (наблюдение за currentTurn)
-    // Будем проверять через setInterval, это простой способ без глубокого вмешательства.
-    function attachAutoWatcher(){
-        setInterval(() => {
-            if (gameOver) return;
-            if (!aiSide) return;
-            if (isViewingHistory) return; // Не делать ходы во время просмотра истории
-
-            // Блокировка ИИ после возврата из режима просмотра истории до тех пор,
-            // пока ход не сменится (игрок сделает ход)
-            if (aiBlockedAfterHistoryReturn && currentTurn === turnBeforeHistoryReturn) {
-                return;
-            }  
-
-            if (currentTurn === aiSide && !thinking) {
-                aiPlayOneMove();
-                // Снимаем блокировку после того, как ИИ сделал ход
-                aiBlockedAfterHistoryReturn = false;
-                turnBeforeHistoryReturn = null;
-            }
-        }, 300);
-    }
-
-    // Инициализация
-    Zobrist.init();
-    setupUIControls();
-    attachAutoWatcher();
-
-    // Экспорт в window для отладки
-    window.EVOLVE_AI = {
-        findBestMove, aiPlayOneMove, setAIConfig: (cfg)=>Object.assign(AI_CONFIG, cfg), getConfig: ()=>AI_CONFIG
-    };
-
-    log(t('ai_loaded'));
-})();
+// AI search was moved to modules/ai.js. We'll initialize a search instance below after
+// helper wrappers are declared (so they can be passed to the AI factory).
 
 // Initialize language from localStorage or default to English
 const savedLanguage = localStorage.getItem('evolution-chess-language');
@@ -2550,6 +1393,81 @@ if (savedLanguage && translations[savedLanguage]) {
 } else {
     currentLanguage = 'en'; // Default to English
 }
+
+// Helper used by AI: call the existing getValidMoves while temporarily setting enPassantTarget
+function getValidMovesWithEP(piece, startX, startY, checkBoard, epTarget = null, ignoreCastling = false) {
+    // Delegate to GAME and pass the provided en-passant target explicitly.
+    return GAME.getValidMoves(piece, startX, startY, checkBoard, epTarget, ignoreCastling);
+}
+
+// Initialize AI search module (search engine is decoupled into modules/ai.js)
+const AI_ENGINE = createAI({ getValidMovesWithEP, PIECE_TYPES, pieceValues, PST });
+
+// Minimal UI glue for AI (keeps original behavior): controls, watcher and single-move executor
+let autoPlay = false;
+let thinking = false;
+
+function aiPlayOneMove() {
+    if (gameOver) return;
+    if (!aiSide) return;
+    if (currentTurn !== aiSide) return;
+    if (thinking) return;
+    thinking = true;
+    log(t('ai_thinking', { side: aiSide }));
+
+    const rootBoard = JSON.parse(JSON.stringify(board));
+    const timeLimit = AI_ENGINE.getConfig().timePerMoveMs;
+
+    setTimeout(() => {
+        try {
+            const res = AI_ENGINE.findBestMove(rootBoard, aiSide, timeLimit);
+            if (!res.move) {
+                log(t('ai_no_move'));
+                thinking = false;
+                return;
+            }
+            makeMove(res.move.fromX, res.move.fromY, res.move.move);
+        } catch (e) {
+            console.error('AI move failed', e);
+        } finally {
+            thinking = false;
+            if (autoPlay && !gameOver) setTimeout(aiPlayOneMove, 200);
+        }
+    }, 30);
+}
+
+function setupUIControls() {
+    const sideBar = document.querySelector('.sidebar');
+    if (!sideBar) return;
+    const btnWhite = document.createElement('button');
+    btnWhite.className = 'ai-btn-white';
+    btnWhite.textContent = t('vs_ai_white');
+    btnWhite.onclick = () => { aiSide = 'black'; autoPlay = false; log('Player plays white. AI — black.'); setTimeout(aiPlayOneMove, 10); };
+    const btnBlack = document.createElement('button');
+    btnBlack.className = 'ai-btn-black';
+    btnBlack.textContent = t('vs_ai_black');
+    btnBlack.onclick = () => { aiSide = 'white'; autoPlay = false; log('Player plays black. AI — white.'); setTimeout(aiPlayOneMove, 10); };
+    sideBar.appendChild(btnWhite);
+    sideBar.appendChild(btnBlack);
+}
+
+function attachAutoWatcher(){
+    setInterval(() => {
+        if (gameOver) return;
+        if (!aiSide) return;
+        if (isViewingHistory) return;
+        if (aiBlockedAfterHistoryReturn && currentTurn === turnBeforeHistoryReturn) return;
+        if (currentTurn === aiSide && !thinking) {
+            aiPlayOneMove();
+            aiBlockedAfterHistoryReturn = false;
+            turnBeforeHistoryReturn = null;
+        }
+    }, 300);
+}
+
+// Setup AI UI and watcher
+setupUIControls();
+attachAutoWatcher();
 
 // Arrow drawing functions
 function drawArrow(fromX, fromY, toX, toY, lineWidth = 3, arrowHeadSize = 10) {
