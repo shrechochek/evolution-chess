@@ -5,7 +5,7 @@
 
 > [!IMPORTANT]
 >  🌍 **Languages**  
->  🇺🇸(en)  |  [🇷🇺(ru)](../resources/READMEs/ru/README.md)  |  [🇺🇦(ua)](../resources/READMEs/ua/README.md)| [🇨🇳(zh)](../resources/READMEs/zh/README.md)
+>  🇺🇸(en)  |  [🇷🇺(ru)](resources/READMEs/ru/README.md)  |  [🇺🇦(ua)](../resources/READMEs/ua/README.md)| [🇨🇳(zh)](../resources/READMEs/zh/README.md)
 
 ---
 
