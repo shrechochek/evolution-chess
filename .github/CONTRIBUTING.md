@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 >  🌍 **Languages**  
->  🇺🇸(en)  |  [🇷🇺(ru)](../resources/READMEs/ru/CONTRIBUTING.md)  |  [🇺🇦(ua)](../resources/READMEs/ua/CONTRIBUTING.md)| [🇨🇳(zh)](../resources/READMEs/zh/CONTRIBUTING.md)
+>  🇺🇸(en)  |  [🇷🇺(ru)](resources/READMEs/ru/CONTRIBUTING.md)  |  [🇺🇦(ua)](resources/READMEs/ua/CONTRIBUTING.md)| [🇨🇳(zh)](resources/READMEs/zh/CONTRIBUTING.md)
 
 ## 🤝 What can you do to help project?
 - find and fix bugs

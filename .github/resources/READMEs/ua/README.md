@@ -5,7 +5,7 @@
 
 > [!IMPORTANT]
 > 🌍 **Мови**  
-> [🇺🇸(en)](../../../.github/README.md) | [🇷🇺(ru)](../ru/README.md) | 🇺🇦(ua) | [🇨🇳(zh)](../zh/README.md)
+> [🇺🇸(en)](../../../README.md) | [🇷🇺(ru)](../ru/README.md) | 🇺🇦(ua) | [🇨🇳(zh)](../zh/README.md)
 
 > [!NOTE]
 > ⚠️ **Машинний переклад**  

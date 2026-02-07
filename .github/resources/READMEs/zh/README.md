@@ -5,7 +5,7 @@
 
 > [!IMPORTANT]
 > 🌍 **语言**  
-> [🇺🇸(en)](../../../.github/README.md) | [🇷🇺(ru)](../ru/README.md) | [🇺🇦(ua)](../ua/README.md) | 🇨🇳(zh)
+> [🇺🇸(en)](../../../README.md) | [🇷🇺(ru)](../ru/README.md) | [🇺🇦(ua)](../ua/README.md) | 🇨🇳(zh)
 
 > [!NOTE]
 > ⚠️ **机器翻译**  

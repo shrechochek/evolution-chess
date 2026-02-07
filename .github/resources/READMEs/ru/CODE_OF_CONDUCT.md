@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 >  🌍 **Languages**  
->  [🇺🇸(en)](../../../.github/CODE_OF_CONDUCT.md)  |  🇷🇺(ru) |  [🇺🇦(ua)](../ua/CODE_OF_CONDUCT.md)| [🇨🇳(zh)](../zh/CODE_OF_CONDUCT.md)
+>  [🇺🇸(en)](../../../CODE_OF_CONDUCT.md)  |  🇷🇺(ru) |  [🇺🇦(ua)](../ua/CODE_OF_CONDUCT.md)| [🇨🇳(zh)](../zh/CODE_OF_CONDUCT.md)
 
 ## Наше обязательство
 
