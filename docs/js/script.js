@@ -969,12 +969,15 @@ function updateGameStatus() {
     if (white_kings === 0 && black_kings === 0) {
         alert(t('draw kings destroyed!'));
         alertGameOver = true;
+        gameOver = true;
     } else if (white_kings === 0) {
         alert(t('black wins!'));
         alertGameOver = true;
+        gameOver = true;
     } else if (black_kings === 0) {
         alert(t('white wins!'));
         alertGameOver = true;
+        gameOver = true;
     }
 
     // alert("END!!!")
@@ -1769,15 +1772,6 @@ function renderBoard() {
     }
 }
 
-// function test_btn() {
-//     selectedCell = null;
-//     gameOver = false;
-//     possibleMoves = [];
-//     markedSquares.clear();
-//     clearArrows();
-//     renderBoard();
-// }
-
 // Update arrow overlay size and position when window changes
 function updateArrowOverlay() {
     if (!arrowsSvg) return;
@@ -2547,13 +2541,6 @@ function log(msg) {
 
         sideBar.appendChild(btnWhite);
         sideBar.appendChild(btnBlack);
-        // panel.appendChild(btnAuto);
-        // panel.appendChild(document.createTextNode('Режим поиска:'));
-        // panel.appendChild(selMode);
-        // panel.appendChild(document.createTextNode('Время на ход (ms):'));
-        // panel.appendChild(inputTime);
-
-        // sideBar.appendChild(panel);
     }
 
     // Hook: запуск ИИ когда приходит его ход (наблюдение за currentTurn)
@@ -2561,6 +2548,7 @@ function log(msg) {
     function attachAutoWatcher(){
         setInterval(() => {
             if (gameOver) return;
+            if (alertGameOver) return;
             if (!aiSide) return;
             if (isViewingHistory) return; // Не делать ходы во время просмотра истории
 
