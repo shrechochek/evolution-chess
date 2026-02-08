@@ -700,11 +700,6 @@ function generateMoveNotation(piece, fromX, fromY, move) {
         return notation;
     }
 
-    // Piece symbol (only for non-pawns)
-    if (PIECE_TYPES[piece.type].role !== 'pawn') {
-        notation = PIECE_TYPES[piece.type].symbol.toUpperCase();
-    }
-
     // Capture
     if (move.isCapture) {
         if (PIECE_TYPES[piece.type].role === 'pawn') {
@@ -731,13 +726,32 @@ function addMoveToNotationHistory(piece, fromX, fromY, move) {
     const notation = generateMoveNotation(piece, fromX, fromY, move);
     const isWhite = piece.color === 'white';
 
+    // Сохраняем КОПИЮ данных фигуры, а не ссылку на объект
     moveNotationHistory.push({
         notation: notation,
         historyIndex: gameHistory.length - 1,
-        isWhite: isWhite
+        isWhite: isWhite,
+        pieceType: piece.type, // Сохраняем тип фигуры в момент хода
+        pieceColor: piece.color,
+        fromX: fromX,
+        fromY: fromY,
+        move: move
     });
 
     updateMoveHistoryDisplay();
+}
+
+// Update last move notation after evolution
+function updateLastMoveNotation(newPieceType) {
+    if (moveNotationHistory.length > 0) {
+        const lastMove = moveNotationHistory[moveNotationHistory.length - 1];
+        // Обновляем тип фигуры только для последнего хода
+        lastMove.pieceType = newPieceType;
+        // Перегенерируем нотацию с новым типом фигуры
+        const tempPiece = { type: newPieceType, color: lastMove.pieceColor };
+        lastMove.notation = generateMoveNotation(tempPiece, lastMove.fromX, lastMove.fromY, lastMove.move);
+        updateMoveHistoryDisplay();
+    }
 }
 
 // Update move history display
@@ -794,7 +808,18 @@ function updateMoveHistoryDisplay() {
         const whiteMove = moveNotationHistory[i];
         const whiteSpan = document.createElement('span');
         whiteSpan.className = 'move-white' + (whiteMove.historyIndex === currentHistoryIndex ? ' current' : '');
-        whiteSpan.textContent = whiteMove.notation;
+        
+        // Добавляем название фигуры, если это не рокировка
+        if (whiteMove.pieceType && !whiteMove.move.isCastling) {
+            const pieceName = document.createElement('span');
+            pieceName.style.fontWeight = 'bold';
+            pieceName.style.marginRight = '4px';
+            pieceName.textContent = getPieceDisplayName(whiteMove.pieceType);
+            whiteSpan.appendChild(pieceName);
+        }
+        
+        const whiteText = document.createTextNode(whiteMove.notation);
+        whiteSpan.appendChild(whiteText);
         whiteSpan.onclick = () => goToMove(whiteMove.historyIndex);
         moveRow.appendChild(whiteSpan);
 
@@ -803,7 +828,18 @@ function updateMoveHistoryDisplay() {
         const blackSpan = document.createElement('span');
         if (blackMove) {
             blackSpan.className = 'move-black' + (blackMove.historyIndex === currentHistoryIndex ? ' current' : '');
-            blackSpan.textContent = blackMove.notation;
+            
+            // Добавляем название фигуры, если это не рокировка
+            if (blackMove.pieceType && !blackMove.move.isCastling) {
+                const pieceName = document.createElement('span');
+                pieceName.style.fontWeight = 'bold';
+                pieceName.style.marginRight = '4px';
+                pieceName.textContent = getPieceDisplayName(blackMove.pieceType);
+                blackSpan.appendChild(pieceName);
+            }
+            
+            const blackText = document.createTextNode(blackMove.notation);
+            blackSpan.appendChild(blackText);
             blackSpan.onclick = () => goToMove(blackMove.historyIndex);
         } else {
             blackSpan.className = 'move-black move-empty';
@@ -1327,10 +1363,13 @@ function makeMove(fromX, fromY, move) {
                 return;
             } else {
                 // Автоматическая эволюция для ИИ - превращаем в ферзя
-                piece.type = 'queen';
+                const newType = 'queen';
+                piece.type = newType;
                 piece.xp = 0;
                 pawnPromoted = true; // Устанавливаем флаг
-                log(`🤖 AI pawn promoted to ${getPieceDisplayName('queen')}`);
+                log(`🤖 AI pawn promoted to ${getPieceDisplayName(newType)}`);
+                // Обновляем нотацию хода с новым типом фигуры
+                updateLastMoveNotation(newType);
                 // Важно: завершаем ход после превращения
                 endTurn();
                 return;
@@ -1372,6 +1411,8 @@ function makeMove(fromX, fromY, move) {
                 piece.type = newType;
                 piece.xp = 0;
                 log(`🧬 AI evolution completed: ${getPieceDisplayName(newType)}`);
+                // Обновляем нотацию хода с новым типом фигуры
+                updateLastMoveNotation(newType);
                 updateGameStatus();
             }
         } else {
@@ -1521,6 +1562,8 @@ function showEvolutionModal(piece) {
         piece.type = newType;
         piece.xp = 0;
         log(t('evolution_complete'));
+        // Обновляем нотацию хода с новым типом фигуры
+        updateLastMoveNotation(newType);
         // Проверяем статус игры после эволюции (вдруг число королей изменилось)
         updateGameStatus();
         endTurn();
@@ -1536,6 +1579,8 @@ function showPromotionModal(piece) {
         piece.xp = 0;
         piece.hasMoved = true;
         log(t('promotion', { piece: getPieceDisplayName(newType) }));
+        // Обновляем нотацию хода с новым типом фигуры
+        updateLastMoveNotation(newType);
         updateGameStatus();
         endTurn();
     });
