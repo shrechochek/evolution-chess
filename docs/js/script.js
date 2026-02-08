@@ -1416,10 +1416,14 @@ function makeMove(fromX, fromY, move) {
                 updateGameStatus();
             }
         } else {
-            // Показываем модальное окно для игрока
+            // Показываем модальное окnно для игрока
             showEvolutionModal(piece);
             return;
         }
+    }
+
+    if (explosion) {
+        board[toY][toX] = null;
     }
 
     endTurn();
