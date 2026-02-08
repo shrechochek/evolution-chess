@@ -135,7 +135,7 @@ function updatePositionEditorTranslations() {
                 btn.textContent = '📂 ' + t('load_position');
                 break;
             case 'apply':
-                btn.textContent = '✓ ' + t('apply_to_game');
+                btn.textContent = '✅ ' + t('apply_to_game');
                 break;
             case 'cancel':
                 btn.textContent = t('cancel', 'Cancel');
